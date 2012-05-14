@@ -1,0 +1,24 @@
+{
+  "name"            : "argparse-js",
+  "description"     : "Cli options parser",
+  "version"         : "0.0.1",
+  "keywords"        : ["cli", "parser", "argparse", "options", "args"],
+  "homepage"        : "https://github.com/nodeca/argparse-js",
+
+  "author"          : "Eugene Shkuropat <e.shkuropat@gmail.com>",
+
+  "bugs"            : { "url": "https://github.com/nodeca/argparse-js/issues" },
+  "license"         : { "type": "MIT", "url": "https://github.com/nodeca/argparse-js/blob/master/LICENSE" },
+  "repository"      : { "type": "git", "url": "git://github.com/nodeca/argparse-js.git" },
+
+  "main"            : "./index.js",
+
+  "dependencies"    : {
+                        "underscore"        : "1.3.1",
+                        "underscore.string" : "2.1.1"
+                      },
+  "devDependencies" : {
+                        "vows": "~ 0.6.0"
+                      },
+  "engines"         : { "node": ">= 0.6.0" }
+}
