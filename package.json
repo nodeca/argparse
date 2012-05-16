@@ -3,7 +3,7 @@
   "description"     : "Cli options parser",
   "version"         : "0.1.0",
   "keywords"        : ["cli", "parser", "argparse", "options", "args"],
-  "homepage"        : "https://github.com/nodeca/argparse-js",
+  "homepage"        : "https://github.com/nodeca/argparse",
 
   "author"          : "Eugene Shkuropat <e.shkuropat@gmail.com>",
 
@@ -16,8 +16,6 @@
   "dependencies"    : {
                         "underscore"        : "1.3.1",
                         "underscore.string" : "2.1.1"
-                      },
-  "devDependencies" : {
                       },
   "engines"         : { "node": ">= 0.6.0" }
 }
