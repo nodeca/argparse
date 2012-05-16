@@ -8,7 +8,7 @@ Example
 
 example.js:
 
-````javascript
+```javascript
 #!/usr/bin/env node
 'use strict';
 
@@ -32,11 +32,11 @@ parser.addArgument(
 );
 var args = parser.parseArgs('-f 1 -b2'.split(' '));
 console.dir(args);
-````
+```
 
 Help
 
-````
+```
 $ ./example.js -h
 usage: example.js [-h] [-v] [-f FOO] [-b BAR]
 
@@ -48,24 +48,24 @@ Optional arguments:
   -f FOO, --foo FOO  foo bar
   -b BAR, --bar BAR  bar foo
 
-````
+```
 
 Parse string
 
-````
+```
 $ ./example.js -f=3 --bar=4
 { foo: '3', bar: '4' }
 
-````
+```
 
 Additional [examples][examples]
 
 ArgumentParser objects
 ======================
 
-````
+```
 new ArgumentParser({paramters hash});
-````
+```
 Create a new ArgumentParser object. Short parameters description they are:
 
 ```description``` - Text to display before the argument help.
@@ -161,7 +161,7 @@ Many programs split up their functionality into a number of sub-commands, for ex
 Some example usage:
 
 sub_commands.js
-````javascript
+```javascript
 #!/usr/bin/env node
 'use strict';
 
@@ -198,7 +198,7 @@ bar.addArgument(
   }
 );
 
-````
+```
 
 Details in [original guide][subcommands]
 
