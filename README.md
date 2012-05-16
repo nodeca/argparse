@@ -1,22 +1,7 @@
 argparse
 ========
 
-CLI arguments parser for node.js. JS port of python's [argparse][main] module.
-
-Installation
-============
-
-Stable via [npm](http://github.com/isaacs/npm):
-
-````$ npm install node-argparse````
- 
-Dev version from github:
-````
-$ git clone https://github.com/nodeca/argparse.git
-$ cd argparse
-$ npm install
-````
-
+CLI arguments parser for node.js. JS port of python's [argparse][main] module version 3.2 .
 
 Example
 =======
@@ -73,6 +58,8 @@ $ ./example.js -f=3 --bar=4
 
 ````
 
+Additional [examples][examples]
+
 ArgumentParser objects
 ======================
 
@@ -99,8 +86,7 @@ Create a new ArgumentParser object. Short parameters description they are:
 
 ```usage``` - The string describing the program usage (default: generated)
 
-Not supportied yet
------------------
+**Not supportied yet**
 
 ```fromfilePrefixChars``` - The set of characters that prefix files from which additional arguments should be read.
 
@@ -169,6 +155,7 @@ Sub-commands
 ============
 
 ArgumentParser.addSubparsers()
+
 Many programs split up their functionality into a number of sub-commands, for example, the svn program can invoke sub-commands like svn checkout, svn update, and svn commit. Splitting up functionality this way can be a particularly good idea when a program performs several different functions which require different kinds of command-line arguments. ArgumentParser supports the creation of such sub-commands with the addSubparsers() method. The addSubparsers() method is normally called with no arguments and returns an special action object. This object has a single method, addParser(), which takes a command name and any ArgumentParser constructor arguments, and returns an ArgumentParser object that can be modified as usual.
 
 Some example usage:
@@ -216,24 +203,6 @@ bar.addArgument(
 Details in [original guide][subcommands]
 
 
-Contributing
-============
-
-The argparse source code is [hosted on GitHub][repo]. You can check out a
-copy of the latest code using Git:
-
-    $ git clone https://shkuropat@github.com/nodeca/argparse.git
-
-If you've found a bug or have a question, please open an issue on the
-[argparse issue tracker][issues]. Or, clone the argparse repository, fix the bug and
-submit a pull request.
-
-Credits
-=======
-
-Great thanks to Antoine Pitrou for the argparse, best command line parser.
-
-
 Author
 ======
 
@@ -250,6 +219,7 @@ Released under the MIT license. See [LICENSE][license] for details.
 
 
 [main]:http://docs.python.org/dev/library/argparse.html
+[examples]:https://github.com/nodeca/argparse/tree/master/examples
 [parser]:http://docs.python.org/dev/library/argparse.html#argumentparser-objects
 [add_argument]:http://docs.python.org/dev/library/argparse.html#the-add-argument-method
 [action]:http://docs.python.org/dev/library/argparse.html#action
