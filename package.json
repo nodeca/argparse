@@ -7,9 +7,9 @@
 
   "author"          : "Eugene Shkuropat <e.shkuropat@gmail.com>",
 
-  "bugs"            : { "url": "https://github.com/nodeca/argparse-js/issues" },
-  "license"         : { "type": "MIT", "url": "https://github.com/nodeca/argparse-js/blob/master/LICENSE" },
-  "repository"      : { "type": "git", "url": "git://github.com/nodeca/argparse-js.git" },
+  "bugs"            : { "url": "https://github.com/nodeca/argparse/issues" },
+  "license"         : { "type": "MIT", "url": "https://github.com/nodeca/argparse/blob/master/LICENSE" },
+  "repository"      : { "type": "git", "url": "git://github.com/nodeca/argparse.git" },
 
   "main"            : "./index.js",
 
