@@ -13,7 +13,7 @@ var subparsers = parser.addSubparsers({
   dest:"subcommand_name"
 });
 
-var bar = subparsers.addParser('c1', {addHelp:true});
+var bar = subparsers.addParser('c1', {addHelp:true, help:'c1 help'});
 bar.addArgument(
   [ '-f', '--foo' ],
   {
@@ -23,7 +23,7 @@ bar.addArgument(
 );
 var bar = subparsers.addParser(
   'c2',
-  {aliases:['co'], addHelp:true}
+  {aliases:['co'], addHelp:true, help:'c2 help'}
 );
 bar.addArgument(
   [ '-b', '--bar' ],
