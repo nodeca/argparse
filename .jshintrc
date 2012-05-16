@@ -1,13 +1,13 @@
 {
   // Enforcing Options /////////////////////////////////////////////////////////
 
-  "bitwise"       : false,  // Prohibit bitwise operators (&, |, ^, etc.).
+  "bitwise"       : true,   // Prohibit bitwise operators (&, |, ^, etc.).
   "curly"         : true,   // Require {} for every new block or scope.
   "eqeqeq"        : true,   // Require triple equals i.e. `===`.
   "forin"         : false,  // Tolerate `for in` loops without `hasOwnPrototype`.
   "immed"         : true,   // Require immediate invocations to be wrapped in parens e.g. `( function(){}() );`
   "latedef"       : true,   // Prohibit hariable use before definition.
-  "newcap"        : false,  // Require capitalization of all constructor functions e.g. `new F()`.
+  "newcap"        : true,   // Require capitalization of all constructor functions e.g. `new F()`.
   "noarg"         : true,   // Prohibit use of `arguments.caller` and `arguments.callee`.
   "noempty"       : true,   // Prohibit use of empty blocks.
   "nonew"         : true,   // Prohibit use of constructors for side-effects.
@@ -31,7 +31,8 @@
   "globalstrict"  : true,   // Allow global "use strict" (also enables 'strict').
   "iterator"      : false,  // Allow usage of __iterator__ property.
   "lastsemic"     : false,  // Tolerate semicolon omited for the last statement.
-  "laxbreak"      : true,   // Tolerate unsafe line breaks e.g. `return [\n] x` without semicolons.
+  "laxbreak"      : false,  // Tolerate unsafe line breaks e.g. `return [\n] x` without semicolons.
+  "laxcomma"      : true,   // This option suppresses warnings about comma-first coding style
   "loopfunc"      : false,  // Allow functions to be defined within loops.
   "multistr"      : false,  // Tolerate multi-line strings.
   "onecase"       : false,  // Tolerate swithes with only one case.
