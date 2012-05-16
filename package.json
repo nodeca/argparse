@@ -1,7 +1,7 @@
 {
-  "name"            : "node-argparse",
+  "name"            : "argparse",
   "description"     : "Cli options parser",
-  "version"         : "0.0.1",
+  "version"         : "0.1.0",
   "keywords"        : ["cli", "parser", "argparse", "options", "args"],
   "homepage"        : "https://github.com/nodeca/argparse-js",
 
