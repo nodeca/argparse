@@ -34,12 +34,7 @@ lint:
 
 
 test: lint
-	@if test ! `which vows` ; then \
-		echo "You need 'vows' installed in order to run tests." >&2 ; \
-		echo "  $ make dev-deps" >&2 ; \
-		exit 128 ; \
-		fi
-	NODE_ENV=test vows --spec
+
 
 
 doc:
