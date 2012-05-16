@@ -1,5 +1,5 @@
 {
-  "name"            : "argparse-js",
+  "name"            : "node-argparse",
   "description"     : "Cli options parser",
   "version"         : "0.0.1",
   "keywords"        : ["cli", "parser", "argparse", "options", "args"],
