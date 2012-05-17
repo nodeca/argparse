@@ -36,7 +36,7 @@ parser.addArgument(
     help: 'bar foo'
   }
 );
-var args = parser.parseArgs('-f 1 -b2'.split(' '));
+var args = parser.parseArgs();
 console.dir(args);
 ```
 
@@ -209,6 +209,9 @@ bar.addArgument(
     help: 'foo3 bar3'
   }
 );
+
+var args = parser.parseArgs();
+console.dir(args);
 
 ```
 
