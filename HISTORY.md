@@ -1,3 +1,12 @@
+0.1.2 / ???
+------------------
+
+* Added some test
+* Added debug mode
+* Help formatter minor fix
+* Fixed empty adguments error(parser with sub-commands)
+
+
 0.1.1 / 2012-05-23
 ------------------
 
