@@ -1,10 +1,10 @@
-0.1.2 / ???
+0.1.2 / 2012-05-29
 ------------------
 
-* Added some test
-* Added debug mode
-* Help formatter minor fix
-* Fixed empty adguments error(parser with sub-commands)
+* Added basic tests
+* Removed excess whitespace in help
+* Fixed error reporting, when parcer with subcommands
+  called with empty arguments
 
 
 0.1.1 / 2012-05-23
