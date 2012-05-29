@@ -34,13 +34,18 @@ lint:
 
 
 test: lint
-
+	@if test ! `which mocha` ; then \
+		echo "You need 'mocha' installed in order to run tests." >&2 ; \
+		echo "  $ make dev-deps" >&2 ; \
+		exit 128 ; \
+		fi
+	NODE_ENV=test mocha
 
 
 doc:
 	@if test ! `which ndoc` ; then \
 		echo "You need 'ndoc' installed in order to generate docs." >&2 ; \
-		echo "  $ npm install -g ndoc" >&2 ; \
+		echo "  $ make dev-deps" >&2 ; \
 		exit 128 ; \
 		fi
 	rm -rf ./doc
@@ -53,8 +58,9 @@ dev-deps:
 		echo "  See: http://npmjs.org/" >&2 ; \
 		exit 128 ; \
 		fi
-	npm install jshint -g
-	npm install --dev
+	which jshint > /dev/null || npm install jshint
+	which ndoc > /dev/null || npm install ndoc
+	npm install
 
 
 gh-pages:
