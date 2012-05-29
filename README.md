@@ -1,6 +1,8 @@
 argparse
 ========
 
+[![Build Status](https://secure.travis-ci.org/nodeca/argparse.png?branch=master)](http://travis-ci.org/nodeca/argparse)
+
 CLI arguments parser for node.js. Javascript port of python's
 [argparse](http://docs.python.org/dev/library/argparse.html) module
 (original version 3.2). That's a full port, except some very rare options,
