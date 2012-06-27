@@ -1,4 +1,4 @@
-0.1.3 / ???
+0.1.3 / 2012-06-27
 ------------------
 
 * Fixed formatter api name: Formatter -> HelpFormatter
