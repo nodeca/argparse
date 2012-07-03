@@ -45,7 +45,7 @@ test: lint
 doc:
 	@if test ! `which ndoc` ; then \
 		echo "You need 'ndoc' installed in order to generate docs." >&2 ; \
-		echo "  $ npm install ndoc" >&2 ; \
+		echo "  $ npm install ndoc -g" >&2 ; \
 		exit 128 ; \
 		fi
 	rm -rf ./doc
@@ -58,7 +58,7 @@ dev-deps:
 		echo "  See: http://npmjs.org/" >&2 ; \
 		exit 128 ; \
 		fi
-	which jshint > /dev/null || npm install jshint
+	which jshint > /dev/null || npm install jshint -g
 	npm install
 
 
