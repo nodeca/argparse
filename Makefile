@@ -10,7 +10,6 @@ REMOTE_REPO ?= $(shell git config --get remote.${REMOTE_NAME}.url)
 
 CURR_HEAD   := $(firstword $(shell git show-ref --hash HEAD | cut --bytes=-6) master)
 GITHUB_PROJ := nodeca/${NPM_PACKAGE}
-SRC_URL_FMT := https://github.com/${GITHUB_PROJ}/blob/${CURR_HEAD}/{file}\#L{line}
 
 
 help:
@@ -49,7 +48,9 @@ doc:
 		exit 128 ; \
 		fi
 	rm -rf ./doc
-	ndoc --output ./doc --linkFormat "${SRC_URL_FMT}" ./lib
+	ndoc lib \
+		--link-format "{package.homepage}/blob/${CURR_HEAD}/{file}#L{line}" \
+		--show-all
 
 
 dev-deps:
