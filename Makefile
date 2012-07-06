@@ -48,9 +48,7 @@ doc:
 		exit 128 ; \
 		fi
 	rm -rf ./doc
-	ndoc lib \
-		--link-format "{package.homepage}/blob/${CURR_HEAD}/{file}#L{line}" \
-		--show-all
+	ndoc lib --link-format "{package.homepage}/blob/${CURR_HEAD}/{file}#L{line}"
 
 
 dev-deps:
