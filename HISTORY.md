@@ -1,3 +1,9 @@
+0.1.4 / In progress
+-------------------
+
+* Fix: addHelp should be true bu default, if not set (thanks to @benblank)
+
+
 0.1.3 / 2012-06-27
 ------------------
 
