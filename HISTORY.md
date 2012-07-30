@@ -1,6 +1,7 @@
 0.1.4 / In progress
 -------------------
 
+* Fixed pseudo-argument support (thanks to @CGamesPlay)
 * Fix: addHelp should be true bu default, if not set (thanks to @benblank)
 
 
