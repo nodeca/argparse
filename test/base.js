@@ -56,7 +56,7 @@ describe('ArgumentParser', function () {
       );
     });
 
-    it("should support positional args", function() {
+    it("should support pseudo-argument", function() {
       parser.addArgument([ 'bar' ], { nargs: '+' });
       args = parser.parseArgs([ '-f', 'foo', '--', '-f', 'bar' ]);
       assert.equal(args.foo, 'foo');
