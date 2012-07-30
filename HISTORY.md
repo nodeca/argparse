@@ -1,8 +1,8 @@
-0.1.4 / In progress
+0.1.4 / 2012-07-30
 -------------------
 
 * Fixed pseudo-argument support (thanks to @CGamesPlay)
-* Fix: addHelp should be true bu default, if not set (thanks to @benblank)
+* Fixed addHelp default (should be true), if not set (thanks to @benblank)
 
 
 0.1.3 / 2012-06-27
