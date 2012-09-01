@@ -25,39 +25,39 @@ describe('ArgumentParser', function () {
       c2.addArgument([ '--baz' ], {});
     });
 
-    it("shold store command name", function(){
+    it("should store command name", function(){
       args = parser.parseArgs('c1 --foo 5'.split(' '));
       assert.equal(args.subcommand_name, 'c1');
     });
 
-    it("shold store command arguments", function(){
+    it("should store command arguments", function(){
       args = parser.parseArgs('c1 --foo 5 -b4'.split(' '));
       assert.equal(args.foo, 5);
       assert.equal(args.bar, 4);
     });
 
-    it("shold have same behavior for alias and original command", function(){
+    it("should have same behavior for alias and original command", function(){
       args = parser.parseArgs('c1 --foo 5 -b4'.split(' '));
       var aliasArgs = parser.parseArgs('co --foo 5 -b4'.split(' '));
       assert.equal(args.foo, aliasArgs.foo);
       assert.equal(args.bar, aliasArgs.bar);
     });
 
-    it("shold have different behavior for different commands", function(){
+    it("should have different behavior for different commands", function(){
       assert.doesNotThrow(function() {parser.parseArgs('c1 --foo 5 -b4'.split(' ')); });
       assert.throws(function () {parser.parseArgs('c2 --foo 5 -b4'.split(' ')); });
       assert.doesNotThrow(function () {parser.parseArgs('c2 --baz 1'.split(' ')); });
       assert.throws(function () {parser.parseArgs('c1 --baz 1'.split(' ')); });
     });
 
-    it("shoud drop down with 'unknown parser' error if parse unrecognized command", function(){
+    it("should drop down with 'unknown parser' error if parse unrecognized command", function(){
       assert.throws(
         function () {parser.parseArgs('command --baz 1'.split(' ')); },
         /Unknown parser/
       );
     });
 
-    it("shoud drop down with empty args ('too few arguments' error)", function(){
+    it("should drop down with empty args ('too few arguments' error)", function(){
       assert.throws(
         function () {parser.parseArgs([]); },
         /too few arguments/
