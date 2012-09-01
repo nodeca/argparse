@@ -31,24 +31,24 @@ describe('ArgumentParser', function () {
       assert.equal(args.foo, 1);
     });
 
-    it("shold parse multipe arguments", function(){
+    it("should parse multiple arguments", function(){
       parser.addArgument(['--bar' ]);
       args = parser.parseArgs('--foo 5 --bar 6'.split(' '));
       assert.equal(args.foo, 5);
       assert.equal(args.bar, 6);
     });
 
-    it("shold check argument type", function(){
+    it("should check argument type", function(){
       parser.addArgument(['--bar' ], {type:'int'});
       assert.throws(function () { parser.parseArgs('--bar bar'.split(' '));});
       assert.doesNotThrow(function () { parser.parseArgs('--bar 1'.split(' '));});
     });
 
-    it("shoud not drop down with empty args(with out positional arguments)", function(){
+    it("should not drop down with empty args (without positional arguments)", function(){
       assert.doesNotThrow(function () {parser.parseArgs([]); });
     });
 
-    it("shoud drop down with empty args (positional arguments", function(){
+    it("should drop down with empty args (positional arguments)", function(){
       parser.addArgument([ 'baz']);
       assert.throws(
         function () {parser.parseArgs([]); },
