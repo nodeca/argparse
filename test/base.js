@@ -62,6 +62,12 @@ describe('ArgumentParser', function () {
       assert.equal(args.foo, 'foo');
       assert.equal(args.bar.length, 2);
     });
+
+    it("should support #setDefaults", function() {
+      parser.setDefaults({bar: 1});
+      args = parser.parseArgs([]);
+      assert.equal(args.bar, 1);
+    });
   });
 });
 
