@@ -1,11 +1,11 @@
-0.1.5 / ???
--------------------
+0.1.5 / 2012-09-03
+------------------
 
 * Fix parser #setDefaults method (thanks to @tomxtobin)
 
 
 0.1.4 / 2012-07-30
--------------------
+------------------
 
 * Fixed pseudo-argument support (thanks to @CGamesPlay)
 * Fixed addHelp default (should be true), if not set (thanks to @benblank)
