@@ -1,3 +1,9 @@
+0.1.5 / ???
+-------------------
+
+* Fix parser #setDefaults method (thanks to @tomxtobin)
+
+
 0.1.4 / 2012-07-30
 -------------------
 
