@@ -68,6 +68,33 @@ describe('ArgumentParser', function () {
       args = parser.parseArgs([]);
       assert.equal(args.bar, 1);
     });
+
+    it("should throw TypeError with conflicting options", function() {
+      assert.throws(
+          function () {
+              parser.addArgument(['-f']);
+          },
+          /Conflicting option string/
+      );
+      assert.throws(
+          function () {
+              parser.addArgument(['--foo']);
+          },
+          /Conflicting option string/
+      );
+      assert.throws(
+          function () {
+              parser.addArgument(['-f', '--flame']);
+          },
+          /Conflicting option string/
+      );
+      assert.throws(
+          function () {
+              parser.addArgument(['-m', '--foo']);
+          },
+          /Conflicting option string/
+      );
+    });
   });
 });
 
