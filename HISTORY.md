@@ -1,7 +1,8 @@
-0.1.5 / ???
+0.1.6 / 2012-09-09
 ------------------
 
 * Fixed check for conflict of options (thanks to @tomxtobin)
+
 
 0.1.5 / 2012-09-03
 ------------------
