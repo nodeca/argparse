@@ -1,8 +1,9 @@
-0.1.6 / ???
+0.1.7 / 2012-10-14
 ------------------
 
-* Fixed 'choices' argument parsing (issue16)
-* Fixed stderr output (issue15)
+* Fixed 'choices' argument parse (issue #16)
+* Fixed stderr output (issue #15)
+
 
 0.1.6 / 2012-09-09
 ------------------
