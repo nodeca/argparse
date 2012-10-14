@@ -4,16 +4,16 @@
 var ArgumentParser = require('../lib/argparse').ArgumentParser;
 var parser = new ArgumentParser({
   version: '0.0.1',
-  addHelp:true,
+  addHelp: true,
   description: 'Argparse examples: sub-commands',
 });
 
 var subparsers = parser.addSubparsers({
-  title:'subcommands',
-  dest:"subcommand_name"
+  title: 'subcommands',
+  dest: "subcommand_name"
 });
 
-var bar = subparsers.addParser('c1', {addHelp:true, help:'c1 help'});
+var bar = subparsers.addParser('c1', {addHelp: true, help: 'c1 help'});
 bar.addArgument(
   [ '-f', '--foo' ],
   {
@@ -23,7 +23,7 @@ bar.addArgument(
 );
 var bar = subparsers.addParser(
   'c2',
-  {aliases:['co'], addHelp:true, help:'c2 help'}
+  {aliases: ['co'], addHelp: true, help: 'c2 help'}
 );
 bar.addArgument(
   [ '-b', '--bar' ],
@@ -46,4 +46,4 @@ console.log('-----------');
 args = parser.parseArgs('co -b 1'.split(' '));
 console.dir(args);
 console.log('-----------');
-parser.parseArgs(['c1','-h']);
+parser.parseArgs(['c1', '-h']);

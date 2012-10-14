@@ -4,34 +4,34 @@
 var ArgumentParser = require('../lib/argparse').ArgumentParser;
 var parser = new ArgumentParser({
   version: '0.0.1',
-  addHelp:true,
+  addHelp: true,
   description: 'Argparse examples: constant',
 });
 
 parser.addArgument(
   [ '-a'],
   {
-    action:'storeConst',
-    dest: 'answer',
-    help: 'store constant',
-    constant:42
+    action: 'storeConst',
+    dest:   'answer',
+    help:   'store constant',
+    constant: 42
   }
 );
 parser.addArgument(
   [ '--str' ],
   {
-    action:'appendConst',
-    dest:'types',
-    help: 'append constant "str" to types',
+    action: 'appendConst',
+    dest:   'types',
+    help:   'append constant "str" to types',
     constant: 'str'
   }
 );
 parser.addArgument(
   [ '--int' ],
   {
-    action:'appendConst',
-    dest:'types',
-    help: 'append constant "int" to types',
+    action: 'appendConst',
+    dest:   'types',
+    help:   'append constant "int" to types',
     constant: 'int'
   }
 );

@@ -4,19 +4,21 @@
 var ArgumentParser = require('../lib/argparse').ArgumentParser;
 var parser = new ArgumentParser({
   version: '0.0.1',
-  addHelp:true,
+  addHelp: true,
   description: 'Argparse examples: nargs'
 });
 parser.addArgument(
   [ '-f', '--foo' ],
   {
-    help: 'foo bar', nargs:1
+    help: 'foo bar',
+    nargs: 1
   }
 );
 parser.addArgument(
   [ '-b', '--bar' ],
   {
-    help: 'bar foo', nargs:'*'
+    help: 'bar foo',
+    nargs: '*'
   }
 );
 
