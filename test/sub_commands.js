@@ -60,10 +60,10 @@ describe('ArgumentParser', function () {
       });
     });
 
-    it("should drop down with 'unknown parser' error if parse unrecognized command", function () {
+    it("should drop down with 'Invalid choice' error if parse unrecognized command", function () {
       assert.throws(
         function () {parser.parseArgs('command --baz 1'.split(' ')); },
-        /Unknown parser/
+        /Invalid choice:/
       );
     });
 
