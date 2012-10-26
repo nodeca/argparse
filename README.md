@@ -133,12 +133,12 @@ parseArgs(). The action keyword argument specifies how the command-line argument
 should be handled. The supported actions are:
 
 - ```store``` - Just stores the argument’s value. This is the default action.
-- ```storeConstant``` - Stores value, specified by the const keyword argument.
+- ```storeConst``` - Stores value, specified by the const keyword argument.
   (Note that the const keyword argument defaults to the rather unhelpful None.)
-  The 'storeConstant' action is most commonly used with optional arguments, that
+  The 'storeConst' action is most commonly used with optional arguments, that
   specify some sort of flag.
 - ```storeTrue``` and ```storeFalse``` - Stores values True and False
-  respectively. These are special cases of 'storeConstant'.
+  respectively. These are special cases of 'storeConst'.
 - ```append``` - Stores a list, and appends each argument value to the list.
   This is useful to allow an option to be specified multiple times.
 - ```appendConst``` - Stores a list, and appends value, specified by the
