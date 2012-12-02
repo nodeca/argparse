@@ -1,8 +1,9 @@
-0.1.8 / ???
+0.1.8 / 2012-12-01
 ------------------
 
 * Fixed parser parents (issue #19) (thanks to @hpaulj)
 * Fixed negative argument parse (issue #20) (thanks to @hpaulj)
+
 
 0.1.7 / 2012-10-14
 ------------------
