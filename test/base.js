@@ -101,6 +101,13 @@ describe('ArgumentParser', function () {
         /Conflicting option string/
       );
     });
+ 
+    it("should parse negative arguments", function () {
+      parser.addArgument([ 'bar' ], { type: 'int', });
+      args = parser.parseArgs(['-1']);
+
+      assert.equal(args.bar, -1);
+    });
   });
 });
 
