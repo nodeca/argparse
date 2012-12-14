@@ -108,6 +108,38 @@ describe('ArgumentParser', function () {
 
       assert.equal(args.bar, -1);
     });
+    
+    it("should infer option destination from short and long options", function () {
+      //parser.addArgument(['-f', '--foo']);        // from long option
+      parser.addArgument(['-g']);                 // from short option
+      parser.addArgument(['-x'], { dest: 'xxx' });// from dest keyword
+
+      args = parser.parseArgs(['-f', '1']);
+      assert.deepEqual(args, { foo: '1', g: null, xxx: null});
+      args = parser.parseArgs(['-g', '2']);
+      assert.deepEqual(args, { foo: null, g: '2', xxx: null});
+      args = parser.parseArgs(['-f', 1, '-g', 2, '-x', 3]);
+      assert.deepEqual(args, { foo: 1, g: 2, xxx: 3});
+    });
+    
+    it("should accept 0 defaultValue", function () {
+      parser.addArgument(['bar'], { nargs: '?', defaultValue: 0});
+      args = parser.parseArgs([]);
+      assert.equal(args.bar, 0);
+      // could also test for '', and false
+    });
+    
+    it("should accept defaultValue for nargs:'*'", function () {
+      parser.addArgument(['bar'], { nargs: '*', defaultValue: 42});
+      args = parser.parseArgs([]);
+      assert.equal(args.bar, 42);
+    });
+    
+    it("getDefault() should get defaults", function () {
+      parser.addArgument(['-g', '--goo'], {defaultValue: 42});
+      assert.equal(parser.getDefault('goo'), 42);
+      assert.equal(parser.getDefault('help'), require('../lib/const').SUPPRESS);
+    });
   });
 });
 
