@@ -108,6 +108,19 @@ describe('ArgumentParser', function () {
 
       assert.equal(args.bar, -1);
     });
+
+    it("should not infere option destination with other params", function () {
+      //parser.addArgument(['-f', '--foo']);        // from long option
+      parser.addArgument(['-g']);                 // from short option
+      parser.addArgument(['-x'], { dest: 'xxx' });// from dest keyword
+
+      args = parser.parseArgs(['-f', '1']);
+      assert.deepEqual(args, { foo: '1', g: null, xxx: null});
+      args = parser.parseArgs(['-g', '2']);
+      assert.deepEqual(args, { foo: null, g: '2', xxx: null});
+      args = parser.parseArgs(['-f', 1, '-g', 2, '-x', 3]);
+      assert.deepEqual(args, { foo: 1, g: 2, xxx: 3});
+    });
   });
 });
 
