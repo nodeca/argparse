@@ -108,6 +108,12 @@ describe('ArgumentParser', function () {
 
       assert.equal(args.bar, -1);
     });
+    
+    it("getDefault() should get defaults", function () {
+      parser.addArgument(['-g', '--goo'], {defaultValue: 42});
+      assert.equal(parser.getDefault('goo'), 42);
+      assert.equal(parser.getDefault('help'), require('../lib/const').SUPPRESS);
+    });
   });
 });
 
