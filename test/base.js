@@ -109,7 +109,7 @@ describe('ArgumentParser', function () {
       assert.equal(args.bar, -1);
     });
 
-    it("should not infere option destination with other params", function () {
+    it("should infer option destination from long and short options", function () {
       //parser.addArgument(['-f', '--foo']);        // from long option
       parser.addArgument(['-g']);                 // from short option
       parser.addArgument(['-x'], { dest: 'xxx' });// from dest keyword
