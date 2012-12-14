@@ -101,7 +101,7 @@ describe('ArgumentParser', function () {
         /Conflicting option string/
       );
     });
- 
+
     it("should parse negative arguments", function () {
       parser.addArgument([ 'bar' ], { type: 'int', });
       args = parser.parseArgs(['-1']);
@@ -121,6 +121,14 @@ describe('ArgumentParser', function () {
       args = parser.parseArgs(['-f', 1, '-g', 2, '-x', 3]);
       assert.deepEqual(args, { foo: 1, g: 2, xxx: 3});
     });
+
+    it("should accept 0 defaultValue", function () {
+      parser.addArgument(['bar'], { nargs: '?', defaultValue: 0});
+      args = parser.parseArgs([]);
+      assert.equal(args.bar, 0);
+      // could also test for '', and false
+    });
+
   });
 });
 
