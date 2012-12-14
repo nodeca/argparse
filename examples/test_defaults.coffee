@@ -24,11 +24,11 @@ print  parser.description, 'should be {pos: 0}'
 print  parser.parseArgs([])
 
 parser = new ArgumentParser({debug:true,description:'positional with ? nargs'})
-parser.addArgument(['pos'],{nargs:'?',defaultValue:42})
+parser.addArgument(['pos'],{nargs:'?',defaultValue: 42})
 print  parser.description, 'should be {pos:42}'
 print  parser.parseArgs([])
 
 parser = new ArgumentParser({debug:true,description:'positional with * nargs'})
-parser.addArgument(['pos'],{nargs:'*',defaultValue:42})
-print  parser.description, 'should be {pos:[42]}'
+parser.addArgument(['pos'],{nargs:'*',defaultValue: 42})
+print  parser.description, 'should be {pos:42}'
 print  parser.parseArgs([])
