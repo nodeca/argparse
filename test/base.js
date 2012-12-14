@@ -108,6 +108,13 @@ describe('ArgumentParser', function () {
 
       assert.equal(args.bar, -1);
     });
+    
+    it("should accept defaultValue for nargs:'*'", function () {
+      parser.addArgument(['bar'], { nargs: '*', defaultValue: 42});
+      args = parser.parseArgs([]);
+      assert.equal(args.bar, 42);
+    });
+    
   });
 });
 
