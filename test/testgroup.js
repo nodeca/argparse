@@ -73,7 +73,17 @@ describe('ArgumentParser', function () {
         // Python:  error: argument --bar: not allowed with argument --foo
         // I  had problems with the proper pairing of bar and foo
         // may also test case with 2 overlapping exlusive groups
-        /("--bar"): Not allowed with argument ("--foo")/
+        // /("--bar"): Not allowed with argument ("--foo")/
+        function (err) {
+          // right and left actions should be different
+          // allow for variations in formatting
+          var pat = /(.*): not allowed with argument (.*)/i;
+          if (err instanceof Error) {
+            var m = err.message.match(pat);
+            return m && m[1] !== m[2];
+          }
+        },
+        "unexpected error"
       );
     });
     it('mutually exclusive group test', function () {
@@ -89,7 +99,7 @@ describe('ArgumentParser', function () {
           args = parser.parseArgs([]);
         },
         // Python: error: one of the arguments --foo --bar is required
-        /one of the arguments (.*) is required/
+        /one of the arguments (.*) is required/i
       );
     });
   });
