@@ -41,7 +41,7 @@ group2 = parser.addArgumentGroup({title:'group2', description:'group2 descriptio
 group2.addArgument(['--bar'], {help:'bar help'})
 parser.print_help()
 
-# print group1
+print group1
 print 'group1 action', group1._groupActions[0].dest
 print 'parser action groups', (action.title for action in parser._actionGroups)
 
@@ -50,11 +50,11 @@ parser = new ArgumentParser({prog: 'PROG', debug:true})
 group = parser.addMutuallyExclusiveGroup()
 group.addArgument(['--foo'], {action: 'storeTrue'})
 group.addArgument(['--bar'], {action: 'storeFalse'})
-print "[] => defaults ", parser.parseArgs([])
+print "[]", parser.parseArgs([])
+print '--foo'
+print "['--foo']", parser.parseArgs(['--foo'])
 
-print "['--foo'] =>", parser.parseArgs(['--foo'])
-
-print "['--bar'] =>", parser.parseArgs(['--bar'])
+print "['--bar']", parser.parseArgs(['--bar'])
 
 print argv = ['--foo', '--bar']
 try 
@@ -70,7 +70,7 @@ group.addArgument(['--foo'], {action: 'storeTrue'})
 barAction = group.addArgument(['--bar'], {action: 'storeFalse'})
 try
     argv = []
-    print argv, '=>', parser.parseArgs(argv)
+    print argv, parser.parseArgs(argv)
 catch error
     print error
     print  argv, 'require one'
