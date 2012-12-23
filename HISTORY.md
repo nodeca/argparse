@@ -3,6 +3,7 @@
 
 * Fixed option dest interferens with other options (issue #23), thanks to @hpaulj
 * Fixed default value behavior with `*` positionals, thanks to @hpaulj
+* Improve `getDefault()` behavior, thanks to @hpaulj
 
 
 0.1.8 / 2012-12-01
