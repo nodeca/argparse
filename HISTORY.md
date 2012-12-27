@@ -1,4 +1,4 @@
-0.1.9 / ...
+0.1.9 / 2012-12-27
 ------------------
 
 * Fixed option dest interferens with other options (issue #23), thanks to @hpaulj
