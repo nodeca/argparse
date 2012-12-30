@@ -1,3 +1,11 @@
+0.1.10 / ...
+-------------------
+
+* Added [mutual exclusion](http://docs.python.org/dev/library/argparse.html#mutual-exclusion)
+  support, thanks to @hpaulj
+* Fixed options check for `storeConst` & `appendConst` actions, thanks to @hpaulj
+
+
 0.1.9 / 2012-12-27
 ------------------
 
