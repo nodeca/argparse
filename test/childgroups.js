@@ -8,7 +8,6 @@ var assert = require('assert');
 var ArgumentParser = require('../lib/argparse').ArgumentParser;
 describe('ArgumentParser', function () {
   describe('group', function () {
-    var parser;
     var args;
     var parentParser, group, xgroup, childParser;
     beforeEach(function () {
