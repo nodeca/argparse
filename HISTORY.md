@@ -1,4 +1,4 @@
-0.1.10 / ...
+0.1.10 / 2012-12-30
 -------------------
 
 * Added [mutual exclusion](http://docs.python.org/dev/library/argparse.html#mutual-exclusion)
