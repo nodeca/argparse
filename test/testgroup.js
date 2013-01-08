@@ -126,10 +126,6 @@ describe('ArgumentParser', function () {
       assert.equal(usage, 'usage: PROG [-h] [--bar BAR | --baz [BAZ]]\n');
       // could also test all or part of parser.formatHelp()
     });
-    // related test_argparse.py tests
-    // TestMutuallyExclusiveLong - 2 regular arguments, 2 in an MEGroup
-    // TestMutuallyExclusiveFirstSuppressed - one argument in group is SUPPRESSED
-    // TestMutuallyExclusiveManySuppressed
     it('mutually exclusive optional and positional', function () {
       // adapted from test_argparse.py TestMutuallyExclusiveOptionalAndPositional
       var usage;
@@ -183,8 +179,6 @@ describe('ArgumentParser', function () {
       usage = parser.formatUsage();
       assert.equal(usage, 'usage: PROG [-h]  --xxx XXX\n');
     });
-    // 3 more
-    
   });
 });
 
