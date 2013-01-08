@@ -102,6 +102,89 @@ describe('ArgumentParser', function () {
         /one of the arguments (.*) is required/i
       );
     });
+    it('mutually exclusive group usage', function () {
+      // adapted from test_argparse.py TestMutuallyExclusiveSimple
+      var usage;
+      parser = new ArgumentParser({prog: 'PROG', debug: true});
+      group = parser.addMutuallyExclusiveGroup({required: true});
+      // or should the input be {required: true}?
+      group.addArgument(['--bar'], {help: 'bar help'});
+      group.addArgument(['--baz'], {nargs: '?', constant: 'Z', help: 'baz help'});
+      args = parser.parseArgs(['--bar', 'X']);
+      assert.deepEqual(args, {bar: 'X', baz: null});
+   
+      assert.throws(
+        function () {
+          args = parser.parseArgs('--bar X --baz Y'.split(' '));
+        },
+        /Not allowed with argument/i
+      );
+      usage = parser.formatUsage();
+      assert.equal(usage, 'usage: PROG [-h] (--bar BAR | --baz [BAZ])\n');
+      group.required = false;
+      usage = parser.formatUsage();
+      assert.equal(usage, 'usage: PROG [-h] [--bar BAR | --baz [BAZ]]\n');
+      // could also test all or part of parser.formatHelp()
+    });
+    // related test_argparse.py tests
+    // TestMutuallyExclusiveLong - 2 regular arguments, 2 in an MEGroup
+    // TestMutuallyExclusiveFirstSuppressed - one argument in group is SUPPRESSED
+    // TestMutuallyExclusiveManySuppressed
+    it('mutually exclusive optional and positional', function () {
+      // adapted from test_argparse.py TestMutuallyExclusiveOptionalAndPositional
+      var usage;
+      parser = new ArgumentParser({prog: 'PROG', debug: true});
+      group = parser.addMutuallyExclusiveGroup({required: true});
+      // or should the input be {required: true}?
+      group.addArgument(['--foo'], {action: 'storeTrue', help: 'foo help'});
+      group.addArgument(['--spam'], {help: 'spam help'});
+      group.addArgument(['badger'], {nargs: '*', defaultValue: 'X', help: 'badger help'});
+      args = parser.parseArgs(['--spam', 'S']);
+      assert.deepEqual(args, {foo: false, spam: 'S', badger: 'X'});
+      args = parser.parseArgs(['X']);
+      assert.deepEqual(args, {"foo": false, "spam": null, "badger": ['X']});
+      args = parser.parseArgs(['--foo']);
+      assert.deepEqual(args, {foo: true, spam: null, badger: 'X'});
+      assert.throws(
+        function () {
+          args = parser.parseArgs('--foo --spam 5'.split(' '));
+        },
+        /Not allowed with argument/i
+      );
+      usage = parser.formatUsage();
+      assert.equal(usage, 'usage: PROG [-h] (--foo | --spam SPAM | badger [badger ...])\n');
+      group.required = false;
+      usage = parser.formatUsage();
+      assert.equal(usage, 'usage: PROG [-h] [--foo | --spam SPAM | badger [badger ...]]\n');
+    });
+    it('two mutually exclusive groups', function () {
+      // adapted from test_argparse.py
+      var usage, group1, group2;
+      parser = new ArgumentParser({prog: 'PROG', debug: true});
+      group1 = parser.addMutuallyExclusiveGroup({required: true});
+      group1.addArgument(['--foo'], {action: 'storeTrue'});
+      group1.addArgument(['--bar'], {action: 'storeFalse'});
+      group2 = parser.addMutuallyExclusiveGroup({required: false});
+      group2.addArgument(['--soup'], {action: 'storeTrue'});
+      group2.addArgument(['--nuts'], {action: 'storeFalse'});
+      usage = parser.formatUsage();
+      assert.equal(usage, 'usage: PROG [-h] (--foo | --bar) [--soup | --nuts]\n');
+    });
+    it('suppressed and single action groups', function () {
+      // adapted from test_argparse.py
+      var usage, group1, group2;
+      parser = new ArgumentParser({prog: 'PROG', debug: true});
+      group1 = parser.addMutuallyExclusiveGroup();
+      group1.addArgument(['--sup'], {help: '==SUPPRESS=='});
+      // should produce an empty group (), which is removed
+      group2 = parser.addMutuallyExclusiveGroup({required: true});
+      group2.addArgument(['--xxx'], {});
+      // single entry in a required group, remove group ()
+      usage = parser.formatUsage();
+      assert.equal(usage, 'usage: PROG [-h]  --xxx XXX\n');
+    });
+    // 3 more
+    
   });
 });
 
