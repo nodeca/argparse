@@ -165,5 +165,20 @@ describe('base', function () {
     assert.equal(parser.getDefault('goo'), 42);
     assert.equal(parser.getDefault('help'), require('../lib/const').SUPPRESS);
   });
+
+  it("should handle mixed positional and optional args", function () {
+    parser = new ArgumentParser({debug: true});
+    parser.addArgument(['-f', '--foo']);
+    parser.addArgument(['x']);
+    parser.addArgument(['y']);
+
+    args = parser.parseArgs(['X', 'Y']);
+    assert.deepEqual(args, {"foo": null, "x": "X", "y": "Y"});
+    args = parser.parseArgs(['-f', 'A', 'X', 'Y']);
+    assert.deepEqual(args, {"foo": "A", "x": "X", "y": "Y"});
+    args = parser.parseArgs(['X', '-f', 'A', 'Y']);
+    assert.deepEqual(args, {"foo": "A", "x": "X", "y": "Y"});
+    // was giving: Error: _mocha: error: Unrecognized arguments: X.
+  });
 });
 
