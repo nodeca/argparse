@@ -220,11 +220,13 @@ console.dir(args);
 Details in [original sub-commands guide](http://docs.python.org/dev/library/argparse.html#sub-commands)
 
 
-Author
-======
+Contributors
+============
 
-[Eugene Shkuropat](https://github.com/shkuropat)
+- [Eugene Shkuropat](https://github.com/shkuropat)
+- [Paul Jacobson](https://github.com/hpaulj)
 
+[others](https://github.com/nodeca/argparse/graphs/contributors)
 
 License
 =======

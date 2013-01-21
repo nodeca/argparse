@@ -5,7 +5,7 @@
   "keywords"        : ["cli", "parser", "argparse", "option", "args"],
   "homepage"        : "https://github.com/nodeca/argparse",
 
-  "author"          : "Eugene Shkuropat <e.shkuropat@gmail.com>",
+  "contributors"    : ["Eugene Shkuropat", "Paul Jacobson"],
 
   "bugs"            : { "url": "https://github.com/nodeca/argparse/issues" },
   "license"         : { "type": "MIT", "url": "https://github.com/nodeca/argparse/blob/master/LICENSE" },
@@ -18,9 +18,9 @@
                       },
 
    "dependencies"    : {
-                        "underscore"        : "~1.3.3",
-                        "underscore.string" : "~2.1.1"
+                        "underscore"        : "~1.4.3",
+                        "underscore.string" : "~2.3.1"
                       },
-  "devDependencies" : { "mocha": "~1.2.1" },
+  "devDependencies" : { "mocha": "~1.8.1" },
   "engines"         : { "node": ">= 0.6.0" }
 }
