@@ -87,11 +87,12 @@ Creates a new ArgumentParser object.
 - ```formatterClass``` - A class for customizing the help output.
 - ```prog``` - The name of the program (default: sys.argv[0])
 - ```usage``` - The string describing the program usage (default: generated)
+- ```conflictHandler``` - Usually unnecessary, defines strategy for resolving conflicting optionals.
 
 **Not supportied yet**
 
 - ```fromfilePrefixChars``` - The set of characters that prefix files from which additional arguments should be read.
-- ```conflictHandler``` - Usually unnecessary, defines strategy for resolving conflicting optionals.
+
 
 Details in [original ArgumentParser guide](http://docs.python.org/dev/library/argparse.html#argumentparser-objects)
 
