@@ -49,15 +49,13 @@ function setup_tempdir() {
 
 function teardown_tempdir(oldcwd) {
   // remove the temp dir
-  var f, tdir, _i, _len, _ref;
-  tdir = process.cwd();
+  var tdir = process.cwd();
   process.chdir(oldcwd);
   if (_.str.startsWith(tdir, os.tmpDir())) {
-    _ref = fs.readdirSync(tdir);
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      f = _ref[_i];
-      fs.unlinkSync(path.join(tdir, f));
-    }
+    var dirls = fs.readdirSync(tdir);
+    dirls.forEach(function (f) {
+        fs.unlinkSync(path.join(tdir, f));
+      });
     fs.rmdir(tdir);
     return console.log('Removed ' + tdir);
   }
