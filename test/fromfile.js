@@ -1,12 +1,10 @@
-/*global describe, it, beforeEach, afterEach*/
-
+/*global describe, it, beforeEach, before, after*/
 
 'use strict';
 
 var assert = require('assert');
 
 var ArgumentParser = require('../lib/argparse').ArgumentParser;
-
 
 var fs = require('fs');
 var os = require('os');
@@ -39,6 +37,7 @@ function teardown_tempdir(oldcwd) {
   process.chdir(oldcwd);
   if (_.str.startsWith(tdir, os.tmpDir())) {
     var dirls = fs.readdirSync(tdir);
+    // console.log(tdir, dirls)
     dirls.forEach(function (f) {
         fs.unlinkSync(path.join(tdir, f));
       });
@@ -47,28 +46,33 @@ function teardown_tempdir(oldcwd) {
   }
 }
 
+function setup_files() {
+  var file_texts = [['hello', 'hello world!\n'],
+              ['recursive', '-a\n', 'A\n', '@hello'],
+              ['invalid', '@no-such-path\n']];
+
+  oldcwd = setup_tempdir();
+  // write the test files
+  file_texts.forEach(function (tpl) {
+    var filename = tpl[0];
+    var data = tpl.slice(1).join('');
+    fs.writeFileSync(filename, data);
+  });
+}
 
 describe('fromfilePrefixchars', function () {
   var parser;
   var args;
+  before(function () {
+    setup_files();
+  });
   beforeEach(function () {
-    var file_texts = [['hello', 'hello world!\n'],
-              ['recursive', '-a\n', 'A\n', '@hello'],
-              ['invalid', '@no-such-path\n']];
-
-    oldcwd = setup_tempdir();
-    // write the test files
-    file_texts.forEach(function (tpl) {
-        var filename = tpl[0];
-        var data = tpl.slice(1).join('');
-        fs.writeFileSync(filename, data);
-      });
     parser = new ArgumentParser({debug: true, fromfilePrefixChars: '@'});
     parser.addArgument(['-a']);
     parser.addArgument(['x']);
     parser.addArgument(['y'], {nargs: '+'});
   });
-  afterEach(function () {
+  after(function () {
     teardown_tempdir(oldcwd);
   });
   it("Test reading arguments from a file", function () {
@@ -103,4 +107,16 @@ describe('fromfilePrefixchars', function () {
       /ENOENT, no such file or directory/
     );
   });
+  it('Test custom convertArgLineToArgs function', function () {
+    parser.convertArgLineToArgs = function (argLine) {
+        // split line into 'words'
+        args = argLine.split(' ');
+        args = args.map(function (arg) {return arg.trim(); });
+        args = args.filter(function (arg) {return arg.length > 0; });
+        return args;
+      };
+    args = parser.parseArgs(['X', '@hello']);
+    assert.deepEqual(args, {a: null, x: 'X', y: ['hello', 'world!']});
+  });
 });
+
