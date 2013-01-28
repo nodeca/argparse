@@ -37,12 +37,12 @@ function teardown_tempdir(oldcwd) {
   process.chdir(oldcwd);
   if (_.str.startsWith(tdir, os.tmpDir())) {
     var dirls = fs.readdirSync(tdir);
-    // console.log(tdir, dirls)
+    //console.log(tdir, dirls)
     dirls.forEach(function (f) {
         fs.unlinkSync(path.join(tdir, f));
       });
-    fs.rmdir(tdir);
-    // console.log('Removed ' + tdir);
+    fs.rmdirSync(tdir);
+    //console.log('Removed ' + tdir);
   }
 }
 
