@@ -6,7 +6,7 @@ var assert = require('assert');
 
 var ArgumentParser = require('../lib/argparse').ArgumentParser;
 
-describe('base', function () {
+describe('user defined type', function () {
   var parser;
   var args;
 

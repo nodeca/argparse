@@ -7,7 +7,7 @@ var assert = require('assert');
 
 var ArgumentParser = require('../lib/argparse').ArgumentParser;
 
-describe('sub-commands', function () {
+describe('choices', function () {
   var parser;
   var args;
 
@@ -68,4 +68,3 @@ describe('sub-commands', function () {
     );
   });
 });
-

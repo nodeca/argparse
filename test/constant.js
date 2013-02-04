@@ -24,10 +24,17 @@ describe('constant actions', function () {
   it("storeConst should give error if constant not given (or misspelled)", function () {
     assert.throws(
       function () {
-          parser.addArgument(['-a'], {action: 'storeConst', dest:   'answer',
-              help:   'store constant', const: 42});
+          parser.addArgument(
+            ['-a'],
+            {
+              action: 'storeConst',
+              dest:   'answer',
+              help:   'store constant',
+              const:  42
+            }
+          );
         },
-      /constant option is required for storeAction/
+        /constant option is required for storeAction/
       );
   });
 
@@ -50,4 +57,3 @@ describe('constant actions', function () {
     );
   });
 });
-

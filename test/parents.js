@@ -7,7 +7,7 @@ var assert = require('assert');
 
 var ArgumentParser = require('../lib/argparse').ArgumentParser;
 
-describe('sub-commands', function () {
+describe('parents', function () {
   var parent_parser;
   var args;
 
@@ -42,4 +42,3 @@ describe('sub-commands', function () {
     });
   });
 });
-

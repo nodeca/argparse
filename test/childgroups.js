@@ -7,7 +7,7 @@ var assert = require('assert');
 
 var ArgumentParser = require('../lib/argparse').ArgumentParser;
 
-describe('group', function () {
+describe('chaild group', function () {
   var args;
   var parentParser, group, xgroup, childParser;
 
@@ -49,11 +49,6 @@ describe('group', function () {
     assert.equal(args.xbar, false);
   });
 
-  it('', function () {
-    args = childParser.parseArgs(['--foo', 'fooarg', 'gbararg', '--xfoo']);
-    assert.equal(args.foo, 'fooarg');
-  });
-
   it('child throws error if both xclusive options are given', function () {
     assert.throws(
       function () {
@@ -63,4 +58,3 @@ describe('group', function () {
     );
   });
 });
-

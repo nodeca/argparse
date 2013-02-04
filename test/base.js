@@ -135,6 +135,51 @@ describe('base', function () {
     assert.equal(args.bar, -1);
   });
 
+  it("No negative number options; neg number is positional argument", function () {
+    parser = new ArgumentParser({debug: true});
+    parser.addArgument(['-x'], {dest: 'x'});
+    parser.addArgument(['foo'], {nargs: '?'});
+
+    // no negative number options, so -1 is a positional argument
+    args = parser.parseArgs(['-x', '-1']);
+    // Namespace(foo=None, x='-1')
+    assert.equal(args.x, '-1');
+    // no negative number options, so -1 and -5 are positional arguments
+    args = parser.parseArgs(['-x', '-1', '-5']);
+    // Namespace(foo='-5', x='-1') order not determined
+    assert.equal(args.x, '-1');
+    assert.equal(args.foo, '-5');
+  });
+
+  it("negative number options present, so any neg number is an option", function () {
+    parser = new ArgumentParser({debug: true});
+    parser.addArgument(['-1'], {dest: 'one'});
+    parser.addArgument(['foo'], {nargs: '?'});
+
+    // negative number options present, so -1 is an option
+    args = parser.parseArgs(['-1', 'X']);
+    // Namespace(foo=None, one='X')
+    assert.equal(args.one, 'X');
+    // negative number options present, so -2 is an option
+    assert.throws(
+      function () {
+        parser.parseArgs(['-2']);
+      },
+      /Unrecognized arguments: -2/
+    );
+    // negative number options present, so both -1s are options
+    assert.throws(
+      function () {
+        parser.parseArgs(['-1', '-1']);
+      },
+      /argument "-1": Expected one argument/
+    );
+    args = parser.parseArgs(['--', '-f']);
+    // Namespace(foo='-f', one=None)
+    assert.equal(args.foo, '-f');
+  });
+
+
   it("should infer option destination from long and short options", function () {
     parser = new ArgumentParser({debug: true});
     parser.addArgument(['-f', '--foo']);        // from long option
@@ -159,14 +204,6 @@ describe('base', function () {
     // could also test for '', and false
   });
 
-  it("should accept defaultValue for nargs:'*'", function () {
-    parser = new ArgumentParser({debug: true});
-    parser.addArgument(['-f', '--foo']);
-    parser.addArgument(['bar'], { nargs: '*', defaultValue: 42});
-
-    args = parser.parseArgs([]);
-    assert.equal(args.bar, 42);
-  });
 
   it("getDefault() should get defaults", function () {
     parser = new ArgumentParser({debug: true});
@@ -191,5 +228,35 @@ describe('base', function () {
     assert.deepEqual(args, {"foo": "A", "x": "X", "y": "Y"});
     // was giving: Error: _mocha: error: Unrecognized arguments: X.
   });
-});
 
+  it('TestEmptyAndSpaceContainingArguments', function () {
+    parser = new ArgumentParser({
+      debug: true,
+      prog: 'TestEmptyAndSpaceContainingArguments',
+      description: null
+    });
+    parser.addArgument([ 'x' ], { nargs: '?' });
+    parser.addArgument([ '-y', '--yyy' ], { dest: 'y' });
+
+    args = parser.parseArgs([ '' ]);
+    assert.deepEqual(args, { y: null, x: '' });
+    args = parser.parseArgs([ 'a badger' ]);
+    assert.deepEqual(args, { y: null, x: 'a badger' });
+    args = parser.parseArgs([ '-a badger' ]);
+    assert.deepEqual(args, { y: null, x: '-a badger' });
+    args = parser.parseArgs([ '-y', '' ]);
+    assert.deepEqual(args, { y: '', x: null });
+    args = parser.parseArgs([ '-y', 'a badger' ]);
+    assert.deepEqual(args, { y: 'a badger', x: null });
+    args = parser.parseArgs([ '-y', '-a badger' ]);
+    assert.deepEqual(args, { y: '-a badger', x: null });
+    args = parser.parseArgs([ '--yyy=a badger' ]);
+    assert.deepEqual(args, { y: 'a badger', x: null });
+    args = parser.parseArgs([ '--yyy=-a badger' ]);
+    assert.deepEqual(args, { y: '-a badger', x: null });
+
+    assert.throws(function () {
+      args = parser.parseArgs([ '-y' ]);
+    });
+  });
+});

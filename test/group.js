@@ -185,4 +185,3 @@ describe('group', function () {
     assert.equal(usage, 'usage: PROG [-h]  --xxx XXX\n');
   });
 });
-

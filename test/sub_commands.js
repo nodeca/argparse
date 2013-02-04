@@ -84,4 +84,3 @@ describe('sub-commands', function () {
     assert.strictEqual(args.spam, undefined);
   });
 });
-
