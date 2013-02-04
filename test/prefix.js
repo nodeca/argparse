@@ -9,15 +9,11 @@ var ArgumentParser = require('../lib/argparse').ArgumentParser;
 describe('prefix', function () {
   var parser;
   var args;
-  it('TestOptionalsAlternatePrefixChars', function () {
+  it('test an Optional with option strings with custom prefixes', function () {
     parser = new ArgumentParser({
-      add_help: false,
-      prefix_chars: '+:/',
       addHelp: false,
       prefixChars: '+:/',
-      debug: true,
-      prog: 'TestOptionalsAlternatePrefixChars',
-      description: 'Test an Optional with option strings with custom prefixes'
+      debug: true
     });
     parser.addArgument([ '+f' ], { action: 'storeTrue' });
     parser.addArgument([ '::bar' ], {});
@@ -74,16 +70,12 @@ describe('prefix', function () {
     });
   });
 
-
-  it('TestOptionalsAlternatePrefixCharsAddedHelp', function () {
+  // http://bugs.python.org/issue9444
+  it('when "-" not in prefix_chars, default operators created for help should use the prefix_chars in use rather than - or --', function () {
     parser = new ArgumentParser({
-      add_help: true,
-      prefix_chars: '+:/',
       addHelp: true,
       prefixChars: '+:/',
-      debug: true,
-      prog: 'TestOptionalsAlternatePrefixCharsAddedHelp',
-      description: 'When ``-`` not in prefix_chars, default operators created for help\n       should use the prefix_chars in use rather than - or --\n       http://bugs.python.org/issue9444'
+      debug: true
     });
     parser.addArgument([ '+f' ], { action: 'storeTrue' });
     parser.addArgument([ '::bar' ], {});
@@ -125,15 +117,11 @@ describe('prefix', function () {
     });
   });
 
-  it('TestOptionalsAlternatePrefixCharsMultipleShortArgs', function () {
+  it('verify that Optionals must be called with their defined prefixes', function () {
     parser = new ArgumentParser({
-      add_help: false,
-      prefix_chars: '+-',
       addHelp: false,
       prefixChars: '+-',
-      debug: true,
-      prog: 'TestOptionalsAlternatePrefixCharsMultipleShortArgs',
-      description: 'Verify that Optionals must be called with their defined prefixes'
+      debug: true
     });
     parser.addArgument([ '-x' ], { action: 'storeTrue' });
     parser.addArgument([ '+y' ], { action: 'storeTrue' });
@@ -165,12 +153,8 @@ describe('prefix', function () {
     });
   });
 
-  it('TestOptionalsDoubleDashPrefixMatch', function () {
-    parser = new ArgumentParser({
-      debug: true,
-      prog: 'TestOptionalsDoubleDashPrefixMatch',
-      description: 'Tests when one double-dash option string is a prefix of another'
-    });
+  it('test when one double-dash option string is a prefix of another', function () {
+    parser = new ArgumentParser({debug: true});
     parser.addArgument([ '--badger' ], { action: 'storeTrue' });
     parser.addArgument([ '--ba' ], {});
 
@@ -206,13 +190,10 @@ describe('prefix', function () {
     });
   });
 
-  it('TestPrefixCharacterOnlyArguments', function () {
+  it('test arguments from prefix chars only', function () {
     parser = new ArgumentParser({
-      prefix_chars: '-+',
       prefixChars: '-+',
-      debug: true,
-      prog: 'TestPrefixCharacterOnlyArguments',
-      description: null
+      debug: true
     });
     parser.addArgument([ '-' ], { dest: 'x', const: 'badger', nargs: '?', constant: 'badger' });
     parser.addArgument([ '+' ], { default: 42, dest: 'y', type: 'int', defaultValue: 42 });

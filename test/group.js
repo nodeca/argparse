@@ -1,4 +1,4 @@
-/*global describe, it, beforeEach*/
+/*global describe, it*/
 
 
 'use strict';
@@ -13,10 +13,6 @@ describe('group', function () {
   var group;
   var group1;
   var group2;
-  beforeEach(function () {
-    // parser = new ArgumentParser({prog: 'PROG', addHelp: false, debug: true});
-    // parser.addArgument([ '-f', '--foo' ]);
-  });
 
   it('group test', function () {
     parser = new ArgumentParser({prog: 'PROG', addHelp: false, debug: true});
@@ -29,7 +25,7 @@ describe('group', function () {
     assert(group._groupActions.length, 2);
   });
 
-  it('2 group test', function () {
+  it('2 groups test', function () {
     parser = new ArgumentParser({prog: 'PROG', addHelp: false, debug: true});
     group1 = parser.addArgumentGroup({title: 'group1', description: 'group1 description'});
     group1.addArgument(['foo'], {help: 'foo help'});
@@ -60,7 +56,7 @@ describe('group', function () {
     assert.equal(args.foo || args.bar, false);
   });
 
-  it('mutually exclusive group test', function () {
+  it('mutually exclusive group test (2)', function () {
     parser = new ArgumentParser({prog: 'PROG', debug: true});
     group = parser.addMutuallyExclusiveGroup();
     group.addArgument(['--foo'], {action: 'storeTrue'});
@@ -87,7 +83,7 @@ describe('group', function () {
     );
   });
 
-  it('mutually exclusive group test', function () {
+  it('mutually exclusive group test (3)', function () {
     parser = new ArgumentParser({prog: 'PROG', debug: true});
     group = parser.addMutuallyExclusiveGroup({required: true});
     // or should the input be {required: true}?

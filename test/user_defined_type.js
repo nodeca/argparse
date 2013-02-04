@@ -24,6 +24,7 @@ describe('user defined type', function () {
         /Invalid int value: a/i
     );
   });
+
   it("should handle user-defined type", function () {
     function myType(arg) {
       return arg;
@@ -37,6 +38,7 @@ describe('user defined type', function () {
     args = parser.parseArgs(['-xf', 'g']);
     assert.deepEqual(args, {x: myType('f'), spam: myType('g')});
   });
+
   it("should give consistent type errors", function () {
     function dateType(arg) {
       var x = new Date(arg);
@@ -74,7 +76,8 @@ describe('user defined type', function () {
       /Invalid dateType value: (.*)/i
     );
   });
-  it("Test a user-defined type by registering it", function () {
+
+  it("test a user-defined type by registering it", function () {
     function dateType(arg) {
       var x = new Date(arg);
       if (x.toString().match('Invalid')) {
@@ -92,7 +95,8 @@ describe('user defined type', function () {
       /Invalid dateType value: (.*)/
     );
   });
-  it("Test an anonymous user-defined type", function () {
+
+  it("test an anonymous user-defined type", function () {
     var dateType = function (arg) {
       var x = new Date(arg);
       if (x.toString().match('Invalid')) {

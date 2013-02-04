@@ -10,10 +10,8 @@ describe('positionals', function () {
   var parser;
   var args;
 
-  it('TestPositionalsActionAppend', function () {
-    parser = new ArgumentParser({ debug: true,
-      prog: 'TestPositionalsActionAppend',
-           description: 'Test the \'append\' action' });
+  it("test the 'append' action", function () {
+    parser = new ArgumentParser({debug: true});
     parser.addArgument([ 'spam' ], { action: 'append' });
     parser.addArgument([ 'spam' ], { action: 'append', nargs: 2 });
 
@@ -37,12 +35,12 @@ describe('positionals', function () {
     });
   });
 
-  it('TestPositionalsChoicesInt', function () {
-    parser = new ArgumentParser({ debug: true,
-      prog: 'TestPositionalsChoicesInt',
-           description: 'Test a set of integer choices' });
-    parser.addArgument([ 'spam' ], { type: 'int',
-      choices: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 ] });
+  it('test a set of integer choices', function () {
+    parser = new ArgumentParser({debug: true});
+    parser.addArgument([ 'spam' ], {
+      type: 'int',
+      choices: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 ]
+    });
 
     args = parser.parseArgs([ '4' ]);
     assert.deepEqual(args, { spam: 4 });
@@ -66,10 +64,8 @@ describe('positionals', function () {
     });
   });
 
-  it('TestPositionalsChoicesString', function () {
-    parser = new ArgumentParser({ debug: true,
-      prog: 'TestPositionalsChoicesString',
-           description: 'Test a set of single-character choices' });
+  it('test a set of single-character choices', function () {
+    parser = new ArgumentParser({debug: true});
     parser.addArgument([ 'spam' ], { choices: [ 'a', 'c', 'b', 'e', 'd', 'g', 'f' ] });
 
     args = parser.parseArgs([ 'a' ]);

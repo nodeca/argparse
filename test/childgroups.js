@@ -7,7 +7,7 @@ var assert = require('assert');
 
 var ArgumentParser = require('../lib/argparse').ArgumentParser;
 
-describe('chaild group', function () {
+describe('child group', function () {
   var args;
   var parentParser, group, xgroup, childParser;
 

@@ -7,15 +7,11 @@ var assert = require('assert');
 var ArgumentParser = require('../lib/argparse').ArgumentParser;
 var $$ = require('../lib/const');
 
-describe('suppress', function () {
+describe('suppress defaults', function () {
   var parser;
   var args;
-  it('TestDefaultSuppress', function () {
-    parser = new ArgumentParser({
-      debug: true,
-      prog: 'TestDefaultSuppress',
-      description: 'Test actions with suppressed defaults'
-    });
+  it('test actions with suppressed defaults', function () {
+    parser = new ArgumentParser({debug: true});
 
     parser.addArgument([ 'foo' ], {
       default: $$.SUPPRESS,
@@ -51,13 +47,11 @@ describe('suppress', function () {
     });
   });
 
-  it('TestParserDefaultSuppress', function () {
+  it('test actions with a parser-level default of SUPPRESS', function () {
     parser = new ArgumentParser({
       argument_default: $$.SUPPRESS,
       argumentDefault: $$.SUPPRESS,
-      debug: true,
-      prog: 'TestParserDefaultSuppress',
-      description: 'Test actions with a parser-level default of SUPPRESS'
+      debug: true
     });
     parser.addArgument([ 'foo' ], { nargs: '?' });
     parser.addArgument([ 'bar' ], { nargs: '*' });

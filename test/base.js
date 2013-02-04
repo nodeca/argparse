@@ -229,12 +229,8 @@ describe('base', function () {
     // was giving: Error: _mocha: error: Unrecognized arguments: X.
   });
 
-  it('TestEmptyAndSpaceContainingArguments', function () {
-    parser = new ArgumentParser({
-      debug: true,
-      prog: 'TestEmptyAndSpaceContainingArguments',
-      description: null
-    });
+  it('test empty and space containing arguments', function () {
+    parser = new ArgumentParser({debug: true});
     parser.addArgument([ 'x' ], { nargs: '?' });
     parser.addArgument([ '-y', '--yyy' ], { dest: 'y' });
 
