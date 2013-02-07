@@ -60,7 +60,7 @@ function setup_files() {
   });
 }
 
-describe('fromfilePrefixchars', function () {
+describe('from file', function () {
   var parser;
   var args;
   before(function () {
@@ -75,7 +75,7 @@ describe('fromfilePrefixchars', function () {
   after(function () {
     teardown_tempdir(oldcwd);
   });
-  it("Test reading arguments from a file", function () {
+  it("test reading arguments from a file", function () {
     args = parser.parseArgs(['X', 'Y']);
     assert.deepEqual(args, {a: null, x: 'X', y: ['Y']});
     args = parser.parseArgs(['X', '-a', 'A', 'Y', 'Z']);
@@ -85,13 +85,13 @@ describe('fromfilePrefixchars', function () {
     args = parser.parseArgs(['X', '@hello']);
     assert.deepEqual(args, {a: null, x: 'X', y: ['hello world!']});
   });
-  it("Test recursive reading arguments from files", function () {
+  it("test recursive reading arguments from files", function () {
     args = parser.parseArgs(['-a', 'B', '@recursive', 'Y', 'Z']);
     assert.deepEqual(args, {a: 'A', x: 'hello world!', y: ['Y', 'Z']});
     args = parser.parseArgs(['X', '@recursive', 'Z', '-a', 'B']);
     assert.deepEqual(args, {a: 'B', x: 'X', y: ['hello world!', 'Z']});
   });
-  it('Test reading arguments from an invalid file', function () {
+  it('fest reading arguments from an invalid file', function () {
     assert.throws(
       function () {
         args = parser.parseArgs(['@invalid']);
@@ -99,7 +99,7 @@ describe('fromfilePrefixchars', function () {
       /ENOENT, no such file or directory/
     );
   });
-  it('Test reading arguments from an missing file', function () {
+  it('test reading arguments from an missing file', function () {
     assert.throws(
       function () {
         args = parser.parseArgs(['@missing']);
@@ -107,7 +107,7 @@ describe('fromfilePrefixchars', function () {
       /ENOENT, no such file or directory/
     );
   });
-  it('Test custom convertArgLineToArgs function', function () {
+  it('test custom convertArgLineToArgs function', function () {
     parser.convertArgLineToArgs = function (argLine) {
         // split line into 'words'
         args = argLine.split(' ');

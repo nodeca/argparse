@@ -1,8 +1,9 @@
-0.1.11 / 2013-02-05
+0.1.11 / 2013-02-07
 
 * Multiple bugfixes, @hpaulj
 * Added 70+ tests (ported from python), @hpaulj
 * Added conflictHandler, @applepicke
+* Added fromfilePrefixChar, @hpaulj
 
 
 0.1.10 / 2012-12-30
