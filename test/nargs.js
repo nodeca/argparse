@@ -725,17 +725,13 @@ describe('nargs', function () {
   });
 
   // Added after bug in ndoc
-  it.skip('test a Positional that specifies unlimited nargs, alternate definition', function () {
+  it('test a `nargs` + `append` combination. Not obvious result - nested array', function () {
     parser = new ArgumentParser({debug: true});
-    parser.addArgument([ 'paths' ], {
-      help:     'Source files location',
-      metavar:  'PATH',
-      action:   'append',
-      nargs:    '+'
-    });
+    parser.addArgument([ 'foo' ], { action: 'append', nargs: '+' });
 
-    args = parser.parseArgs([ 'lib/', 'examples/' ]);
-    assert.deepEqual(args, { paths: [ 'lib/', 'examples/' ] });
+    args = parser.parseArgs([ 'a', 'b' ]);
+    // YES, NESTED array, don't try to 'fix' it.
+    assert.deepEqual(args, { foo: [[ 'a', 'b' ]] });
   });
 
 
