@@ -17,10 +17,10 @@
                         "test": "make test"
                       },
 
-   "dependencies"    : {
+   "dependencies"   : {
                         "underscore"        : "~1.4.3",
                         "underscore.string" : "~2.3.1"
                       },
-  "devDependencies" : { "mocha": "~1.8.1" },
+  "devDependencies" : { "mocha": "*" },
   "engines"         : { "node": ">= 0.6.0" }
 }

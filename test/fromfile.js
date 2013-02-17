@@ -6,72 +6,20 @@ var assert = require('assert');
 
 var ArgumentParser = require('../lib/argparse').ArgumentParser;
 
-var fs = require('fs');
-var os = require('os');
-var path = require('path');
-var assert = require('assert');
-var _ = require('underscore');
-_.str = require('underscore.string');
+var assert  = require('assert');
+var path    = require('path');
+var _       = require('underscore');
+_.str       = require('underscore.string');
 
-var oldcwd = process.cwd();
 
-function setup_tempdir() {
-  // setup a temporary directory:
-  //   /tmp/argparse_6732
-  //
-  // For 0.6 node use '/tmp' as workaround for travis-ci
-  var tdir = path.join(
-    os.tmpDir ? os.tmpDir() : '/tmp',
-    'argparse_' + Math.floor(Math.random() * 10000)
-  );
-
-  try {
-    fs.mkdirSync(tdir);
-  } catch (error) {
-    if (!error.message.match(/EEXIST/)) {
-      throw error;
-    }
-  }
-  oldcwd = process.cwd();
-  process.chdir(tdir);
-  // console.log('Now in ' + process.cwd());
-  return oldcwd;
-}
-
-function teardown_tempdir(oldcwd) {
-  // remove the temp dir
-  var tdir = process.cwd();
-  process.chdir(oldcwd);
-  if (_.str.startsWith(tdir, os.tmpDir ? os.tmpDir() : '/tmp')) {
-    var dirls = fs.readdirSync(tdir);
-    //console.log(tdir, dirls)
-    dirls.forEach(function (f) {
-        fs.unlinkSync(path.join(tdir, f));
-      });
-    fs.rmdirSync(tdir);
-    //console.log('Removed ' + tdir);
-  }
-}
-
-function setup_files() {
-  var file_texts = [['hello', 'hello world!\n'],
-              ['recursive', '-a\n', 'A\n', '@hello'],
-              ['invalid', '@no-such-path\n']];
-
-  oldcwd = setup_tempdir();
-  // write the test files
-  file_texts.forEach(function (tpl) {
-    var filename = tpl[0];
-    var data = tpl.slice(1).join('');
-    fs.writeFileSync(filename, data);
-  });
-}
+var orig_cwd   = process.cwd();
 
 describe('from file', function () {
   var parser;
   var args;
   before(function () {
-    setup_files();
+    orig_cwd = process.cwd();
+    process.chdir(path.normalize('./test/fixtures'));
   });
   beforeEach(function () {
     parser = new ArgumentParser({debug: true, fromfilePrefixChars: '@'});
@@ -80,7 +28,7 @@ describe('from file', function () {
     parser.addArgument(['y'], {nargs: '+'});
   });
   after(function () {
-    teardown_tempdir(oldcwd);
+    process.chdir(orig_cwd);
   });
   it("test reading arguments from a file", function () {
     args = parser.parseArgs(['X', 'Y']);
