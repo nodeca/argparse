@@ -16,8 +16,15 @@ _.str = require('underscore.string');
 var oldcwd = process.cwd();
 
 function setup_tempdir() {
-  // setup a temporary directory as cwd
-  var tdir = path.join(os.tmpDir(), 'argparse_temp');
+  // setup a temporary directory:
+  //   /tmp/argparse_6732
+  //
+  // For 0.6 node use '/tmp' as workaround for travis-ci
+  var tdir = path.join(
+    os.tmpDir ? os.tmpDir() : '/tmp',
+    'argparse_' + Math.floor(Math.random() * 10000)
+  );
+
   try {
     fs.mkdirSync(tdir);
   } catch (error) {
@@ -35,7 +42,7 @@ function teardown_tempdir(oldcwd) {
   // remove the temp dir
   var tdir = process.cwd();
   process.chdir(oldcwd);
-  if (_.str.startsWith(tdir, os.tmpDir())) {
+  if (_.str.startsWith(tdir, os.tmpDir ? os.tmpDir() : '/tmp')) {
     var dirls = fs.readdirSync(tdir);
     //console.log(tdir, dirls)
     dirls.forEach(function (f) {
