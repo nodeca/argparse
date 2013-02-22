@@ -840,7 +840,7 @@ describe('nargs', function () {
 
   });
 
-  
+
   it("should accept defaultValue for nargs:'*'", function () {
     parser = new ArgumentParser({debug: true});
     parser.addArgument(['-f', '--foo']);

@@ -460,7 +460,7 @@ describe('optionals', function () {
     });
   });
 
-  
+
 
   it('test an Optional with a short opt string', function () {
     parser = new ArgumentParser({debug: true});

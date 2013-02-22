@@ -219,5 +219,5 @@ describe('prefix', function () {
       args = parser.parseArgs([ '+', '-' ]);
     });
   });
- 
+
 });
