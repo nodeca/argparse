@@ -1,9 +1,17 @@
+0.1.13 / 2013-05-08
+-------------------
+
+* Added `.npmignore` to reduce package size
+
+
 0.1.12 / 2013-02-10
+-------------------
 
 * Fixed conflictHandler (#46), @hpaulj
 
 
 0.1.11 / 2013-02-07
+-------------------
 
 * Multiple bugfixes, @hpaulj
 * Added 70+ tests (ported from python), @hpaulj
