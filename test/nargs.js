@@ -854,8 +854,10 @@ describe('nargs', function () {
     parser = new ArgumentParser({debug: true});
     parser.addArgument(['--xlim'], {nargs: 2, type: 'float'});
 
-    var args1 = parser.parseArgs(['--xlim', '-.002', '1e4']);
-    var args2 = parser.parseArgs(['--xlim', '-2e-3', '1e4']);
-    assert.equal(args1, args2);
+    args = parser.parseArgs(['--xlim', '-2e-3', '1e4']);
+
+    var firstResult = args['xlim'][0];
+
+    assert.equal(firstResult, -2 / 1000);
 	});
 });
