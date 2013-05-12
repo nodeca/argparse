@@ -14,17 +14,17 @@ describe('suppress defaults', function () {
     parser = new ArgumentParser({debug: true});
 
     parser.addArgument([ 'foo' ], {
-      default: $$.SUPPRESS,
+      "default": $$.SUPPRESS,
       nargs: '?',
       defaultValue: $$.SUPPRESS
     });
     parser.addArgument([ 'bar' ], {
-      default: $$.SUPPRESS,
+      "default": $$.SUPPRESS,
       nargs: '*',
       defaultValue: $$.SUPPRESS
     });
     parser.addArgument([ '--baz' ], {
-      default: $$.SUPPRESS,
+      "default": $$.SUPPRESS,
       action: 'storeTrue',
       defaultValue: $$.SUPPRESS
     });

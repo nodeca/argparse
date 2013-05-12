@@ -118,7 +118,7 @@ describe('base', function () {
   it("should parse negative arguments", function () {
     parser = new ArgumentParser({debug: true});
     parser.addArgument(['-f', '--foo']);
-    parser.addArgument([ 'bar' ], { type: 'int', });
+    parser.addArgument([ 'bar' ], { type: 'int' });
 
     args = parser.parseArgs(['-1']);
     assert.equal(args.bar, -1);

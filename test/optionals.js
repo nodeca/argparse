@@ -138,7 +138,7 @@ describe('optionals', function () {
 
   it('test the append_const action for an Optional', function () {
     parser = new ArgumentParser({debug: true});
-    parser.addArgument([ '-b' ], { default: [ 'X' ],
+    parser.addArgument([ '-b' ], { "default": [ 'X' ],
       action: 'appendConst',
       const: 'Exception',
       defaultValue: [ 'X' ],
@@ -173,7 +173,7 @@ describe('optionals', function () {
     parser = new ArgumentParser({debug: true});
     parser.addArgument(
       [ '--baz' ],
-      { default: [ 'X' ], action: 'append', defaultValue: [ 'X' ] }
+      { "default": [ 'X' ], action: 'append', defaultValue: [ 'X' ] }
     );
 
     args = parser.parseArgs([]);
@@ -354,7 +354,7 @@ describe('optionals', function () {
   it('test specifying a default for an Optional', function () {
     parser = new ArgumentParser({debug: true});
     parser.addArgument([ '-x' ], {});
-    parser.addArgument([ '-y' ], { default: 42, defaultValue: 42 });
+    parser.addArgument([ '-y' ], { "default": 42, defaultValue: 42 });
 
     args = parser.parseArgs([]);
     assert.deepEqual(args, { y: 42, x: null });

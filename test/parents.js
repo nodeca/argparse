@@ -18,7 +18,7 @@ describe('parents', function () {
 
   it("should parse args from parents parser", function () {
     var parser = new ArgumentParser({
-      parents: [ parent_parser ],
+      parents: [ parent_parser ]
     });
     parser.addArgument(['-f', '--foo']);
 
@@ -33,7 +33,7 @@ describe('parents', function () {
 
   it("should throw error if has same args as parent", function () {
     var parser = new ArgumentParser({
-      parents: [ parent_parser ],
+      parents: [ parent_parser ]
     });
     parser.addArgument(['-f', '--foo']);
 
