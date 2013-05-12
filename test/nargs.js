@@ -849,4 +849,13 @@ describe('nargs', function () {
     args = parser.parseArgs([]);
     assert.equal(args.bar, 42);
   });
+
+	it("should accept negative scientific and complex numbers", function () {
+    parser = new ArgumentParser({debug: true});
+    parser.addArgument(['--xlim'], {nargs: 2, type: 'float'});
+
+    var args1 = parser.parseArgs(['--xlim', '-.002', '1e4']);
+    var args2 = parser.parseArgs(['--xlim', '-2e3', '1e4']);
+    assert.equal(args1, args2);
+	});
 });
