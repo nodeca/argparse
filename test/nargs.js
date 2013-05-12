@@ -840,7 +840,6 @@ describe('nargs', function () {
 
   });
 
-
   it("should accept defaultValue for nargs:'*'", function () {
     parser = new ArgumentParser({debug: true});
     parser.addArgument(['-f', '--foo']);
@@ -849,4 +848,13 @@ describe('nargs', function () {
     args = parser.parseArgs([]);
     assert.equal(args.bar, 42);
   });
+
+  it("should accept negative scientific numbers as values", function () {
+    parser = new ArgumentParser({debug: true});
+    parser.addArgument(['--xlim'], {nargs: 2, type: 'float'});
+
+    args = parser.parseArgs(['--xlim', '-2e-3', '1e4']);
+    assert.equal(args['xlim'][0], -0.002);
+  });
+
 });
