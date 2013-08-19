@@ -85,7 +85,7 @@ Creates a new ArgumentParser object.
 - ```parents``` - A list of ArgumentParser objects whose arguments should also be included.
 - ```prefixChars``` - The set of characters that prefix optional arguments. (default: ‘-‘)
 - ```formatterClass``` - A class for customizing the help output.
-- ```prog``` - The name of the program (default: sys.argv[0])
+- ```prog``` - The name of the program (default: process.argv[0])
 - ```usage``` - The string describing the program usage (default: generated)
 - ```conflictHandler``` - Usually unnecessary, defines strategy for resolving conflicting optionals.
 
