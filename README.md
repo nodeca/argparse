@@ -80,8 +80,8 @@ Creates a new ArgumentParser object.
 
 - ```description``` - Text to display before the argument help.
 - ```epilog``` - Text to display after the argument help.
-- ```addHelp``` - Add a -h/–help option to the parser. (default: True)
-- ```argumentDefault``` - Set the global default value for arguments. (default: None)
+- ```addHelp``` - Add a -h/–help option to the parser. (default: true)
+- ```argumentDefault``` - Set the global default value for arguments. (default: null)
 - ```parents``` - A list of ArgumentParser objects whose arguments should also be included.
 - ```prefixChars``` - The set of characters that prefix optional arguments. (default: ‘-‘)
 - ```formatterClass``` - A class for customizing the help output.
