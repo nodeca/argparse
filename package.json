@@ -8,7 +8,7 @@
   "contributors"    : ["Eugene Shkuropat", "Paul Jacobson"],
 
   "bugs"            : { "url": "https://github.com/nodeca/argparse/issues" },
-  "license"         : { "type": "MIT", "url": "https://github.com/nodeca/argparse/blob/master/LICENSE" },
+  "license"         : "MIT",
   "repository"      : { "type": "git", "url": "git://github.com/nodeca/argparse.git" },
 
   "main"            : "./index.js",
