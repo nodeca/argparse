@@ -18,9 +18,8 @@
                       },
 
    "dependencies"   : {
-                        "underscore"        : "~1.4.3",
-                        "underscore.string" : "~2.3.1"
+                        "underscore"        : "~1.7.0",
+                        "underscore.string" : "~2.4.0"
                       },
-  "devDependencies" : { "mocha": "*" },
-  "engines"         : { "node": ">= 0.6.0" }
+  "devDependencies" : { "mocha": "*" }
 }
