@@ -8,8 +8,6 @@ var ArgumentParser = require('../lib/argparse').ArgumentParser;
 
 var assert  = require('assert');
 var path    = require('path');
-var _       = require('underscore');
-_.str       = require('underscore.string');
 
 
 var orig_cwd   = process.cwd();

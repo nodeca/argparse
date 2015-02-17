@@ -2,8 +2,7 @@
 'use strict';
 
 var assert = require('assert');
-var _ = require('underscore');
-_.str = require('underscore.string');
+
 
 var argparse = require('../lib/argparse');
 
