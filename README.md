@@ -8,7 +8,10 @@ CLI arguments parser for node.js. Javascript port of python's
 (original version 3.2). That's a full port, except some very rare options,
 recorded in issue tracker.
 
-**NB.** Method names changed to camelCase. See [generated docs](http://nodeca.github.com/argparse/).
+**NB. Difference with original.**
+
+- Method names changed to camelCase. See [generated docs](http://nodeca.github.com/argparse/).
+- Use `defaultValue` instead of `default`.
 
 
 Example
