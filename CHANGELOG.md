@@ -1,3 +1,12 @@
+1.0.0 / 2015-02-19
+-------------------
+
+* Maintenance release.
+* Replaced `underscore` with `lodash`.
+* Bumped version to 1.0.0 to better reflect semver meaning.
+* HISTORY.md -> CHANGELOG.md
+
+
 0.1.16 / 2013-12-01
 -------------------
 
