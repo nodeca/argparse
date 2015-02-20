@@ -1,5 +1,11 @@
+1.0.1 / 2015-02-20
+------------------
+
+* Changed dependencies to be compatible with ancient nodejs.
+
+
 1.0.0 / 2015-02-19
--------------------
+------------------
 
 * Maintenance release.
 * Replaced `underscore` with `lodash`.
