@@ -1,7 +1,7 @@
 {
   "name": "argparse",
   "description": "Very powerful CLI arguments parser. Native port of argparse - python's options parsing library",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "keywords": [
     "cli",
     "parser",
@@ -27,7 +27,7 @@
     "test": "make test"
   },
   "dependencies": {
-    "lodash": "~3.2",
+    "lodash": ">= 3.2.0 < 4.0.0",
     "sprintf-js": "~1.0.2"
   },
   "devDependencies": {
