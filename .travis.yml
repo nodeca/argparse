@@ -1,5 +1,8 @@
 language: node_js
 node_js:
  - "0.10"
+ - "0.12"
+ - iojs
 before_script: "make dev-deps"
 script: "make test"
+sudo: false
