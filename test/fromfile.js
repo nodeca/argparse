@@ -49,7 +49,7 @@ describe('from file', function () {
       function () {
         args = parser.parseArgs(['@invalid']);
       },
-      /ENOENT, no such file or directory/
+      /ENOENT[:,] no such file or directory/
     );
   });
   it('test reading arguments from an missing file', function () {
@@ -57,7 +57,7 @@ describe('from file', function () {
       function () {
         args = parser.parseArgs(['@missing']);
       },
-      /ENOENT, no such file or directory/
+      /ENOENT[:,] no such file or directory/
     );
   });
   it('test custom convertArgLineToArgs function', function () {
