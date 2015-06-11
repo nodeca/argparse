@@ -244,4 +244,12 @@ describe('base', function () {
       args = parser.parseArgs([ '-y' ]);
     });
   });
+
+  it('should support instantiation without new', function () {
+    assert.doesNotThrow(function () {
+      /* jshint -W064 */
+      parser = ArgumentParser({debug: true});
+      /* jshint +W064 */
+    });
+  });
 });
