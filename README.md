@@ -93,12 +93,15 @@ Creates a new ArgumentParser object.
 - ```usage``` - The string describing the program usage (default: generated)
 - ```conflictHandler``` - Usually unnecessary, defines strategy for resolving conflicting optionals.
 
-**Not supportied yet**
+**Not supported yet**
 
 - ```fromfilePrefixChars``` - The set of characters that prefix files from which additional arguments should be read.
 
 
-Details in [original ArgumentParser guide](http://docs.python.org/dev/library/argparse.html#argumentparser-objects)
+Details in [original ArgumentParser guide](http://docs.python.org/dev/library/argparse.html#argumentparser-objects).
+
+Unlike in Python, the `description` key can take both a string and an array
+of strings. When passing an array, a paragraph is added for each string.
 
 
 addArgument() method
