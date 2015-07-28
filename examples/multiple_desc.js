@@ -7,8 +7,8 @@ var parser = new ArgumentParser({
   addHelp: true,
   description: [
     'Argparse examples: multiple description paragraphs.',
-    'This is an example of multiple paragraphs in the description. Pass an '
-    + 'array instead of a string to do this.'
+    'This is an example of multiple paragraphs in the description. Pass an ' +
+    'array instead of a string to do this.'
   ],
   epilog: 'help epilog',
   prog: 'help_example_prog'
