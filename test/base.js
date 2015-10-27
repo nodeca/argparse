@@ -123,6 +123,16 @@ describe('base', function () {
     args = parser.parseArgs(['-1']);
     assert.equal(args.bar, -1);
   });
+  
+  it("should parse arguments with '='", function () {
+    parser = new ArgumentParser({debug: true});
+    parser.addArgument(['-f', '--foo']);
+    parser.addArgument([ 'bar' ]);
+
+    args = parser.parseArgs('-f="foo=nice=path" "bar=nice=path"'.split(' '));
+    assert.equal(args.foo, '"foo=nice=path"');
+    assert.equal(args.bar, '"bar=nice=path"');
+  });
 
   it("No negative number options; neg number is positional argument", function () {
     parser = new ArgumentParser({debug: true});
