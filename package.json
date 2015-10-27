@@ -1,7 +1,7 @@
 {
   "name": "argparse",
   "description": "Very powerful CLI arguments parser. Native port of argparse - python's options parsing library",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "keywords": [
     "cli",
     "parser",
@@ -14,15 +14,8 @@
     "Eugene Shkuropat",
     "Paul Jacobson"
   ],
-  "bugs": {
-    "url": "https://github.com/nodeca/argparse/issues"
-  },
   "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/nodeca/argparse.git"
-  },
-  "main": "./index.js",
+  "repository": "nodeca/argparse",
   "scripts": {
     "test": "make test"
   },
