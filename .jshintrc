@@ -15,7 +15,7 @@
   "regexp"        : false,  // Prohibit `.` and `[^...]` in regular expressions.
   "undef"         : true,   // Require all non-global variables be declared before they are used.
   "unused"        : true,   // Warns when you define and never use your variables
-  "strict"        : true,   // Require `use strict` pragma  in every file.
+  "strict"        : "global",   // Require `use strict` pragma  in every file.
   "trailing"      : true,   // Prohibit trailing whitespaces.
 
   // Relaxing Options //////////////////////////////////////////////////////////
@@ -29,7 +29,6 @@
   "evil"          : false,  // Tolerate use of `eval`.
   "expr"          : false,  // Tolerate `ExpressionStatement` as Programs.
   "funcscope"     : false,  // Tolerate declaring variables inside of control structures while accessing them later
-  "globalstrict"  : true,   // Allow global "use strict" (also enables 'strict').
   "iterator"      : false,  // Allow usage of __iterator__ property.
   "lastsemic"     : false,  // Tolerate semicolon omited for the last statement.
   "laxbreak"      : false,  // Tolerate unsafe line breaks e.g. `return [\n] x` without semicolons.
