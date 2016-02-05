@@ -1,3 +1,10 @@
+1.0.5 / 2016-02-05
+------------------
+
+- Removed lodash dependency to significantly reduce install size.
+  Thanks to @mourner.
+
+
 1.0.4 / 2016-01-17
 ------------------
 
