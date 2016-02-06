@@ -17,13 +17,13 @@ function max(arr) {
 }
 
 
-parser.addArgument(['integers'], {
+parser.addArgument([ 'integers' ], {
   metavar:      'N',
   type:         'int',
   nargs:        '+',
   help:         'an integer for the accumulator'
 });
-parser.addArgument(['--sum'], {
+parser.addArgument([ '--sum' ], {
   dest:         'accumulate',
   action:       'storeConst',
   constant:     sum,

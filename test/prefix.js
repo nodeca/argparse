@@ -154,7 +154,7 @@ describe('prefix', function () {
   });
 
   it('test when one double-dash option string is a prefix of another', function () {
-    parser = new ArgumentParser({debug: true});
+    parser = new ArgumentParser({ debug: true });
     parser.addArgument([ '--badger' ], { action: 'storeTrue' });
     parser.addArgument([ '--ba' ], {});
 
@@ -196,7 +196,7 @@ describe('prefix', function () {
       debug: true
     });
     parser.addArgument([ '-' ], { dest: 'x', const: 'badger', nargs: '?', constant: 'badger' });
-    parser.addArgument([ '+' ], { "default": 42, dest: 'y', type: 'int', defaultValue: 42 });
+    parser.addArgument([ '+' ], { 'default': 42, dest: 'y', type: 'int', defaultValue: 42 });
     parser.addArgument([ '-+-' ], { action: 'storeTrue', dest: 'z' });
 
     args = parser.parseArgs([]);

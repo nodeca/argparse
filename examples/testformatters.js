@@ -12,7 +12,7 @@ var print = function () {
 
 var argparse = require('argparse');
 
-print("TEST argparse.ArgumentDefaultsHelpFormatter");
+print('TEST argparse.ArgumentDefaultsHelpFormatter');
 
 parser = new argparse.ArgumentParser({
   debug: true,
@@ -20,20 +20,20 @@ parser = new argparse.ArgumentParser({
   description: 'description'
 });
 
-parser.addArgument(['--foo'], {
+parser.addArgument([ '--foo' ], {
   help: 'foo help - oh and by the way, %(defaultValue)s'
 });
 
-parser.addArgument(['--bar'], {
+parser.addArgument([ '--bar' ], {
   action: 'storeTrue',
   help: 'bar help'
 });
 
-parser.addArgument(['spam'], {
+parser.addArgument([ 'spam' ], {
   help: 'spam help'
 });
 
-parser.addArgument(['badger'], {
+parser.addArgument([ 'badger' ], {
   nargs: '?',
   defaultValue: 'wooden',
   help: 'badger help'
@@ -44,7 +44,7 @@ group = parser.addArgumentGroup({
   description: 'group description'
 });
 
-group.addArgument(['--baz'], {
+group.addArgument([ '--baz' ], {
   type: 'int',
   defaultValue: 42,
   help: 'baz help'
@@ -79,7 +79,7 @@ title:
   --baz BAZ   baz help (default: 42)
 */
 
-print("TEST argparse.RawDescriptionHelpFormatter");
+print('TEST argparse.RawDescriptionHelpFormatter');
 
 parser = new argparse.ArgumentParser({
   debug: true,
@@ -91,12 +91,12 @@ parser = new argparse.ArgumentParser({
                'here\n'
 });
 
-a = parser.addArgument(['--foo'], {
+a = parser.addArgument([ '--foo' ], {
   help: '  foo help should not\n' +
         '    retain this odd formatting'
 });
 
-parser.addArgument(['spam'], {
+parser.addArgument([ 'spam' ], {
   'help': 'spam help'
 });
 
@@ -107,7 +107,7 @@ group = parser.addArgumentGroup({
                '    exactly like it is here\n'
 });
 
-group.addArgument(['--bar'], {
+group.addArgument([ '--bar' ], {
   help: 'bar help'
 });
 
@@ -146,7 +146,7 @@ title:
 */
 
 
-print("TEST argparse.RawTextHelpFormatter");
+print('TEST argparse.RawTextHelpFormatter');
 
 parser = new argparse.ArgumentParser({
   debug: true,
@@ -158,17 +158,17 @@ parser = new argparse.ArgumentParser({
                'here\n'
 });
 
-parser.addArgument(['--baz'], {
+parser.addArgument([ '--baz' ], {
   help: '    baz help should also\n' +
         'appear as given here'
 });
 
-a = parser.addArgument(['--foo'], {
+a = parser.addArgument([ '--foo' ], {
   help: '  foo help should also\n' +
         'appear as given here'
 });
 
-parser.addArgument(['spam'], {
+parser.addArgument([ 'spam' ], {
   'help': 'spam help'
 });
 
@@ -179,7 +179,7 @@ group = parser.addArgumentGroup({
                '    exactly like it is here\n'
 });
 
-group.addArgument(['--bar'], {
+group.addArgument([ '--bar' ], {
   help: 'bar help'
 });
 
@@ -217,34 +217,34 @@ title:
 */
 
 
-print("TEST metavar as a tuple");
+print('TEST metavar as a tuple');
 
 parser = new argparse.ArgumentParser({
   prog: 'PROG'
 });
 
-parser.addArgument(['-w'], {
+parser.addArgument([ '-w' ], {
   help: 'w',
   nargs: '+',
-  metavar: ['W1', 'W2']
+  metavar: [ 'W1', 'W2' ]
 });
 
-parser.addArgument(['-x'], {
+parser.addArgument([ '-x' ], {
   help: 'x',
   nargs: '*',
-  metavar: ['X1', 'X2']
+  metavar: [ 'X1', 'X2' ]
 });
 
-parser.addArgument(['-y'], {
+parser.addArgument([ '-y' ], {
   help: 'y',
   nargs: 3,
-  metavar: ['Y1', 'Y2', 'Y3']
+  metavar: [ 'Y1', 'Y2', 'Y3' ]
 });
 
-parser.addArgument(['-z'], {
+parser.addArgument([ '-z' ], {
   help: 'z',
   nargs: '?',
-  metavar: ['Z1']
+  metavar: [ 'Z1' ]
 });
 
 helptext = parser.formatHelp();

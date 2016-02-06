@@ -9,7 +9,7 @@ var parser = new ArgumentParser({
 });
 
 parser.addArgument(
-  [ '-a'],
+  [ '-a' ],
   {
     action: 'storeConst',
     dest:   'answer',

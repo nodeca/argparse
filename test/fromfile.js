@@ -20,34 +20,34 @@ describe('from file', function () {
     process.chdir(path.normalize('./test/fixtures'));
   });
   beforeEach(function () {
-    parser = new ArgumentParser({debug: true, fromfilePrefixChars: '@'});
-    parser.addArgument(['-a']);
-    parser.addArgument(['x']);
-    parser.addArgument(['y'], {nargs: '+'});
+    parser = new ArgumentParser({ debug: true, fromfilePrefixChars: '@' });
+    parser.addArgument([ '-a' ]);
+    parser.addArgument([ 'x' ]);
+    parser.addArgument([ 'y' ], { nargs: '+' });
   });
   after(function () {
     process.chdir(orig_cwd);
   });
-  it("test reading arguments from a file", function () {
-    args = parser.parseArgs(['X', 'Y']);
-    assert.deepEqual(args, {a: null, x: 'X', y: ['Y']});
-    args = parser.parseArgs(['X', '-a', 'A', 'Y', 'Z']);
-    assert.deepEqual(args, { a: 'A',  x: 'X',  y: ['Y', 'Z']});
-    args = parser.parseArgs(['@hello', 'X']);
-    assert.deepEqual(args, {a: null, x: 'hello world!', y: ['X']});
-    args = parser.parseArgs(['X', '@hello']);
-    assert.deepEqual(args, {a: null, x: 'X', y: ['hello world!']});
+  it('test reading arguments from a file', function () {
+    args = parser.parseArgs([ 'X', 'Y' ]);
+    assert.deepEqual(args, { a: null, x: 'X', y: [ 'Y' ] });
+    args = parser.parseArgs([ 'X', '-a', 'A', 'Y', 'Z' ]);
+    assert.deepEqual(args, { a: 'A',  x: 'X',  y: [ 'Y', 'Z' ] });
+    args = parser.parseArgs([ '@hello', 'X' ]);
+    assert.deepEqual(args, { a: null, x: 'hello world!', y: [ 'X' ] });
+    args = parser.parseArgs([ 'X', '@hello' ]);
+    assert.deepEqual(args, { a: null, x: 'X', y: [ 'hello world!' ] });
   });
-  it("test recursive reading arguments from files", function () {
-    args = parser.parseArgs(['-a', 'B', '@recursive', 'Y', 'Z']);
-    assert.deepEqual(args, {a: 'A', x: 'hello world!', y: ['Y', 'Z']});
-    args = parser.parseArgs(['X', '@recursive', 'Z', '-a', 'B']);
-    assert.deepEqual(args, {a: 'B', x: 'X', y: ['hello world!', 'Z']});
+  it('test recursive reading arguments from files', function () {
+    args = parser.parseArgs([ '-a', 'B', '@recursive', 'Y', 'Z' ]);
+    assert.deepEqual(args, { a: 'A', x: 'hello world!', y: [ 'Y', 'Z' ] });
+    args = parser.parseArgs([ 'X', '@recursive', 'Z', '-a', 'B' ]);
+    assert.deepEqual(args, { a: 'B', x: 'X', y: [ 'hello world!', 'Z' ] });
   });
   it('test reading arguments from an invalid file', function () {
     assert.throws(
       function () {
-        args = parser.parseArgs(['@invalid']);
+        args = parser.parseArgs([ '@invalid' ]);
       },
       /ENOENT[:,] no such file or directory/
     );
@@ -55,7 +55,7 @@ describe('from file', function () {
   it('test reading arguments from an missing file', function () {
     assert.throws(
       function () {
-        args = parser.parseArgs(['@missing']);
+        args = parser.parseArgs([ '@missing' ]);
       },
       /ENOENT[:,] no such file or directory/
     );
@@ -64,12 +64,12 @@ describe('from file', function () {
     parser.convertArgLineToArgs = function (argLine) {
         // split line into 'words'
         args = argLine.split(' ');
-        args = args.map(function (arg) {return arg.trim(); });
-        args = args.filter(function (arg) {return arg.length > 0; });
+        args = args.map(function (arg) { return arg.trim(); });
+        args = args.filter(function (arg) { return arg.length > 0; });
         return args;
       };
-    args = parser.parseArgs(['X', '@hello']);
-    assert.deepEqual(args, {a: null, x: 'X', y: ['hello', 'world!']});
+    args = parser.parseArgs([ 'X', '@hello' ]);
+    assert.deepEqual(args, { a: null, x: 'X', y: [ 'hello', 'world!' ] });
   });
 });
 

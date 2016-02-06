@@ -11,7 +11,7 @@ describe('positionals', function () {
   var args;
 
   it("test the 'append' action", function () {
-    parser = new ArgumentParser({debug: true});
+    parser = new ArgumentParser({ debug: true });
     parser.addArgument([ 'spam' ], { action: 'append' });
     parser.addArgument([ 'spam' ], { action: 'append', nargs: 2 });
 
@@ -36,7 +36,7 @@ describe('positionals', function () {
   });
 
   it('test a set of integer choices', function () {
-    parser = new ArgumentParser({debug: true});
+    parser = new ArgumentParser({ debug: true });
     parser.addArgument([ 'spam' ], {
       type: 'int',
       choices: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 ]
@@ -65,7 +65,7 @@ describe('positionals', function () {
   });
 
   it('test a set of single-character choices', function () {
-    parser = new ArgumentParser({debug: true});
+    parser = new ArgumentParser({ debug: true });
     parser.addArgument([ 'spam' ], { choices: [ 'a', 'c', 'b', 'e', 'd', 'g', 'f' ] });
 
     args = parser.parseArgs([ 'a' ]);

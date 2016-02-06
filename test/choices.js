@@ -11,9 +11,9 @@ describe('choices', function () {
   var parser;
   var args;
 
-  it("should store correct choice(choices defined as string)", function () {
+  it('should store correct choice(choices defined as string)', function () {
     parser = new ArgumentParser({ debug: true });
-    parser.addArgument(['--foo'], {choices: 'abc'});
+    parser.addArgument([ '--foo' ], { choices: 'abc' });
 
     args = parser.parseArgs('--foo a'.split(' '));
     assert.equal(args.foo, 'a');
@@ -21,7 +21,7 @@ describe('choices', function () {
 
   it("should drop down with 'Invalid choice' error for incorrect choices(choices defined as string)", function () {
     parser = new ArgumentParser({ debug: true });
-    parser.addArgument(['--foo'], {choices: 'abc'});
+    parser.addArgument([ '--foo' ], { choices: 'abc' });
 
     assert.throws(
       function () {
@@ -40,9 +40,9 @@ describe('choices', function () {
   });
 
 
-  it("should store correct choice(choices defined as array)", function () {
+  it('should store correct choice(choices defined as array)', function () {
     parser = new ArgumentParser({ debug: true });
-    parser.addArgument(['--foo'], {choices: ['a', 'abc', 'd']});
+    parser.addArgument([ '--foo' ], { choices: [ 'a', 'abc', 'd' ] });
 
     args = parser.parseArgs('--foo abc'.split(' '));
     assert.equal(args.foo, 'abc');
@@ -50,7 +50,7 @@ describe('choices', function () {
 
   it("should drop down with 'Invalid choice' error for incorrect choices(choices defined as array)", function () {
     parser = new ArgumentParser({ debug: true });
-    parser.addArgument(['--foo'], {choices: ['a', 'abc', 'd']});
+    parser.addArgument([ '--foo' ], { choices: [ 'a', 'abc', 'd' ] });
 
     assert.throws(
       function () {

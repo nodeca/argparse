@@ -13,17 +13,17 @@ describe('child group', function () {
 
   beforeEach(function () {
     // parent has name group and exclusive group that should be passed to child
-    parentParser = new ArgumentParser({prog: 'PROG', debug: true, addHelp: false});
-    parentParser.addArgument(['--foo'], {help: 'parent foo'});
+    parentParser = new ArgumentParser({ prog: 'PROG', debug: true, addHelp: false });
+    parentParser.addArgument([ '--foo' ], { help: 'parent foo' });
     // parentParser.addArgument(['pbar'], {help: 'parent positional'});
-    group = parentParser.addArgumentGroup({title: 'parent group'});
-    group.addArgument(['--gfoo'], {help: 'group foo help'});
-    group.addArgument(['gbar'], {help: 'group bar help'});
-    xgroup = parentParser.addMutuallyExclusiveGroup({required: true});
-    xgroup.addArgument(['--xfoo'], {action: 'storeTrue', help: 'xfoo or xbar, set true'});
-    xgroup.addArgument(['--xbar'], {action: 'storeFalse', help: 'xfoo or xbar, set false'});
-    childParser = new ArgumentParser({parents: [parentParser], description: 'child parser', debug: true});
-    childParser.addArgument(['--cbar'], {help: 'child bar opt arg'});
+    group = parentParser.addArgumentGroup({ title: 'parent group' });
+    group.addArgument([ '--gfoo' ], { help: 'group foo help' });
+    group.addArgument([ 'gbar' ], { help: 'group bar help' });
+    xgroup = parentParser.addMutuallyExclusiveGroup({ required: true });
+    xgroup.addArgument([ '--xfoo' ], { action: 'storeTrue', help: 'xfoo or xbar, set true' });
+    xgroup.addArgument([ '--xbar' ], { action: 'storeFalse', help: 'xfoo or xbar, set false' });
+    childParser = new ArgumentParser({ parents: [ parentParser ], description: 'child parser', debug: true });
+    childParser.addArgument([ '--cbar' ], { help: 'child bar opt arg' });
   });
 
   it('compare help parent and child', function () {
@@ -37,14 +37,14 @@ describe('child group', function () {
   it('child should  throw error if an xclusive group member is missing', function () {
     assert.throws(
       function () {
-        args = childParser.parseArgs(['gbararg']);
+        args = childParser.parseArgs([ 'gbararg' ]);
       },
       /one of the arguments (.*) is required/
     );
   });
 
   it('child accepts an xgroup item and positional arg from parent', function () {
-    args = childParser.parseArgs(['--xbar', 'gbararg']);
+    args = childParser.parseArgs([ '--xbar', 'gbararg' ]);
     assert.equal(args.gbar, 'gbararg');
     assert.equal(args.xbar, false);
   });
@@ -52,7 +52,7 @@ describe('child group', function () {
   it('child throws error if both xclusive options are given', function () {
     assert.throws(
       function () {
-        args = childParser.parseArgs(['--xfoo', '--xbar']);
+        args = childParser.parseArgs([ '--xfoo', '--xbar' ]);
       },
       /Not allowed with argument/
     );

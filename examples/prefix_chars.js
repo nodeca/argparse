@@ -8,16 +8,16 @@ var parser = new ArgumentParser({
   description: 'Argparse examples: prefix_chars',
   prefixChars: '-+'
 });
-parser.addArgument(['+f', '++foo']);
-parser.addArgument(['++bar'], {action: 'storeTrue'});
+parser.addArgument([ '+f', '++foo' ]);
+parser.addArgument([ '++bar' ], { action: 'storeTrue' });
 
 parser.printHelp();
 console.log('-----------');
 
 var args;
-args = parser.parseArgs(['+f', '1']);
+args = parser.parseArgs([ '+f', '1' ]);
 console.dir(args);
-args = parser.parseArgs(['++bar']);
+args = parser.parseArgs([ '++bar' ]);
 console.dir(args);
-args = parser.parseArgs(['++foo', '2', '++bar']);
+args = parser.parseArgs([ '++foo', '2', '++bar' ]);
 console.dir(args);

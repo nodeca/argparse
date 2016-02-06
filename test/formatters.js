@@ -17,20 +17,20 @@ describe('formatterClass alternatives', function () {
       description: 'description'
     });
 
-    parser.addArgument(['--foo'], {
+    parser.addArgument([ '--foo' ], {
       help: 'foo help - oh and by the way, %(defaultValue)s'
     });
 
-    parser.addArgument(['--bar'], {
+    parser.addArgument([ '--bar' ], {
       action: 'storeTrue',
       help: 'bar help'
     });
 
-    parser.addArgument(['spam'], {
+    parser.addArgument([ 'spam' ], {
       help: 'spam help'
     });
 
-    parser.addArgument(['badger'], {
+    parser.addArgument([ 'badger' ], {
       nargs: '?',
       defaultValue: 'wooden',
       help: 'badger help'
@@ -41,7 +41,7 @@ describe('formatterClass alternatives', function () {
       description: 'group description'
     });
 
-    group.addArgument(['--baz'], {
+    group.addArgument([ '--baz' ], {
       type: 'int',
       defaultValue: 42,
       help: 'baz help'
@@ -89,12 +89,12 @@ title:
                    'here\n'
     });
 
-    a = parser.addArgument(['--foo'], {
+    a = parser.addArgument([ '--foo' ], {
       help: '  foo help should not\n' +
             '    retain this odd formatting'
     });
 
-    parser.addArgument(['spam'], {
+    parser.addArgument([ 'spam' ], {
       'help': 'spam help'
     });
 
@@ -105,7 +105,7 @@ title:
                    '    exactly like it is here\n'
     });
 
-    group.addArgument(['--bar'], {
+    group.addArgument([ '--bar' ], {
       help: 'bar help'
     });
 
@@ -153,17 +153,17 @@ title:
                    'here\n'
     });
 
-    parser.addArgument(['--baz'], {
+    parser.addArgument([ '--baz' ], {
       help: '    baz help should also\n' +
             'appear as given here'
     });
 
-    a = parser.addArgument(['--foo'], {
+    a = parser.addArgument([ '--foo' ], {
       help: '  foo help should also\n' +
             'appear as given here'
     });
 
-    parser.addArgument(['spam'], {
+    parser.addArgument([ 'spam' ], {
       'help': 'spam help'
     });
 
@@ -174,7 +174,7 @@ title:
                    '    exactly like it is here\n'
     });
 
-    group.addArgument(['--bar'], {
+    group.addArgument([ '--bar' ], {
       help: 'bar help'
     });
 
@@ -214,28 +214,28 @@ title:
       prog: 'PROG'
     });
 
-    parser.addArgument(['-w'], {
+    parser.addArgument([ '-w' ], {
       help: 'w',
       nargs: '+',
-      metavar: ['W1', 'W2']
+      metavar: [ 'W1', 'W2' ]
     });
 
-    parser.addArgument(['-x'], {
+    parser.addArgument([ '-x' ], {
       help: 'x',
       nargs: '*',
-      metavar: ['X1', 'X2']
+      metavar: [ 'X1', 'X2' ]
     });
 
-    parser.addArgument(['-y'], {
+    parser.addArgument([ '-y' ], {
       help: 'y',
       nargs: 3,
-      metavar: ['Y1', 'Y2', 'Y3']
+      metavar: [ 'Y1', 'Y2', 'Y3' ]
     });
 
-    parser.addArgument(['-z'], {
+    parser.addArgument([ '-z' ], {
       help: 'z',
       nargs: '?',
-      metavar: ['Z1']
+      metavar: [ 'Z1' ]
     });
 
     helptext = parser.formatHelp();

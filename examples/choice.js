@@ -8,15 +8,15 @@ var parser = new ArgumentParser({
   description: 'Argparse examples: choice'
 });
 
-parser.addArgument(['foo'], {choices: 'abc'});
+parser.addArgument([ 'foo' ], { choices: 'abc' });
 
 parser.printHelp();
 console.log('-----------');
 
 var args;
-args = parser.parseArgs(['c']);
+args = parser.parseArgs([ 'c' ]);
 console.dir(args);
 console.log('-----------');
-parser.parseArgs(['X']);
+parser.parseArgs([ 'X' ]);
 console.dir(args);
 
