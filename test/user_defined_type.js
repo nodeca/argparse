@@ -97,6 +97,7 @@ describe('user defined type', function () {
   });
 
   it('test an anonymous user-defined type', function () {
+    /*eslint-disable func-style*/
     var dateType = function (arg) {
       var x = new Date(arg);
       if (x.toString().match('Invalid')) {

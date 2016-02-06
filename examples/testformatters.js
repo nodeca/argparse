@@ -5,9 +5,9 @@ var a, group, parser, helptext;
 var assert = require('assert');
 
 
-var print = function () {
-    return console.log.apply(console, arguments);
-  };
+function print() {
+  return console.log.apply(console, arguments);
+}
 // print = function () {};
 
 var argparse = require('argparse');
@@ -97,7 +97,7 @@ a = parser.addArgument([ '--foo' ], {
 });
 
 parser.addArgument([ 'spam' ], {
-  'help': 'spam help'
+  help: 'spam help'
 });
 
 group = parser.addArgumentGroup({
@@ -169,7 +169,7 @@ a = parser.addArgument([ '--foo' ], {
 });
 
 parser.addArgument([ 'spam' ], {
-  'help': 'spam help'
+  help: 'spam help'
 });
 
 group = parser.addArgumentGroup({

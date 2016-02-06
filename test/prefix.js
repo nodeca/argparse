@@ -71,6 +71,7 @@ describe('prefix', function () {
   });
 
   // http://bugs.python.org/issue9444
+  /*eslint-disable max-len*/
   it('when "-" not in prefix_chars, default operators created for help should use the prefix_chars in use rather than - or --', function () {
     parser = new ArgumentParser({
       addHelp: true,
@@ -196,7 +197,7 @@ describe('prefix', function () {
       debug: true
     });
     parser.addArgument([ '-' ], { dest: 'x', const: 'badger', nargs: '?', constant: 'badger' });
-    parser.addArgument([ '+' ], { 'default': 42, dest: 'y', type: 'int', defaultValue: 42 });
+    parser.addArgument([ '+' ], { default: 42, dest: 'y', type: 'int', defaultValue: 42 });
     parser.addArgument([ '-+-' ], { action: 'storeTrue', dest: 'z' });
 
     args = parser.parseArgs([]);

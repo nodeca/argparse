@@ -3,12 +3,9 @@
 'use strict';
 
 var assert = require('assert');
-
-var ArgumentParser = require('../lib/argparse').ArgumentParser;
-
-var assert  = require('assert');
 var path    = require('path');
 
+var ArgumentParser = require('../lib/argparse').ArgumentParser;
 
 var orig_cwd   = process.cwd();
 

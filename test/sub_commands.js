@@ -74,6 +74,7 @@ describe('sub-commands', function () {
   });
 
   it('should support #setDefaults', function () {
+    /*eslint-disable no-undefined*/
     c1.setDefaults({ spam: 1 });
     c2.setDefaults({ eggs: 2 });
     args = parser.parseArgs([ 'c1' ]);

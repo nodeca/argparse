@@ -26,14 +26,14 @@ describe('choices', function () {
     assert.throws(
       function () {
         args = parser.parseArgs('--foo e'.split(' '));
-        console.dir(args);
+        // console.dir(args);
       },
       /Invalid choice:/
     );
     assert.throws(
       function () {
         args = parser.parseArgs('--foo 0'.split(' '));
-        console.dir(args);
+        // console.dir(args);
       },
       /Invalid choice:/
     );
@@ -55,14 +55,14 @@ describe('choices', function () {
     assert.throws(
       function () {
         args = parser.parseArgs('--foo e'.split(' '));
-        console.dir(args);
+        // console.dir(args);
       },
       /Invalid choice:/
     );
     assert.throws(
       function () {
         args = parser.parseArgs('--foo 0'.split(' '));
-        console.dir(args);
+        // console.dir(args);
       },
       /Invalid choice:/
     );

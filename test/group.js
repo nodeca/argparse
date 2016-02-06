@@ -137,7 +137,7 @@ describe('group', function () {
     args = parser.parseArgs([ '--spam', 'S' ]);
     assert.deepEqual(args, { foo: false, spam: 'S', badger: 'X' });
     args = parser.parseArgs([ 'X' ]);
-    assert.deepEqual(args, {'foo': false, 'spam': null, 'badger': [ 'X' ] });
+    assert.deepEqual(args, { foo: false, spam: null, badger: [ 'X' ] });
     args = parser.parseArgs([ '--foo' ]);
     assert.deepEqual(args, { foo: true, spam: null, badger: 'X' });
     assert.throws(

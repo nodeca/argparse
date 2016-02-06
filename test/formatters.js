@@ -95,7 +95,7 @@ title:
     });
 
     parser.addArgument([ 'spam' ], {
-      'help': 'spam help'
+      help: 'spam help'
     });
 
     group = parser.addArgumentGroup({
@@ -164,7 +164,7 @@ title:
     });
 
     parser.addArgument([ 'spam' ], {
-      'help': 'spam help'
+      help: 'spam help'
     });
 
     group = parser.addArgumentGroup({

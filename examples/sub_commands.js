@@ -21,7 +21,8 @@ bar.addArgument(
     help: 'foo3 bar3'
   }
 );
-var bar = subparsers.addParser(
+
+bar = subparsers.addParser(
   'c2',
   { aliases: [ 'co' ], addHelp: true, help: 'c2 help' }
 );

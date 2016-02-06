@@ -220,11 +220,11 @@ describe('base', function () {
     parser.addArgument([ 'y' ]);
 
     args = parser.parseArgs([ 'X', 'Y' ]);
-    assert.deepEqual(args, {'foo': null, 'x': 'X', 'y': "Y" });
+    assert.deepEqual(args, { foo: null, x: 'X', y: 'Y' });
     args = parser.parseArgs([ '-f', 'A', 'X', 'Y' ]);
-    assert.deepEqual(args, {'foo': 'A', 'x': 'X', 'y': "Y" });
+    assert.deepEqual(args, { foo: 'A', x: 'X', y: 'Y' });
     args = parser.parseArgs([ 'X', '-f', 'A', 'Y' ]);
-    assert.deepEqual(args, {'foo': 'A', 'x': 'X', 'y': "Y" });
+    assert.deepEqual(args, { foo: 'A', x: 'X', y: 'Y' });
     // was giving: Error: _mocha: error: Unrecognized arguments: X.
   });
 
@@ -257,9 +257,8 @@ describe('base', function () {
 
   it('should support instantiation without new', function () {
     assert.doesNotThrow(function () {
-      /* jshint -W064 */
+      /*eslint-disable new-cap*/
       parser = ArgumentParser({ debug: true });
-      /* jshint +W064 */
     });
   });
 });

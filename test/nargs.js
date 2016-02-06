@@ -77,7 +77,7 @@ describe('nargs', function () {
   it('test specifying an args for an Optional, that accepts one or more', function () {
     parser = new ArgumentParser({ debug: true });
     parser.addArgument([ '-x' ], { nargs: '+' });
-    parser.addArgument([ '-y' ], { 'default': 'spam', nargs: '+', defaultValue: 'spam' });
+    parser.addArgument([ '-y' ], { default: 'spam', nargs: '+', defaultValue: 'spam' });
 
     args = parser.parseArgs([]);
     assert.deepEqual(args, { y: 'spam', x: null });
@@ -111,9 +111,9 @@ describe('nargs', function () {
     parser = new ArgumentParser({ debug: true });
     parser.addArgument([ '-w' ], { nargs: '?' });
     parser.addArgument([ '-x' ], { const: 42, nargs: '?', constant: 42 });
-    parser.addArgument([ '-y' ], { 'default': 'spam', nargs: '?', defaultValue: 'spam' });
+    parser.addArgument([ '-y' ], { default: 'spam', nargs: '?', defaultValue: 'spam' });
     parser.addArgument([ '-z' ], {
-      'default': '84',
+      default: '84',
       nargs: '?',
       type: 'int',
       const: '42',
@@ -148,7 +148,7 @@ describe('nargs', function () {
   it('test specifying an args for an Optional that accepts zero or more', function () {
     parser = new ArgumentParser({ debug: true });
     parser.addArgument([ '-x' ], { nargs: '*' });
-    parser.addArgument([ '-y' ], { 'default': 'spam', nargs: '*', defaultValue: 'spam' });
+    parser.addArgument([ '-y' ], { default: 'spam', nargs: '*', defaultValue: 'spam' });
 
     args = parser.parseArgs([]);
     assert.deepEqual(args, { y: 'spam', x: null });
@@ -433,7 +433,7 @@ describe('nargs', function () {
   it('test three Positionals: no nargs, optional narg and 1 nargs', function () {
     parser = new ArgumentParser({ debug: true });
     parser.addArgument([ 'foo' ], {});
-    parser.addArgument([ 'bar' ], { 'default': 0.625, nargs: '?', defaultValue: 0.625 });
+    parser.addArgument([ 'bar' ], { default: 0.625, nargs: '?', defaultValue: 0.625 });
     parser.addArgument([ 'baz' ], { nargs: 1 });
 
     args = parser.parseArgs([ 'a', 'b' ]);
@@ -591,9 +591,10 @@ describe('nargs', function () {
     });
   });
 
+  /*eslint-disable max-len*/
   it('test an Optional Positional with a default value (that needs to be converted to the appropriate type.)', function () {
     parser = new ArgumentParser({ debug: true });
-    parser.addArgument([ 'foo' ], { 'default': '42', type: 'int', nargs: '?', defaultValue: '42' });
+    parser.addArgument([ 'foo' ], { default: '42', type: 'int', nargs: '?', defaultValue: '42' });
 
     args = parser.parseArgs([]);
     assert.deepEqual(args, { foo: 42 });
@@ -613,7 +614,7 @@ describe('nargs', function () {
 
   it('tests an Optional Positional with a default value', function () {
     parser = new ArgumentParser({ debug: true });
-    parser.addArgument([ 'foo' ], { 'default': 42, nargs: '?', defaultValue: 42 });
+    parser.addArgument([ 'foo' ], { default: 42, nargs: '?', defaultValue: 42 });
 
     args = parser.parseArgs([]);
     assert.deepEqual(args, { foo: 42 });
@@ -630,7 +631,7 @@ describe('nargs', function () {
 
   it('test a Positional with an Optional nargs followed by one with none', function () {
     parser = new ArgumentParser({ debug: true });
-    parser.addArgument([ 'foo' ], { 'default': 42, nargs: '?', defaultValue: 42 });
+    parser.addArgument([ 'foo' ], { default: 42, nargs: '?', defaultValue: 42 });
     parser.addArgument([ 'bar' ], {});
 
     args = parser.parseArgs([ 'a' ]);
@@ -672,7 +673,7 @@ describe('nargs', function () {
   it('test two optional nargs', function () {
     parser = new ArgumentParser({ debug: true });
     parser.addArgument([ 'foo' ], { nargs: '?' });
-    parser.addArgument([ 'bar' ], { 'default': 42, nargs: '?', defaultValue: 42 });
+    parser.addArgument([ 'bar' ], { default: 42, nargs: '?', defaultValue: 42 });
 
     args = parser.parseArgs([]);
     assert.deepEqual(args, { foo: null, bar: 42 });
@@ -757,7 +758,7 @@ describe('nargs', function () {
 
   it('test a Positional that specifies unlimited nargs and a default', function () {
     parser = new ArgumentParser({ debug: true });
-    parser.addArgument([ 'foo' ], { 'default': 'bar', nargs: '*', defaultValue: 'bar' });
+    parser.addArgument([ 'foo' ], { default: 'bar', nargs: '*', defaultValue: 'bar' });
 
     args = parser.parseArgs([]);
     assert.deepEqual(args, { foo: 'bar' });
