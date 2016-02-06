@@ -2,6 +2,6 @@ language: node_js
 node_js:
  - "0.10"
  - "0.12"
- - stable
-before_script: "make dev-deps"
+ - "4"
+ - "5"
 sudo: false

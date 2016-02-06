@@ -27,6 +27,9 @@
     "sprintf-js": "~1.0.2"
   },
   "devDependencies": {
-    "mocha": "*"
+    "eslint": "2.0.0-rc.0",
+    "eslint-plugin-nodeca": "~1.0.3",
+    "mocha": "*",
+    "ndoc": "^3.1.0"
   }
 }
