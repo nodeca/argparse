@@ -19,6 +19,12 @@ parser.addArgument(
     help: 'bar foo'
   }
 );
+parser.addArgument(
+  '--baz',
+  {
+    help: 'baz bar'
+  }
+);
 
 
 parser.printHelp();
@@ -32,5 +38,8 @@ args = parser.parseArgs('-f=3 --bar=4'.split(' '));
 console.dir(args);
 console.log('-----------');
 args = parser.parseArgs('--foo 5 --bar 6'.split(' '));
+console.dir(args);
+console.log('-----------');
+args = parser.parseArgs('--baz 7 -f 8'.split(' '));
 console.dir(args);
 console.log('-----------');
