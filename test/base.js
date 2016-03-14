@@ -261,4 +261,25 @@ describe('base', function () {
       parser = ArgumentParser({ debug: true });
     });
   });
+
+  it('should accept a string as a positional argument name', function () {
+    parser = new ArgumentParser({ debug: true });
+    parser.addArgument('foo');
+    args = parser.parseArgs([ 'badger' ]);
+    assert.equal(args.foo, 'badger');
+  });
+
+  it('should accept a string as a short option name', function () {
+    parser = new ArgumentParser({ debug: true });
+    parser.addArgument('-f');
+    args = parser.parseArgs('-f badger'.split(' '));
+    assert.equal(args.f, 'badger');
+  });
+
+  it('should accept a string as a long option name', function () {
+    parser = new ArgumentParser({ debug: true });
+    parser.addArgument('--foo');
+    args = parser.parseArgs('--foo badger'.split(' '));
+    assert.equal(args.foo, 'badger');
+  });
 });
