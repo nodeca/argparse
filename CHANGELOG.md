@@ -1,3 +1,9 @@
+1.0.7 / 2016-03-17
+------------------
+
+- Teach `addArgument` to accept string arg names. #97, @tomxtobin.
+
+
 1.0.6 / 2016-02-06
 ------------------
 
