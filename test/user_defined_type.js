@@ -113,6 +113,8 @@ describe('user defined type', function () {
     assert.throws(
     function () { parser.parseArgs([ '-d', 'abc' ]); },
       TypeError,
+      // DateTime exception message format has changed around node v6.5
+      // use `.+` to match any variations.
       /Invalid .+ value: abc/im
     );
   });
