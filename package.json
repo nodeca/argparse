@@ -24,12 +24,13 @@
     "test": "make test"
   },
   "dependencies": {
+    "istanbul": "^0.4.5",
     "sprintf-js": "~1.0.2"
   },
   "devDependencies": {
     "eslint": "2.0.0-rc.0",
     "eslint-plugin-nodeca": "~1.0.3",
-    "mocha": "*",
-    "ndoc": "^3.1.0"
+    "mocha": "^3.1.0",
+    "ndoc": "^5.0.0"
   }
 }

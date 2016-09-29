@@ -27,6 +27,9 @@ lint:
 test: lint
 	./node_modules/.bin/mocha
 
+coverage:
+	rm -rf coverage
+	./node_modules/.bin/istanbul cover node_modules/.bin/_mocha
 
 doc:
 	rm -rf ./doc
