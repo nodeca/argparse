@@ -59,12 +59,12 @@ describe('from file', function () {
   });
   it('test custom convertArgLineToArgs function', function () {
     parser.convertArgLineToArgs = function (argLine) {
-        // split line into 'words'
-        args = argLine.split(' ');
-        args = args.map(function (arg) { return arg.trim(); });
-        args = args.filter(function (arg) { return arg.length > 0; });
-        return args;
-      };
+      // split line into 'words'
+      args = argLine.split(' ');
+      args = args.map(function (arg) { return arg.trim(); });
+      args = args.filter(function (arg) { return arg.length > 0; });
+      return args;
+    };
     args = parser.parseArgs([ 'X', '@hello' ]);
     assert.deepEqual(args, { a: null, x: 'X', y: [ 'hello', 'world!' ] });
   });

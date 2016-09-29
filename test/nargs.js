@@ -855,7 +855,7 @@ describe('nargs', function () {
     parser.addArgument([ '--xlim' ], { nargs: 2, type: 'float' });
 
     args = parser.parseArgs([ '--xlim', '-2e-3', '1e4' ]);
-    assert.equal(args['xlim'][0], -0.002);
+    assert.equal(args.xlim[0], -0.002);
   });
 
 });
