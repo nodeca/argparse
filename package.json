@@ -9,7 +9,6 @@
     "option",
     "args"
   ],
-  "homepage": "https://github.com/nodeca/argparse",
   "contributors": [
     "Eugene Shkuropat",
     "Paul Jacobson"
@@ -24,13 +23,12 @@
     "test": "make test"
   },
   "dependencies": {
-    "istanbul": "^0.4.5",
     "sprintf-js": "~1.0.2"
   },
   "devDependencies": {
-    "eslint": "^2.0.0",
-    "eslint-plugin-nodeca": "~1.0.3",
+    "eslint": "^2.13.1",
+    "istanbul": "^0.4.5",
     "mocha": "^3.1.0",
-    "ndoc": "^5.0.0"
+    "ndoc": "^5.0.1"
   }
 }
