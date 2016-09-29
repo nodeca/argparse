@@ -112,7 +112,8 @@ describe('user defined type', function () {
     assert.deepEqual(args, { d: new Date('1/1/2012') });
     assert.throws(
     function () { parser.parseArgs([ '-d', 'abc' ]); },
-      /Invalid <function> value: abc\nabc is not a valid date/im
+      TypeError,
+      /Invalid .+ value: abc/im
     );
   });
 });
