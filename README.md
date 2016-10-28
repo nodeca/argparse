@@ -82,7 +82,7 @@ ArgumentParser objects
 ======================
 
 ```
-new ArgumentParser({paramters hash});
+new ArgumentParser({parameters hash});
 ```
 
 Creates a new ArgumentParser object.
