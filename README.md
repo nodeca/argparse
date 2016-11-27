@@ -13,6 +13,10 @@ recorded in issue tracker.
 
 - Method names changed to camelCase. See [generated docs](http://nodeca.github.com/argparse/).
 - Use `defaultValue` instead of `default`.
+- Use `argparse.Const.REMAINDER` instead of `argparse.REMAINDER`, and
+  similarly for constant values `OPTIONAL`, `ZERO_OR_MORE`, and `ONE_OR_MORE`
+  (aliases for `nargs` values `'?'`, `'*'`, `'+'`, respectively), and
+  `SUPPRESS`.
 
 
 Example
