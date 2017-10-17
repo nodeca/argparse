@@ -1,7 +1,7 @@
 argparse
 ========
 
-[![Build Status](https://secure.travis-ci.org/nodeca/argparse.png?branch=master)](http://travis-ci.org/nodeca/argparse)
+[![Build Status](https://secure.travis-ci.org/nodeca/argparse.svg?branch=master)](http://travis-ci.org/nodeca/argparse)
 [![NPM version](https://img.shields.io/npm/v/argparse.svg)](https://www.npmjs.org/package/argparse)
 
 CLI arguments parser for node.js. Javascript port of python's
