@@ -64,7 +64,7 @@ usage: example.js [-h] [-v] [-f FOO] [-b BAR] [--baz BAZ]
 
 Argparse example
 
-Optional arguments:
+optional arguments:
   -h, --help         Show this help message and exit.
   -v, --version      Show program's version number and exit.
   -f FOO, --foo FOO  foo bar
