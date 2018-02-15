@@ -255,4 +255,18 @@ optional arguments:
   -z [Z1]           z
 */
   });
+
+  it('HelpFormatter addUsage -- regression test for long prefixes', function () {
+    parser = new argparse.HelpFormatter({ prog: 'prog' });
+    var mockAction = {
+      isOptional: function () { return true; },
+      optionStrings: [ 'a' ],
+      dest: 'dest'
+    };
+    var longPrefix = 'really really really really really really really really really long prefix';
+    parser.addUsage(null, [ mockAction ], [], longPrefix);
+    var helperText = parser.formatHelp();
+    assert(helperText.match(longPrefix));
+    assert(helperText.match('DEST'));
+  });
 });
