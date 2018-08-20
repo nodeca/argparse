@@ -47,12 +47,15 @@ describe('base', function () {
     parser = new ArgumentParser({ debug: true });
     parser.addArgument([ '-f', '--foo' ]);
     parser.addArgument([ '--bar' ], { type: 'int' });
+    parser.addArgument([ '--baz' ], { type: 'date' });
 
     assert.throws(function () {
       parser.parseArgs('--bar bar'.split(' '));
+      parser.parseArgs('--baz baz'.split(' '));
     });
     assert.doesNotThrow(function () {
       parser.parseArgs('--bar 1'.split(' '));
+      parser.parseArgs('--baz 1970-01-01'.split(' '));
     });
   });
 
