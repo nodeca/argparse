@@ -118,10 +118,10 @@ describe('group', function () {
       /Not allowed with argument/i
     );
     usage = parser.formatUsage();
-    assert.equal(usage, 'usage: PROG [-h] (--bar BAR | --baz [BAZ])\n');
+    assert.equal(usage, 'Usage: PROG [-h] (--bar BAR | --baz [BAZ])\n');
     group.required = false;
     usage = parser.formatUsage();
-    assert.equal(usage, 'usage: PROG [-h] [--bar BAR | --baz [BAZ]]\n');
+    assert.equal(usage, 'Usage: PROG [-h] [--bar BAR | --baz [BAZ]]\n');
     // could also test all or part of parser.formatHelp()
   });
 
@@ -147,10 +147,10 @@ describe('group', function () {
       /Not allowed with argument/i
     );
     usage = parser.formatUsage();
-    assert.equal(usage, 'usage: PROG [-h] (--foo | --spam SPAM | badger [badger ...])\n');
+    assert.equal(usage, 'Usage: PROG [-h] (--foo | --spam SPAM | badger [badger ...])\n');
     group.required = false;
     usage = parser.formatUsage();
-    assert.equal(usage, 'usage: PROG [-h] [--foo | --spam SPAM | badger [badger ...]]\n');
+    assert.equal(usage, 'Usage: PROG [-h] [--foo | --spam SPAM | badger [badger ...]]\n');
   });
 
   it('two mutually exclusive groups', function () {
@@ -164,7 +164,7 @@ describe('group', function () {
     group2.addArgument([ '--soup' ], { action: 'storeTrue' });
     group2.addArgument([ '--nuts' ], { action: 'storeFalse' });
     usage = parser.formatUsage();
-    assert.equal(usage, 'usage: PROG [-h] (--foo | --bar) [--soup | --nuts]\n');
+    assert.equal(usage, 'Usage: PROG [-h] (--foo | --bar) [--soup | --nuts]\n');
   });
 
   it('suppressed and single action groups', function () {
@@ -178,6 +178,6 @@ describe('group', function () {
     group2.addArgument([ '--xxx' ], {});
     // single entry in a required group, remove group ()
     usage = parser.formatUsage();
-    assert.equal(usage, 'usage: PROG [-h]  --xxx XXX\n');
+    assert.equal(usage, 'Usage: PROG [-h]  --xxx XXX\n');
   });
 });

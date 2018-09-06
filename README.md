@@ -60,7 +60,7 @@ Display help:
 
 ```
 $ ./test.js -h
-usage: example.js [-h] [-v] [-f FOO] [-b BAR] [--baz BAZ]
+Usage: example.js [-h] [-v] [-f FOO] [-b BAR] [--baz BAZ]
 
 Argparse example
 

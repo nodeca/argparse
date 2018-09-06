@@ -38,20 +38,20 @@ describe('Argument conflict handling', function () {
     parser.addArgument([ '-x' ], { help: 'NEW X' });
     help = parser.formatHelp();
     /* expect
-    usage: PROG [-h] [-x X]
+    Usage: PROG [-h] [-x X]
 
     optional arguments:
       -h, --help  show this help message and exit
       -x X        NEW X
     */
-    assert(help.match(/usage: PROG \[-h\] \[-x X\]/im));
+    assert(help.match(/Usage: PROG \[-h\] \[-x X\]/im));
     assert(help.match(/Show this help message and exit/im));
     assert(help.match(/-x X\s*NEW X/im));
     parser.addArgument([ '--spam' ], { metavar: 'OLD_SPAM' });
     parser.addArgument([ '--spam' ], { metavar: 'NEW_SPAM' });
     help = parser.formatHelp();
     /* expect
-    usage: PROG [-h] [-x X] [--spam NEW_SPAM]
+    Usage: PROG [-h] [-x X] [--spam NEW_SPAM]
 
     optional arguments:
       -h, --help       show this help message and exit
@@ -75,7 +75,7 @@ describe('Argument conflict handling', function () {
     parser.addArgument([ '--bar' ]);
     help = parser.formatHelp();
     /*
-    usage: _mocha [-h] [-f FOO] [--bar BAR]
+    Usage: _mocha [-h] [-f FOO] [--bar BAR]
     Optional arguments:
       -h, --help         Show this help message and exit.
       -f FOO, --foo FOO
@@ -87,7 +87,7 @@ describe('Argument conflict handling', function () {
     assert(help.match(/-f FOO$/im));
     assert(help.match(/--foo FOO, --bar FOO, --foobar FOO/im));
     /*
-    usage: _mocha [-h] [-f FOO] [--foo FOO]
+    Usage: _mocha [-h] [-f FOO] [--foo FOO]
     Optional arguments:
       -h, --help            Show this help message and exit.
       -f FOO
