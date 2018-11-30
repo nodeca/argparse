@@ -28,7 +28,7 @@ test.js file:
 #!/usr/bin/env node
 'use strict';
 
-var ArgumentParser = require('../lib/argparse').ArgumentParser;
+var ArgumentParser = require('argparse').ArgumentParser;
 var parser = new ArgumentParser({
   version: '0.0.1',
   addHelp:true,
@@ -198,7 +198,7 @@ sub_commands.js
 #!/usr/bin/env node
 'use strict';
 
-var ArgumentParser = require('../lib/argparse').ArgumentParser;
+var ArgumentParser = require('argparse').ArgumentParser;
 var parser = new ArgumentParser({
   version: '0.0.1',
   addHelp:true,
