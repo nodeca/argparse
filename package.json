@@ -19,7 +19,7 @@
 
    "dependencies"   : {
                         "underscore"        : "~1.7.0",
-                        "underscore.string" : "~2.4.0"
+                        "underscore.string" : "~3.3.5"
                       },
   "devDependencies" : { "mocha": "*" }
 }
