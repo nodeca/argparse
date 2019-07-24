@@ -14,35 +14,30 @@ var ArgumentParser = require('../lib/argparse').ArgumentParser;
 
 /**
  * Does it's best to imitate interactively playing with node.
- * There are limits to how execution can be split based on the REPL model.
+ * There are limits on how live execution can be emulated based on the
+ * REPL model.
+ *
+ * TODO:
+ *	* Add time dependant input to include capture potential for special,
+ *	  conditions like racing.
  */
-function interactive(script){ // or lines
-	// if (! Array.isArray(script)){
-	// 	if ( (typeof script) == (typeof "") )
-	// 		script = script.split("\n").map(s => s+"\n");
-	// 	else
-	// 		// TODO: better error handling
-	// 		console.error("derp");
-	// }
-
-	// script.unshift('try{');
-	// script.push('');
-
-	// here's my limitation pretty much.
+function interactive(script){
+	// The main problem trying to emulate complex, time dependant, input;
+	// I need some way to capture the error stacktrace. If we don't have that,
+	// it's kinda hard to diagnose problems.
 	script = "try{" + script + "} catch (e){ console.error(e); process.exit(1) }";
-	let stacktrace = null;
 
+	let stacktrace = null; // Keep a place to store stacktraces for later;
 	let node = subprocess.spawn("node", ["-i"], {
-		// make sure we can find all our node modules automatically.
+		// Puts all of our interactive node sessions into the root directory of the
+		// repository to make sure we can find all our node modules automatically.
 		pwd: path.resolve(__dirname, "../")
 	});
-	/*sinkhole; TODO: something usefull here*/
+
+	/* sinkhole; TODO: verbose logging of some kind for bug hunting */
 	//node.stdout.on("data", (d)=> { console.log(d.toString()); });
 	node.stderr.on("data", (d) => { stacktrace = d.toString(); });
 
-	// Too lazy to worry about the buffer clogging rn.
-	// Not enough data to make that happen yet.
-	//script.forEach( line => node.stdin.write(line, "UTF-8") );
 	node.stdin.write(script, "UTF-8")
 	node.stdin.write("\n.exit\n", "UTF-8"); // buffer will toss this in last.
 
@@ -56,62 +51,11 @@ function interactive(script){ // or lines
 }
 
 describe('Interactive NodeJS', () => {
-	// If only this would have worked as nicely as I'd liked.
-	// But now, we have to do things the hard way apparently.
-	//
-	// it('All Scripted Tests Pass Interactively', () => {
-	// 	fs.readdirSync(__dirname).forEach(async (filename)=>{
-	// 		switch (filename){
-	// 			// skip this file to avoid loop
-	// 			case "interactive.js": case "fixtures": return;
-	// 		}
-	// 		let fullpath = path.join(__dirname, filename);
-	//
-	// 		// spawn a new subprocess for each test just to make sure we have a
-	// 		// clean environment for working with.
-	//
-	// 		let node = subprocess.spawn("node", ["-i"], {
-	// 			// ... okay that wasn't the problem after all.
-	// 			argv0: "", // interactive mode should not have argv[0] no matter what.
-	// 		});
-	// 		node.stdout.on("data", (d)=> { /*sinkhole; TODO: something usefull here*/ });
-	// 		node.stderr.on("data", (d)=> {});
-	//
-	// 		let testPromise = new Promise((resolve, reject) => {
-	// 			let done = false;
-	//
-	// 			node.on("close", (code) => {
-	// 				if (code == 0) resolve(true);
-	// 				else resolve(false);
-	//
-	// 				done = true;
-	// 			});
-	// 		});
-	//
-	// 		let injectedScript = fs.readFileSync(fullpath, { encoding: "UTF-8" });
-	// 		let scriptlines = injectedScript.split("\n");
-	// 		let inc = 1;
-	//
-	// 		node.stdin.on("drain", () => {
-	// 			if (inc < scriptlines.length)
-	// 				node.stdin.write(scriptlines[inc]+"\n", "UTF-8");
-	// 			else
-	// 				node.stdin.write("\n.exit\n", "UTF-8");
-	//
-	// 			inc++;
-	// 		});
-	//
-	// 		node.stdin.write(scriptlines[0]+"\n", "UTF-8");
-	//
-	// 		assert(await testPromise);
-	// 	});
-	// });
 	it('Can instantiate empty ArgumentParser interactively', async() => {
 		await interactive(`
 			var ArgumentParser = require('./lib/argparse').ArgumentParser;
 
 			let parser = new ArgumentParser();
-			console.log(process.argv);
 		`);
 	});
 });
