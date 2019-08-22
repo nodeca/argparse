@@ -20,7 +20,7 @@ recorded in issue tracker.
 
 
 Example
-=======
+-------
 
 test.js file:
 
@@ -83,7 +83,7 @@ More [examples](https://github.com/nodeca/argparse/tree/master/examples).
 
 
 ArgumentParser objects
-======================
+----------------------
 
 ```
 new ArgumentParser({parameters hash});
@@ -112,8 +112,8 @@ Creates a new ArgumentParser object.
 Details in [original ArgumentParser guide](http://docs.python.org/dev/library/argparse.html#argumentparser-objects)
 
 
-addArgument() method
-====================
+### addArgument() method
+
 
 ```
 ArgumentParser.addArgument(name or flag or [name] or [flags...], {options})
@@ -143,7 +143,7 @@ Details in [original add_argument guide](http://docs.python.org/dev/library/argp
 
 
 Action (some details)
-================
+---------------------
 
 ArgumentParser objects associate command-line arguments with actions.
 These actions can do just about anything with the command-line arguments associated
@@ -176,7 +176,7 @@ Details in [original action guide](http://docs.python.org/dev/library/argparse.h
 
 
 Sub-commands
-============
+------------
 
 ArgumentParser.addSubparsers()
 
@@ -239,16 +239,23 @@ console.dir(args);
 Details in [original sub-commands guide](http://docs.python.org/dev/library/argparse.html#sub-commands)
 
 
+Support argparse
+----------------
+
+You can support this project via [Tidelift subscription](https://tidelift.com/subscription/pkg/npm-argparse?utm_source=npm-argparse&utm_medium=referral&utm_campaign=readme).
+
+
 Contributors
-============
+------------
 
 - [Eugene Shkuropat](https://github.com/shkuropat)
 - [Paul Jacobson](https://github.com/hpaulj)
 
 [others](https://github.com/nodeca/argparse/graphs/contributors)
 
+
 License
-=======
+-------
 
 Copyright (c) 2012 [Vitaly Puzrin](https://github.com/puzrin).
 Released under the MIT license. See
