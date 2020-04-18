@@ -21,8 +21,8 @@ var path = require('path');
  */
 function interactive(script) {
   // Wraps the script in a try loop that catches throws javascript errors
-	// so they aren't ignored unless the script application processes them.
-  script = 'try{ '+ script +' } catch (e){ console.error(e); process.exit(1) }';
+  // so they aren't ignored unless the script application processes them.
+  script = 'try{ ' + script + ' } catch (e){ console.error(e); process.exit(1) }';
   script += '\n.exit;';  // don't forget to exit when done.
 
   var node = subprocess.spawnSync('node', [ '-i' ], {
