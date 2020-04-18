@@ -23,7 +23,6 @@
     "test": "make test"
   },
   "dependencies": {
-    "argparse": "link:",
     "sprintf-js": "~1.0.2"
   },
   "devDependencies": {
