@@ -19,43 +19,34 @@ var ArgumentParser = require('../lib/argparse').ArgumentParser;
  *
  * TODO:
  *	* Add time dependant input to include capture potential for special,
- *	  conditions like racing.
+ *	  conditions like racing. Had to make things sync to accomodate for
+ *    old NodeJS version support.
  */
 function interactive(script){
-	// The main problem trying to emulate complex, time dependant, input;
-	// I need some way to capture the error stacktrace. If we don't have that,
-	// it's kinda hard to diagnose problems.
-	script = "try{" + script + "} catch (e){ console.error(e); process.exit(1) }";
+	// Wraps the script in a try loop that catches thrown javascript errors
+	// so they aren't ignored unless the script application processes them.
+	script = "try{ "+ script +" } catch (e){ console.error(e); process.exit(1) }";
+	script = script + "\n.exit;";  // don't forget to exit when done.
 
-	let stacktrace = null; // Keep a place to store stacktraces for later;
-	let node = subprocess.spawn("node", ["-i"], {
+	var node = subprocess.spawnSync("node", ["-i"], {
 		// Puts all of our interactive node sessions into the root directory of the
 		// repository to make sure we can find all our node modules automatically.
-		pwd: path.resolve(__dirname, "../")
+		pwd: path.resolve(__dirname, "../"),
+
+		// Just shove script directly into the standard input for the program.
+		input: script
 	});
 
-	/* sinkhole; TODO: verbose logging of some kind for bug hunting */
-	//node.stdout.on("data", (d)=> { console.log(d.toString()); });
-	node.stderr.on("data", (d) => { stacktrace = d.toString(); });
-
-	node.stdin.write(script, "UTF-8")
-	node.stdin.write("\n.exit\n", "UTF-8"); // buffer will toss this in last.
-
-	return new Promise((resolve, reject) => {
-		node.on("close", (code) => {
-			if (code == 0) resolve(null);
-			else reject(new Error(stacktrace));
-		});
-	});
-
+	if (node.status !== 0 && !node.signal) {
+		throw Error(node.stderr);
+	}
 }
 
 describe('Interactive NodeJS', () => {
-	it('Can instantiate empty ArgumentParser interactively', async() => {
-		await interactive(`
-			var ArgumentParser = require('./lib/argparse').ArgumentParser;
-
-			let parser = new ArgumentParser();
-		`);
+	it('Can instantiate empty ArgumentParser interactively', function (){
+		return interactive(
+			"var ArgumentParser = require('./lib/argparse').ArgumentParser;" +
+			"var parser = new ArgumentParser();"
+		);
 	});
 });
