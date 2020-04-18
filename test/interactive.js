@@ -6,7 +6,7 @@
 
 'use strict';
 
-var subprocess = require('child_process');
+var spawnSync = require('spawn-sync');
 var path = require('path');
 
 /**
@@ -25,7 +25,7 @@ function interactive(script) {
   script = 'try{ ' + script + ' } catch (e){ console.error(e); process.exit(1) }';
   script += '\n.exit;';  // don't forget to exit when done.
 
-  var node = subprocess.spawnSync('node', [ '-i' ], {
+  var node = spawnSync('node', [ '-i' ], {
     // Puts all of our interactive node sessions into the root directory of the
     // repository to make sure we can find all our node modules automatically.
     pwd: path.resolve(__dirname, '../'),
