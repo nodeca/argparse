@@ -256,6 +256,29 @@ optional arguments:
 */
   });
 
+  it('should correctly wrap very long lines', function () {
+    parser = new argparse.ArgumentParser({
+      prog: 'PROG'
+    });
+
+    var longPath = '/a/really/really/really/really/really/really/really/really/long/path';
+    parser.addArgument([ '-w' ], {
+      help: 'this an argument that by default is set to ' + longPath
+    });
+
+    helptext = parser.formatHelp();
+    assert(helptext.match(longPath));
+
+/*
+usage: PROG [-h] [-w W]
+
+optional arguments:
+  -h, --help        show this help message and exit
+  -w                this an argument that by default is set to
+                    /a/really/really/really/really/really/really/really/really/long/path
+*/
+  });
+
   it('HelpFormatter addUsage -- regression test for long prefixes', function () {
     parser = new argparse.HelpFormatter({ prog: 'prog' });
     var mockAction = {
