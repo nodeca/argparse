@@ -103,6 +103,7 @@ Creates a new ArgumentParser object.
 - ```prog``` - The name of the program (default: `path.basename(process.argv[1])`)
 - ```usage``` - The string describing the program usage (default: generated)
 - ```conflictHandler``` - Usually unnecessary, defines strategy for resolving conflicting optionals.
+- ```version``` - The version of the program.
 
 **Not supported yet**
 
