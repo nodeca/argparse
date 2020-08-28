@@ -89,9 +89,8 @@ const path = require('path')
 const repr = util.inspect
 
 function get_argv() {
-    let argv = process.argv.slice(0)
-    if (argv[0] === process.execPath) argv.shift()
-    return argv
+    // omit first argument (which is assumed to be interpreter - `node`, `coffee`, `ts-node`, etc.)
+    return process.argv.slice(1)
 }
 
 function get_terminal_size() {
