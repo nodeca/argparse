@@ -29,8 +29,18 @@ Example
 const { ArgumentParser } = require('argparse');
 const { version } = require('./package.json');
 
+// Formatter with support of `\n` in Help texts.
+class HelpFormatter extends ArgumentParser.RawDescriptionHelpFormatter {
+  // executes parent _split_lines for each line of the help, then flattens the result
+  _split_lines(text, width) {
+    return [].concat(...text.split('\n').map(line => super._split_lines(line, width)));
+  }
+}
+
 const parser = new ArgumentParser({
-  description: 'Argparse example'
+  description: 'Argparse example',
+  add_help: true,
+  formatter_class: HelpFormatter
 });
 
 parser.add_argument('-v', '--version', { action: 'version', version });
