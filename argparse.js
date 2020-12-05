@@ -3654,11 +3654,11 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
         // end
         this.print_usage(process.stderr)
         let args = {prog: this.prog, message: message}
-        const errorMessage = sub('%(prog)s: error: %(message)s\n', args);
+        const errorMessage = sub('%(prog)s: error: %(message)s\n', args)
         if (this.exit_on_error) {
             this.exit(2, errorMessage)
         } else {
-            throw new Error(errorMessage);
+            throw new Error(errorMessage)
         }
     }
 }))
