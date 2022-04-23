@@ -26,11 +26,11 @@ Example
 #!/usr/bin/env node
 'use strict';
 
-const { ArgumentParser } = require('argparse');
+const { ArgumentParser, RawDescriptionHelpFormatter } = require('argparse');
 const { version } = require('./package.json');
 
 // Formatter with support of `\n` in Help texts.
-class HelpFormatter extends ArgumentParser.RawDescriptionHelpFormatter {
+class HelpFormatter extends RawDescriptionHelpFormatter {
   // executes parent _split_lines for each line of the help, then flattens the result
   _split_lines(text, width) {
     return [].concat(...text.split('\n').map(line => super._split_lines(line, width)));
