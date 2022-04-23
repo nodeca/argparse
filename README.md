@@ -46,7 +46,7 @@ const parser = new ArgumentParser({
 parser.add_argument('-v', '--version', { action: 'version', version });
 parser.add_argument('-f', '--foo', { help: 'foo bar' });
 parser.add_argument('-b', '--bar', { help: 'bar foo' });
-parser.add_argument('--baz', { help: 'baz bar' });
+parser.add_argument('--baz', { help: 'baz bar', "default": "bazar" });
 
 console.dir(parser.parse_args());
 ```
@@ -70,8 +70,8 @@ optional arguments:
 Parse arguments:
 
 ```
-$ ./test.js -f=3 --bar=4 --baz 5
-{ foo: '3', bar: '4', baz: '5' }
+$ ./test.js -f=3 --bar=4
+Namespace { foo: '3', bar: '4', baz: 'bazar' }
 ```
 
 
