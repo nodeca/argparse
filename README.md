@@ -20,59 +20,60 @@ More details in [doc](./doc).
 Example
 -------
 
-`test.js` file:
+Following code is a JS program that takes a list of integers and produces either the sum or the max:
 
-```javascript
-#!/usr/bin/env node
-'use strict';
+```js
+const { ArgumentParser } = require('argparse')
 
-const { ArgumentParser } = require('argparse');
-const { version } = require('./package.json');
+const parser = new ArgumentParser({ description: 'Process some integers.' })
 
-// Formatter with support of `\n` in Help texts.
-class HelpFormatter extends ArgumentParser.RawDescriptionHelpFormatter {
-  // executes parent _split_lines for each line of the help, then flattens the result
-  _split_lines(text, width) {
-    return [].concat(...text.split('\n').map(line => super._split_lines(line, width)));
-  }
-}
+let sum = ints => ints.reduce((a, b) => a + b)
+let max = ints => ints.reduce((a, b) => a > b ? a : b)
 
-const parser = new ArgumentParser({
-  description: 'Argparse example',
-  add_help: true,
-  formatter_class: HelpFormatter
-});
+parser.add_argument('integers', { metavar: 'N', type: 'int', nargs: '+',
+                                  help: 'an integer for the accumulator' })
+parser.add_argument('--sum',    { dest: 'accumulate', action: 'store_const',
+                                  const: sum, default: max,
+                                  help: 'sum the integers (default: find the max)' });
 
-parser.add_argument('-v', '--version', { action: 'version', version });
-parser.add_argument('-f', '--foo', { help: 'foo bar' });
-parser.add_argument('-b', '--bar', { help: 'bar foo' });
-parser.add_argument('--baz', { help: 'baz bar' });
-
-console.dir(parser.parse_args());
+let args = parser.parse_args()
+console.log(args.accumulate(args.integers))
 ```
 
-Display help:
+Assuming the JS code above is saved into a file called prog.js, it can be run at the command line and provides useful help messages:
 
 ```
-$ ./test.js -h
-usage: test.js [-h] [-v] [-f FOO] [-b BAR] [--baz BAZ]
+$ node prog.js -h
+usage: prog.js [-h] [--sum] N [N ...]
 
-Argparse example
+Process some integers.
+
+positional arguments:
+  N           an integer for the accumulator
 
 optional arguments:
-  -h, --help         show this help message and exit
-  -v, --version      show program's version number and exit
-  -f FOO, --foo FOO  foo bar
-  -b BAR, --bar BAR  bar foo
-  --baz BAZ          baz bar
+  -h, --help  show this help message and exit
+  --sum       sum the integers (default: find the max)
 ```
 
-Parse arguments:
+When run with the appropriate arguments, it prints either the sum or the max of the command-line integers:
 
 ```
-$ ./test.js -f=3 --bar=4 --baz 5
-{ foo: '3', bar: '4', baz: '5' }
+$ node prog.js 1 2 3 4
+4
+$ node prog.js 1 2 3 4 --sum
+10
 ```
+
+If invalid arguments are passed in, it will issue an error:
+
+```
+$ node prog.js a b c
+usage: prog.js [-h] [--sum] N [N ...]
+prog.js: error: argument N: invalid 'int' value: 'a'
+```
+
+This is an example ported from Python. You can find detailed explanation [here](https://docs.python.org/3.9/library/argparse.html).
 
 
 API docs
