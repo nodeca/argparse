@@ -14,7 +14,7 @@
     "argparse.js",
     "lib/"
   ],
-  "license": "Python-2.0",
+  "license": "Python-2.0.1",
   "repository": "nodeca/argparse",
   "scripts": {
     "lint": "eslint .",
