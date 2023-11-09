@@ -2,7 +2,6 @@
 // https://github.com/python/cpython/blob/v3.9.0rc1/Lib/argparse.py
 
 'use strict'
-
 // Copyright (C) 2010-2020 Python Software Foundation.
 // Copyright (C) 2020 argparse.js authors
 
@@ -2535,6 +2534,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
             add_help,
             allow_abbrev,
             exit_on_error,
+            capitalize_messages,
             debug, // LEGACY (v1 compatibility), debug mode
             version // LEGACY (v1 compatibility), version
         ] = _parse_opts(arguments, {
@@ -2551,6 +2551,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
             add_help: true,
             allow_abbrev: true,
             exit_on_error: true,
+            capitalize_messages: undefined,
             debug: undefined, // LEGACY (v1 compatibility), debug mode
             version: undefined // LEGACY (v1 compatibility), version
         })
@@ -2591,12 +2592,15 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
         this.add_help = add_help
         this.allow_abbrev = allow_abbrev
         this.exit_on_error = exit_on_error
+        this.capitalize_messages = capitalize_messages
         // LEGACY (v1 compatibility), debug mode
         this.debug = debug
         // end
 
-        this._positionals = this.add_argument_group('positional arguments')
-        this._optionals = this.add_argument_group('optional arguments')
+        const optionalArgumentsMessage = this._use_capitalized_messages('optional arguments', this.capitalize_messages)
+        const positionalArgumentsMessage = this._use_capitalized_messages('positional arguments', this.capitalize_messages)
+        this._positionals = this.add_argument_group(positionalArgumentsMessage)
+        this._optionals = this.add_argument_group(optionalArgumentsMessage)
         this._subparsers = undefined
 
         // register types
@@ -2636,7 +2640,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
                 {
                     action: 'help',
                     default: SUPPRESS,
-                    help: 'show this help message and exit'
+                    help: this._use_capitalized_messages('show this help message and exit', this.capitalize_messages)
                 }
             )
         }
@@ -2649,7 +2653,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
                     action: 'version',
                     default: SUPPRESS,
                     version: this.version,
-                    help: "show program's version number and exit"
+                    help: this._use_capitalized_messages("show program's version number and exit", this._use_capitalized_messages)
                 }
             )
         }
@@ -2710,7 +2714,8 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
             let formatter = this._get_formatter()
             let positionals = this._get_positional_actions()
             let groups = this._mutually_exclusive_groups
-            formatter.add_usage(this.usage, positionals, groups, '')
+
+            formatter.add_usage(this.usage, positionals, groups, this._use_capitalized_messages('usage: ', this.capitalize_messages))
             kwargs.prog = formatter.format_help().trim()
         }
 
@@ -3574,7 +3579,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
     format_usage() {
         let formatter = this._get_formatter()
         formatter.add_usage(this.usage, this._actions,
-                            this._mutually_exclusive_groups)
+                            this._mutually_exclusive_groups, this._use_capitalized_messages('usage: ', this.capitalize_messages))
         return formatter.format_help()
     }
 
@@ -3583,7 +3588,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
 
         // usage
         formatter.add_usage(this.usage, this._actions,
-                            this._mutually_exclusive_groups)
+                            this._mutually_exclusive_groups, this._use_capitalized_messages('usage: ', this.capitalize_messages))
 
         // description
         formatter.add_text(this.description)
@@ -3628,6 +3633,23 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
         }
     }
 
+    //Capitalize the message first letter, and at the start of any new sentence.
+    //After (., ! or ?)
+    _use_capitalized_messages(message, capitalize = false, onlyFirstLetter = false) {
+        if (!capitalize) return message
+
+        //capitalize the first letter of the message
+        let capitalizedmessage = message.charAt(0).toUpperCase() + message.slice(1)
+        if (onlyFirstLetter) return capitalizedmessage
+
+        // Capitalize words according the grammar
+        capitalizedmessage = capitalizedmessage.replace(/([.!?]\s*)([a-z])/g, function (match, punctuation, char) {
+            return punctuation + char.toUpperCase()
+        })
+
+        return capitalizedmessage
+    }
+
     // ===============
     // Exiting methods
     // ===============
@@ -3653,7 +3675,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
         if (this.debug === true) throw new Error(message)
         // end
         this.print_usage(process.stderr)
-        let args = {prog: this.prog, message: message}
+        let args = {prog: this.prog, message: this._use_capitalized_messages(message, this.capitalize_messages, true)}
         this.exit(2, sub('%(prog)s: error: %(message)s\n', args))
     }
 }))
