@@ -219,7 +219,7 @@ function _alias(object, from, to) {
                 name, from, name, to)),
             enumerable: false
         })
-    } catch {}
+    } catch (e) {}
 }
 
 // decorator that allows snake_case class methods to be called with camelCase and vice versa
