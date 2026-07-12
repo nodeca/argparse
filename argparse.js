@@ -122,7 +122,7 @@ function delattr(object, name) {
 
 function range(from, to, step=1) {
     // range(10) is equivalent to range(0, 10)
-    if (arguments.length === 1) [ to, from ] = [ from, 0 ]
+    if (arguments.length === 1) [to, from] = [from, 0]
     if (typeof from !== 'number' || typeof to !== 'number' || typeof step !== 'number') {
         throw new TypeError('argument cannot be interpreted as an integer')
     }
@@ -161,7 +161,7 @@ function _string_lstrip(string, prefix_chars) {
 function _string_split(string, sep, maxsplit) {
     let result = string.split(sep)
     if (result.length > maxsplit) {
-        result = result.slice(0, maxsplit).concat([ result.slice(maxsplit).join(sep) ])
+        result = result.slice(0, maxsplit).concat([result.slice(maxsplit).join(sep)])
     }
     return result
 }
@@ -281,21 +281,21 @@ function _parse_opts(args, descriptor) {
             } else {
                 kwargs[key] = kwargs[old_name]
             }
-            renames.push([ old_name, key ])
+            renames.push([old_name, key])
             delete kwargs[old_name]
         }
     }
     if (renames.length) {
         let name = get_name()
         deprecate('camelcase_' + name, sub('%s(): following options are renamed: %s',
-            name, renames.map(([ a, b ]) => sub('%r -> %r', a, b))))
+            name, renames.map(([a, b]) => sub('%r -> %r', a, b))))
     }
     // end
 
     let missing_positionals = []
     let positional_count = args.length
 
-    for (let [ key, def ] of Object.entries(descriptor)) {
+    for (let [key, def] of Object.entries(descriptor)) {
         if (key[0] === '*') {
             if (key.length > 0 && key[1] === '*') {
                 // LEGACY (v1 compatibility): camelcase
@@ -309,14 +309,14 @@ function _parse_opts(args, descriptor) {
                         } else {
                             kwargs[new_name] = kwargs[key]
                         }
-                        renames.push([ key, new_name ])
+                        renames.push([key, new_name])
                         delete kwargs[key]
                     }
                 }
                 if (renames.length) {
                     let name = get_name()
                     deprecate('camelcase_' + name, sub('%s(): following options are renamed: %s',
-                        name, renames.map(([ a, b ]) => sub('%r -> %r', a, b))))
+                        name, renames.map(([a, b]) => sub('%r -> %r', a, b))))
                 }
                 // end
                 result.push(kwargs)
@@ -345,8 +345,8 @@ function _parse_opts(args, descriptor) {
     }
 
     if (args.length) {
-        let from = Object.entries(descriptor).filter(([ k, v ]) => k[0] !== '*' && v !== no_default).length
-        let to = Object.entries(descriptor).filter(([ k ]) => k[0] !== '*').length
+        let from = Object.entries(descriptor).filter(([k, v]) => k[0] !== '*' && v !== no_default).length
+        let to = Object.entries(descriptor).filter(([k]) => k[0] !== '*').length
         throw new TypeError(sub('%s() takes %s positional argument%s but %s %s given',
             get_name(),
             from === to ? sub('from %s to %s', from, to) : to,
@@ -394,7 +394,7 @@ function _AttributeHolder(cls = Object) {
             for (let arg of this._get_args()) {
                 arg_strings.push(repr(arg))
             }
-            for (let [ name, value ] of this._get_kwargs()) {
+            for (let [name, value] of this._get_kwargs()) {
                 if (/^[a-z_][a-z0-9_$]*$/i.test(name)) {
                     arg_strings.push(sub('%s=%r', name, value))
                 } else {
@@ -492,7 +492,7 @@ const HelpFormatter = _camelcase_alias(_callable(class HelpFormatter {
     }
 
     _add_item(func, args) {
-        this._current_section.items.push([ func, args ])
+        this._current_section.items.push([func, args])
     }
 
     // ========================
@@ -518,7 +518,7 @@ const HelpFormatter = _camelcase_alias(_callable(class HelpFormatter {
 
     add_usage(usage, actions, groups, prefix = undefined) {
         if (usage !== SUPPRESS) {
-            let args = [ usage, actions, groups, prefix ]
+            let args = [usage, actions, groups, prefix]
             this._add_item(this._format_usage.bind(this), args)
         }
     }
@@ -595,7 +595,7 @@ const HelpFormatter = _camelcase_alias(_callable(class HelpFormatter {
 
             // build full usage string
             let action_usage = this._format_actions_usage([].concat(optionals).concat(positionals), groups)
-            usage = [ prog, action_usage ].map(String).join(' ')
+            usage = [prog, action_usage].map(String).join(' ')
 
             // wrap the usage parts if it's too long
             let text_width = this._width - this._current_indent
@@ -720,7 +720,7 @@ const HelpFormatter = _camelcase_alias(_callable(class HelpFormatter {
 
         // collect all actions format strings
         let parts = []
-        for (let [ i, action ] of Object.entries(actions)) {
+        for (let [i, action] of Object.entries(actions)) {
 
             // suppressed arguments are marked with None
             // remove | separators for suppressed arguments
@@ -814,18 +814,18 @@ const HelpFormatter = _camelcase_alias(_callable(class HelpFormatter {
 
         // no help; start on same line and add a final newline
         if (!action.help) {
-            let tup = [ this._current_indent, '', action_header ]
+            let tup = [this._current_indent, '', action_header]
             action_header = sub('%*s%s\n', ...tup)
 
         // short action name; start on the same line and pad two spaces
         } else if (action_header.length <= action_width) {
-            let tup = [ this._current_indent, '', action_width, action_header ]
+            let tup = [this._current_indent, '', action_width, action_header]
             action_header = sub('%*s%-*s  ', ...tup)
             indent_first = 0
 
         // long action name; start on the next line
         } else {
-            let tup = [ this._current_indent, '', action_header ]
+            let tup = [this._current_indent, '', action_header]
             action_header = sub('%*s%s\n', ...tup)
             indent_first = help_position
         }
@@ -1017,7 +1017,7 @@ HelpFormatter.prototype._Section = _callable(class _Section {
         if (this.parent !== undefined) {
             this.formatter._indent()
         }
-        let item_help = this.formatter._join_parts(this.items.map(([ func, args ]) => func.apply(null, args)))
+        let item_help = this.formatter._join_parts(this.items.map(([func, args]) => func.apply(null, args)))
         if (this.parent !== undefined) {
             this.formatter._dedent()
         }
@@ -1121,9 +1121,9 @@ function _get_action_name(argument) {
         return undefined
     } else if (argument.option_strings.length) {
         return argument.option_strings.join('/')
-    } else if (![ undefined, SUPPRESS ].includes(argument.metavar)) {
+    } else if (![undefined, SUPPRESS].includes(argument.metavar)) {
         return argument.metavar
-    } else if (![ undefined, SUPPRESS ].includes(argument.dest)) {
+    } else if (![undefined, SUPPRESS].includes(argument.dest)) {
         return argument.dest
     } else {
         return undefined
@@ -1279,7 +1279,7 @@ const Action = _camelcase_alias(_callable(class Action extends _AttributeHolder(
             'help',
             'metavar'
         ]
-        return names.map(name => [ name, getattr(this, name) ])
+        return names.map(name => [name, getattr(this, name)])
     }
 
     format_usage() {
@@ -1820,8 +1820,8 @@ const _SubParsersAction = _camelcase_alias(_callable(class _SubParsersAction ext
         // in a new namespace object and then update the original
         // namespace for the relevant parts.
         let subnamespace
-        [ subnamespace, arg_strings ] = parser.parse_known_args(arg_strings, undefined)
-        for (let [ key, value ] of Object.entries(subnamespace)) {
+        [subnamespace, arg_strings] = parser.parse_known_args(arg_strings, undefined)
+        for (let [key, value] of Object.entries(subnamespace)) {
             setattr(namespace, key, value)
         }
 
@@ -1953,10 +1953,10 @@ const FileType = _callable(class FileType extends Function {
     }
 
     [util.inspect.custom]() {
-        let args = [ this._flags ]
-        let kwargs = Object.entries(this._options).map(([ k, v ]) => {
+        let args = [this._flags]
+        let kwargs = Object.entries(this._options).map(([k, v]) => {
             if (k === 'mode') v = { value: v, [util.inspect.custom]() { return '0o' + this.value.toString(8) } }
-            return [ k, v ]
+            return [k, v]
         })
         let args_str = []
                 .concat(args.filter(arg => arg !== -1).map(repr))
@@ -2029,7 +2029,7 @@ const _ActionsContainer = _camelcase_alias(_callable(class _ActionsContainer {
         this.register('action', 'parsers', _SubParsersAction)
         this.register('action', 'extend', _ExtendAction)
         // LEGACY (v1 compatibility): camelcase variants
-        ;[ 'storeConst', 'storeTrue', 'storeFalse', 'appendConst' ].forEach(old_name => {
+        ;['storeConst', 'storeTrue', 'storeFalse', 'appendConst'].forEach(old_name => {
             let new_name = _to_new_name(old_name)
             this.register('action', old_name, util.deprecate(this._registry_get('action', new_name),
                 sub('{action: "%s"} is renamed to {action: "%s"}', old_name, new_name)))
@@ -2188,7 +2188,7 @@ const _ActionsContainer = _camelcase_alias(_callable(class _ActionsContainer {
     }
 
     add_mutually_exclusive_group() {
-        // eslint-disable-next-line no-use-before-define
+
         let group = _MutuallyExclusiveGroup(this, ...arguments)
         this._mutually_exclusive_groups.push(group)
         return group
@@ -2379,7 +2379,7 @@ const _ActionsContainer = _camelcase_alias(_callable(class _ActionsContainer {
         for (let option_string of action.option_strings) {
             if (hasattr(this._option_string_actions, option_string)) {
                 let confl_optional = this._option_string_actions[option_string]
-                confl_optionals.push([ option_string, confl_optional ])
+                confl_optionals.push([option_string, confl_optional])
             }
         }
 
@@ -2394,14 +2394,14 @@ const _ActionsContainer = _camelcase_alias(_callable(class _ActionsContainer {
         let message = conflicting_actions.length === 1 ?
             'conflicting option string: %s' :
             'conflicting option strings: %s'
-        let conflict_string = conflicting_actions.map(([ option_string/*, action*/ ]) => option_string).join(', ')
+        let conflict_string = conflicting_actions.map(([option_string]) => option_string).join(', ')
         throw new ArgumentError(action, sub(message, conflict_string))
     }
 
     _handle_conflict_resolve(action, conflicting_actions) {
 
         // remove all conflicting options
-        for (let [ option_string, action ] of conflicting_actions) {
+        for (let [option_string, action] of conflicting_actions) {
 
             // remove the conflicting option
             _array_remove(action.option_strings, option_string)
@@ -2674,7 +2674,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
             'conflict_handler',
             'add_help'
         ]
-        return names.map(name => [ name, getattr(this, name) ])
+        return names.map(name => [name, getattr(this, name)])
     }
 
     // ==================================
@@ -2746,7 +2746,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
     // =====================================
     parse_args(args = undefined, namespace = undefined) {
         let argv
-        [ args, argv ] = this.parse_known_args(args, namespace)
+        [args, argv] = this.parse_known_args(args, namespace)
         if (argv && argv.length > 0) {
             let msg = 'unrecognized arguments: %s'
             this.error(sub(msg, argv.join(' ')))
@@ -2785,7 +2785,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
         // parse the arguments and exit if there are any errors
         if (this.exit_on_error) {
             try {
-                [ namespace, args ] = this._parse_known_args(args, namespace)
+                [namespace, args] = this._parse_known_args(args, namespace)
             } catch (err) {
                 if (err instanceof ArgumentError) {
                     this.error(err.message)
@@ -2794,7 +2794,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
                 }
             }
         } else {
-            [ namespace, args ] = this._parse_known_args(args, namespace)
+            [namespace, args] = this._parse_known_args(args, namespace)
         }
 
         if (hasattr(namespace, _UNRECOGNIZED_ARGS_ATTR)) {
@@ -2802,7 +2802,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
             delattr(namespace, _UNRECOGNIZED_ARGS_ATTR)
         }
 
-        return [ namespace, args ]
+        return [namespace, args]
     }
 
     _parse_known_args(arg_strings, namespace) {
@@ -2816,7 +2816,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
         let action_conflicts = new Map()
         for (let mutex_group of this._mutually_exclusive_groups) {
             let group_actions = mutex_group._group_actions
-            for (let [ i, mutex_action ] of Object.entries(mutex_group._group_actions)) {
+            for (let [i, mutex_action] of Object.entries(mutex_group._group_actions)) {
                 let conflicts = action_conflicts.get(mutex_action) || []
                 conflicts = conflicts.concat(group_actions.slice(0, +i))
                 conflicts = conflicts.concat(group_actions.slice(+i + 1))
@@ -2830,12 +2830,12 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
         let option_string_indices = {}
         let arg_string_pattern_parts = []
         let arg_strings_iter = Object.entries(arg_strings)[Symbol.iterator]()
-        for (let [ i, arg_string ] of arg_strings_iter) {
+        for (let [i, arg_string] of arg_strings_iter) {
 
             // all args after -- are non-options
             if (arg_string === '--') {
                 arg_string_pattern_parts.push('-')
-                for ([ i, arg_string ] of arg_strings_iter) {
+                for ([i, arg_string] of arg_strings_iter) {
                     arg_string_pattern_parts.push('A')
                 }
 
@@ -2892,7 +2892,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
 
             // get the optional identified at this index
             let option_tuple = option_string_indices[start_index]
-            let [ action, option_string, explicit_arg ] = option_tuple
+            let [action, option_string, explicit_arg] = option_tuple
 
             // identify additional optionals in the same arg string
             // (e.g. -xyz is the same as -x -y -z if no args are required)
@@ -2916,7 +2916,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
                     // of the tail of the option string
                     let chars = this.prefix_chars
                     if (arg_count === 0 && !chars.includes(option_string[1])) {
-                        action_tuples.push([ action, [], option_string ])
+                        action_tuples.push([action, [], option_string])
                         let char = option_string[0]
                         option_string = char + explicit_arg[0]
                         let new_explicit_arg = explicit_arg.slice(1) || undefined
@@ -2933,8 +2933,8 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
                     // successfully matched the option; exit the loop
                     } else if (arg_count === 1) {
                         stop = start_index + 1
-                        let args = [ explicit_arg ]
-                        action_tuples.push([ action, args, option_string ])
+                        let args = [explicit_arg]
+                        action_tuples.push([action, args, option_string])
                         break
 
                     // error if a double-dash option did not use the
@@ -2953,7 +2953,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
                     let arg_count = this._match_argument(action, selected_patterns)
                     stop = start + arg_count
                     let args = arg_strings.slice(start, stop)
-                    action_tuples.push([ action, args, option_string ])
+                    action_tuples.push([action, args, option_string])
                     break
                 }
             }
@@ -2961,7 +2961,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
             // add the Optional to the list and return the index at which
             // the Optional's string args stopped
             assert(action_tuples.length)
-            for (let [ action, args, option_string ] of action_tuples) {
+            for (let [action, args, option_string] of action_tuples) {
                 take_action(action, args, option_string)
             }
             return stop
@@ -3002,7 +3002,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
 
             // consume any Positionals preceding the next option
             let next_option_string_index = Math.min(
-                // eslint-disable-next-line no-loop-func
+
                 ...Object.keys(option_string_indices).map(Number).filter(index => index >= start_index)
             )
             if (start_index !== next_option_string_index) {
@@ -3087,7 +3087,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
         }
 
         // return the updated namespace and the extra arguments
-        return [ namespace, extras ]
+        return [namespace, extras]
     }
 
     _read_args_from_files(arg_strings) {
@@ -3180,7 +3180,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
         // if the option string is present in the parser, return the action
         if (arg_string in this._option_string_actions) {
             let action = this._option_string_actions[arg_string]
-            return [ action, arg_string, undefined ]
+            return [action, arg_string, undefined]
         }
 
         // if it's just a single character, it was meant to be positional
@@ -3190,10 +3190,10 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
 
         // if the option string before the "=" is present, return the action
         if (arg_string.includes('=')) {
-            let [ option_string, explicit_arg ] = _string_split(arg_string, '=', 1)
+            let [option_string, explicit_arg] = _string_split(arg_string, '=', 1)
             if (option_string in this._option_string_actions) {
                 let action = this._option_string_actions[option_string]
-                return [ action, option_string, explicit_arg ]
+                return [action, option_string, explicit_arg]
             }
         }
 
@@ -3203,7 +3203,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
 
         // if multiple actions match, the option string was ambiguous
         if (option_tuples.length > 1) {
-            let options = option_tuples.map(([ /*action*/, option_string/*, explicit_arg*/ ]) => option_string).join(', ')
+            let options = option_tuples.map(([, option_string]) => option_string).join(', ')
             let args = {option: arg_string, matches: options}
             let msg = 'ambiguous option: %(option)s could match %(matches)s'
             this.error(sub(msg, args))
@@ -3211,7 +3211,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
         // if exactly one action matched, this segmentation is good,
         // so return the parsed action
         } else if (option_tuples.length === 1) {
-            let [ option_tuple ] = option_tuples
+            let [option_tuple] = option_tuples
             return option_tuple
         }
 
@@ -3231,7 +3231,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
 
         // it was meant to be an optional but there is no such option
         // in this parser (though it might be a valid option in a subparser)
-        return [ undefined, arg_string, undefined ]
+        return [undefined, arg_string, undefined]
     }
 
     _get_option_tuples(option_string) {
@@ -3244,7 +3244,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
             if (this.allow_abbrev) {
                 let option_prefix, explicit_arg
                 if (option_string.includes('=')) {
-                    [ option_prefix, explicit_arg ] = _string_split(option_string, '=', 1)
+                    [option_prefix, explicit_arg] = _string_split(option_string, '=', 1)
                 } else {
                     option_prefix = option_string
                     explicit_arg = undefined
@@ -3252,7 +3252,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
                 for (let option_string of Object.keys(this._option_string_actions)) {
                     if (option_string.startsWith(option_prefix)) {
                         let action = this._option_string_actions[option_string]
-                        let tup = [ action, option_string, explicit_arg ]
+                        let tup = [action, option_string, explicit_arg]
                         result.push(tup)
                     }
                 }
@@ -3270,11 +3270,11 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
             for (let option_string of Object.keys(this._option_string_actions)) {
                 if (option_string === short_option_prefix) {
                     let action = this._option_string_actions[option_string]
-                    let tup = [ action, option_string, short_explicit_arg ]
+                    let tup = [action, option_string, short_explicit_arg]
                     result.push(tup)
                 } else if (option_string.startsWith(option_prefix)) {
                     let action = this._option_string_actions[option_string]
-                    let tup = [ action, option_string, explicit_arg ]
+                    let tup = [action, option_string, explicit_arg]
                     result.push(tup)
                 }
             }
@@ -3343,7 +3343,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
 
     parse_intermixed_args(args = undefined, namespace = undefined) {
         let argv
-        [ args, argv ] = this.parse_known_intermixed_args(args, namespace)
+        [args, argv] = this.parse_known_intermixed_args(args, namespace)
         if (argv.length) {
             let msg = 'unrecognized arguments: %s'
             this.error(sub(msg, argv.join(' ')))
@@ -3366,7 +3366,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
 
         let extras
         let positionals = this._get_positional_actions()
-        let a = positionals.filter(action => [ PARSER, REMAINDER ].includes(action.nargs))
+        let a = positionals.filter(action => [PARSER, REMAINDER].includes(action.nargs))
         if (a.length) {
             throw new TypeError(sub('parse_intermixed_args: positional arg' +
                                     ' with nargs=%s', a[0].nargs))
@@ -3398,13 +3398,13 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
                     action.save_default = action.default
                     action.default = SUPPRESS
                 }
-                [ namespace, remaining_args ] = this.parse_known_args(args,
+                [namespace, remaining_args] = this.parse_known_args(args,
                                                                       namespace)
                 for (let action of positionals) {
                     // remove the empty positional values from namespace
                     let attr = getattr(namespace, action.dest)
                     if (Array.isArray(attr) && attr.length === 0) {
-                        // eslint-disable-next-line no-console
+
                         console.warn(sub('Do not expect %s in %s', action.dest, namespace))
                         delattr(namespace, action.dest)
                     }
@@ -3428,7 +3428,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
                     group.save_required = group.required
                     group.required = false
                 }
-                [ namespace, extras ] = this.parse_known_args(remaining_args,
+                [namespace, extras] = this.parse_known_args(remaining_args,
                                                               namespace)
             } finally {
                 // restore parser values before exiting
@@ -3442,7 +3442,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
         } finally {
             this.usage = save_usage
         }
-        return [ namespace, extras ]
+        return [namespace, extras]
     }
 
     // ========================
@@ -3653,7 +3653,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
         if (this.debug === true) throw new Error(message)
         // end
         this.print_usage(process.stderr)
-        let args = {prog: this.prog, message: message}
+        let args = {prog: this.prog, message}
         this.exit(2, sub('%(prog)s: error: %(message)s\n', args))
     }
 }))
@@ -3684,7 +3684,7 @@ module.exports = {
 Object.defineProperty(module.exports, 'Const', {
     get() {
         let result = {}
-        Object.entries({ ONE_OR_MORE, OPTIONAL, PARSER, REMAINDER, SUPPRESS, ZERO_OR_MORE }).forEach(([ n, v ]) => {
+        Object.entries({ ONE_OR_MORE, OPTIONAL, PARSER, REMAINDER, SUPPRESS, ZERO_OR_MORE }).forEach(([n, v]) => {
             Object.defineProperty(result, n, {
                 get() {
                     deprecate(n, sub('use argparse.%s instead of argparse.Const.%s', n, n))
@@ -3692,7 +3692,7 @@ Object.defineProperty(module.exports, 'Const', {
                 }
             })
         })
-        Object.entries({ _UNRECOGNIZED_ARGS_ATTR }).forEach(([ n, v ]) => {
+        Object.entries({ _UNRECOGNIZED_ARGS_ATTR }).forEach(([n, v]) => {
             Object.defineProperty(result, n, {
                 get() {
                     deprecate(n, sub('argparse.Const.%s is an internal symbol and will no longer be available', n))

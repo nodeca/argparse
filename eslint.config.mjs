@@ -4,7 +4,7 @@ export default [
     ...neostandard(),
     {
         rules: {
-            '@stylistic/array-bracket-spacing': 'off',
+            // '@stylistic/array-bracket-spacing': 'off',
             '@stylistic/indent': 'off',
             '@stylistic/lines-between-class-members': 'off',
             '@stylistic/new-parens': 'off',

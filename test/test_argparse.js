@@ -4,9 +4,9 @@
 // Copyright (C) 2010-2020 Python Software Foundation.
 // Copyright (C) 2020 argparse.js authors
 
-/* eslint-disable quotes, new-cap, new-parens, no-extra-semi, comma-dangle */
+/* eslint-disable new-cap */
 
-// eslint-disable-next-line strict
+
 'use strict'
 
 const assert = require('assert')
@@ -42,7 +42,7 @@ class JSTestCase {
     }
 
     * [Symbol.iterator]() {
-        /* eslint-disable consistent-this */
+
         let self = this
         let member_names = new Set()
         while (self) {
@@ -50,7 +50,7 @@ class JSTestCase {
             self = Object.getPrototypeOf(self)
         }
         yield* Array.from(member_names)
-        /* eslint-enable consistent-this */
+
     }
 
     assertEqual(expected, actual)    { assert.deepStrictEqual(actual, expected) }
@@ -147,7 +147,7 @@ class ArgumentParserError extends Error {
     }
 
     toString() {
-        return '(' + [ this.m, this.stdout, this.stderr, this.error_code ].join(', ') + ')'
+        return '(' + [this.m, this.stdout, this.stderr, this.error_code].join(', ') + ')'
     }
 }
 
@@ -264,7 +264,7 @@ class ParserTestCase extends TestCase {
 
         function many_groups(parser, argument_signatures) {
             /* Add each argument in its own group to the parser */
-            for (let [ i, sig ] of Object.entries(argument_signatures)) {
+            for (let [i, sig] of Object.entries(argument_signatures)) {
                 let group = parser.add_argument_group(sub('foo:%i', +i))
                 group.add_argument(...sig)
             }
@@ -301,7 +301,7 @@ class ParserTestCase extends TestCase {
                 let parse_args_name = this._parse_args.name
                 for (let test_func of [this.test_failures, this.test_successes]) {
                     let func_name = test_func.name
-                    let names = [ func_name, add_arguments_name, parse_args_name ]
+                    let names = [func_name, add_arguments_name, parse_args_name]
                     let test_name = names.join('_')
                     tester_cls[test_name] = () => test_func.call(this, tester_cls)
                 }
@@ -323,7 +323,7 @@ class ParserTestCase extends TestCase {
 
             test_successes(tester) {
                 let parser = this._get_parser(tester)
-                for (let [ args, expected_ns ] of tester.successes) {
+                for (let [args, expected_ns] of tester.successes) {
                     if (typeof args === 'string') {
                         args = args.split(/\s+/).filter(Boolean)
                     }
@@ -1284,7 +1284,7 @@ class ParserTestCase extends TestCase {
     /* Test a Positional with unlimited nargs followed by one with 1 */
 
     argument_signatures = [Sig('foo', { nargs: '*' }), Sig('bar', { nargs: 1 })]
-    failures = ['', '--foo', ]
+    failures = ['', '--foo',]
     successes = [
         ['a', NS({ foo: [], bar: ['a'] })],
         ['a b', NS({ foo: ['a'], bar: ['b'] })],
@@ -1660,7 +1660,7 @@ let TempDirMixin_ParserTestCase = TempDirMixin(ParserTestCase)
                           '@hello'],
             ['invalid', '@no-such-path\n'],
         ]
-        for (let [ path, text ] of file_texts) {
+        for (let [path, text] of file_texts) {
             fs.writeFileSync(path, text)
         }
     }
@@ -1692,7 +1692,7 @@ let TempDirMixin_ParserTestCase = TempDirMixin(ParserTestCase)
         let file_texts = [
             ['hello', 'hello world!\n'],
         ]
-        for (let [ path, text ] of file_texts) {
+        for (let [path, text] of file_texts) {
             fs.writeFileSync(path, text)
         }
     }
@@ -2175,42 +2175,42 @@ class WFile {
         // check some non-failure cases:
         this.assertEqual(
             this.parser.parse_args('0.5 1 b -w 7'.split(' ')),
-            NS({ foo: false, bar: 0.5, w: 7, x: 'b' }),
+            NS({ foo: false, bar: 0.5, w: 7, x: 'b' })
         )
         this.assertEqual(
             this.parser.parse_args('0.25 --foo 2 -y 2 3j -- -1j'.split(' ')),
-            NS({ foo: true, bar: 0.25, y: '2', z: ['3j', '-1j'] }),
+            NS({ foo: true, bar: 0.25, y: '2', z: ['3j', '-1j'] })
         )
         this.assertEqual(
             this.parser.parse_args('--foo 0.125 1 c'.split(' ')),
-            NS({ foo: true, bar: 0.125, w: undefined, x: 'c' }),
+            NS({ foo: true, bar: 0.125, w: undefined, x: 'c' })
         )
         this.assertEqual(
             this.parser.parse_args('-1.5 3 11 -- a --foo 7 -- b'.split(' ')),
-            NS({ foo: false, bar: -1.5, t: 11, u: ['a', '--foo', '7', '--', 'b'] }),
+            NS({ foo: false, bar: -1.5, t: 11, u: ['a', '--foo', '7', '--', 'b'] })
         )
     }
 
     test_parse_known_args() {
         this.assertEqual(
             this.parser.parse_known_args('0.5 1 b -w 7'.split(' ')),
-            [NS({ foo: false, bar: 0.5, w: 7, x: 'b' }), []],
+            [NS({ foo: false, bar: 0.5, w: 7, x: 'b' }), []]
         )
         this.assertEqual(
             this.parser.parse_known_args('0.5 -p 1 b -w 7'.split(' ')),
-            [NS({ foo: false, bar: 0.5, w: 7, x: 'b' }), ['-p']],
+            [NS({ foo: false, bar: 0.5, w: 7, x: 'b' }), ['-p']]
         )
         this.assertEqual(
             this.parser.parse_known_args('0.5 1 b -w 7 -p'.split(' ')),
-            [NS({ foo: false, bar: 0.5, w: 7, x: 'b' }), ['-p']],
+            [NS({ foo: false, bar: 0.5, w: 7, x: 'b' }), ['-p']]
         )
         this.assertEqual(
             this.parser.parse_known_args('0.5 1 b -q -rs -w 7'.split(' ')),
-            [NS({ foo: false, bar: 0.5, w: 7, x: 'b' }), ['-q', '-rs']],
+            [NS({ foo: false, bar: 0.5, w: 7, x: 'b' }), ['-q', '-rs']]
         )
         this.assertEqual(
             this.parser.parse_known_args('0.5 -W 1 b -X Y -w 7 Z'.split(' ')),
-            [NS({ foo: false, bar: 0.5, w: 7, x: 'b' }), ['-W', '-X', 'Y', 'Z']],
+            [NS({ foo: false, bar: 0.5, w: 7, x: 'b' }), ['-W', '-X', 'Y', 'Z']]
         )
     }
 
@@ -2435,11 +2435,11 @@ class WFile {
         let parser = this._get_parser({ aliases: true })
         this.assertEqual(
             parser.parse_known_args('0.5 1alias1 b'.split(' ')),
-            [NS({ foo: false, bar: 0.5, w: undefined, x: 'b' }), []],
+            [NS({ foo: false, bar: 0.5, w: undefined, x: 'b' }), []]
         )
         this.assertEqual(
             parser.parse_known_args('0.5 1alias2 b'.split(' ')),
-            [NS({ foo: false, bar: 0.5, w: undefined, x: 'b' }), []],
+            [NS({ foo: false, bar: 0.5, w: undefined, x: 'b' }), []]
         )
     }
 
@@ -2779,7 +2779,7 @@ function MEMixin(cls) {
         test_successes_when_not_required() {
             let parser = this.get_parser({ required: false })
             let successes = this.successes.concat(this.successes_when_not_required)
-            for (let [ args_string, expected_ns ] of successes) {
+            for (let [args_string, expected_ns] of successes) {
                 let actual_ns = parser.parse_args(args_string.split(/\s+/).filter(Boolean))
                 this.assertEqual(actual_ns, expected_ns)
             }
@@ -2787,7 +2787,7 @@ function MEMixin(cls) {
 
         test_successes_when_required() {
             let parser = this.get_parser({ required: true })
-            for (let [ args_string, expected_ns ] of this.successes) {
+            for (let [args_string, expected_ns] of this.successes) {
                 let actual_ns = parser.parse_args(args_string.split(/\s+/).filter(Boolean))
                 this.assertEqual(actual_ns, expected_ns)
             }
@@ -3432,7 +3432,7 @@ class HelpTestCase extends TestCase {
                     parser.add_argument(...argument_sig)
                 }
                 let group_sigs = tester.argument_group_signatures || []
-                for (let [ group_sig, argument_sigs ] of group_sigs) {
+                for (let [group_sig, argument_sigs] of group_sigs) {
                     let group = parser.add_argument_group(...group_sig)
                     for (let argument_sig of argument_sigs) {
                         group.add_argument(...argument_sig)
@@ -3486,7 +3486,7 @@ class HelpTestCase extends TestCase {
         }
 
         // add tests for {format,print}_{usage,help}
-        for (let [ func_suffix, std_name ] of [['usage', 'stdout'],
+        for (let [func_suffix, std_name] of [['usage', 'stdout'],
                                                ['help', 'stdout']]) {
             // eslint-disable-next-line no-new
             new AddTests(this, func_suffix, std_name)
@@ -4645,7 +4645,7 @@ VV VV VV
                              description: 'display some subcommands' })
     argument_signatures = [Sig('-v', '--version', { action: 'version', version: '0.1' })]
 
-    subparsers_signatures = [ 'a', 'b', 'c', 'd', 'e' ].map(name => Sig({ name }))
+    subparsers_signatures = ['a', 'b', 'c', 'd', 'e'].map(name => Sig({ name }))
 
     usage = `\
         usage: PROG [-h] [-v] {a,b,c,d,e} ...
@@ -4680,7 +4680,7 @@ VV VV VV
                        ['d', 'd subcommand help'],
                        ['e', 'e subcommand help']]
 
-    subparsers_signatures = this.subcommand_data.map(([ name, help ]) => Sig({ name, help }))
+    subparsers_signatures = this.subcommand_data.map(([name, help]) => Sig({ name, help }))
 
     usage = `\
         usage: PROG [-h] [-v] {a,b,c,d,e} ...
@@ -4778,7 +4778,7 @@ VV VV VV
 
     test_invalid_type() {
         this.assertValueError('--foo', { type: 'Number' })
-        this.assertValueError('--foo', { type: [ Number, Number ] })
+        this.assertValueError('--foo', { type: [Number, Number] })
     }
 
 /*
@@ -5366,7 +5366,7 @@ VV VV VV
     test_optionals() {
         let parser = argparse.ArgumentParser()
         parser.add_argument('--foo')
-        let [ args, extras ] = parser.parse_known_args('--foo F --bar --baz'.split(' '))
+        let [args, extras] = parser.parse_known_args('--foo F --bar --baz'.split(' '))
         this.assertEqual(NS({ foo: 'F' }), args)
         this.assertEqual(['--bar', '--baz'], extras)
     }
@@ -5378,7 +5378,7 @@ VV VV VV
         parser.add_argument('badger')
 
         let argv = ["B", "C", "--foo", "-v", "3", "4"]
-        let [ args, extras ] = parser.parse_known_args(argv)
+        let [args, extras] = parser.parse_known_args(argv)
         this.assertEqual(NS({ v: 3, spam: true, badger: "B" }), args)
         this.assertEqual(["C", "--foo", "4"], extras)
     }
@@ -5402,13 +5402,13 @@ VV VV VV
         this.assertEqual(NS({ bar: 'y', cmd: 'cmd', foo: 'x', rest: [1, 2, 3] }), args)
 
         let extras
-        ;[ args, extras ] = parser.parse_known_args(argv)
+        ;[args, extras] = parser.parse_known_args(argv)
         // cannot parse the '1,2,3'
         this.assertEqual(NS({ bar: 'y', cmd: 'cmd', foo: 'x', rest: [] }), args)
         this.assertEqual(["1", "2", "3"], extras)
 
         argv = 'cmd --foo x 1 --error 2 --bar y 3'.split(' ')
-        ;[ args, extras ] = parser.parse_known_intermixed_args(argv)
+        ;[args, extras] = parser.parse_known_intermixed_args(argv)
         // unknown optionals go into extras
         this.assertEqual(NS({ bar: 'y', cmd: 'cmd', foo: 'x', rest: [1] }), args)
         this.assertEqual(['--error', '2', '3'], extras)
