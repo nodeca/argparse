@@ -26,6 +26,6 @@
     "@babel/plugin-syntax-class-properties": "^7.10.4",
     "eslint": "^7.5.0",
     "mocha": "^8.0.1",
-    "nyc": "^15.1.0"
+    "nyc": "^18.0.0"
   }
 }
