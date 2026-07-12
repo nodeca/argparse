@@ -22,9 +22,7 @@
     "coverage": "c8 --reporter html npm test"
   },
   "devDependencies": {
-    "@babel/eslint-parser": "^7.11.0",
-    "@babel/plugin-syntax-class-properties": "^7.10.4",
     "c8": "^11.0.0",
-    "eslint": "^7.5.0"
+    "neostandard": "^0.13.0"
   }
 }
