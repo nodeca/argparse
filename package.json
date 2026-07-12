@@ -9,9 +9,8 @@
     "option",
     "args"
   ],
-  "main": "argparse.js",
+  "main": "lib/argparse.js",
   "files": [
-    "argparse.js",
     "lib/"
   ],
   "license": "Python-2.0",
