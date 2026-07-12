@@ -16,6 +16,16 @@
   ],
   "license": "Python-2.0",
   "repository": "nodeca/argparse",
+  "funding": [
+    {
+      "type": "github",
+      "url": "https://github.com/sponsors/puzrin"
+    },
+    {
+      "type": "github",
+      "url": "https://github.com/sponsors/nodeca"
+    }
+  ],
   "scripts": {
     "lint": "eslint .",
     "test": "npm run lint && node --test",
