@@ -4,13 +4,13 @@
 // Copyright (C) 2010-2020 Python Software Foundation.
 // Copyright (C) 2020 argparse.js authors
 
-/* global describe, it, before, after */
 /* eslint-disable quotes, new-cap, new-parens, no-extra-semi, comma-dangle */
 
 // eslint-disable-next-line strict
 'use strict'
 
 const assert = require('assert')
+const { describe, it, before, after } = require('node:test')
 const fs = require('fs')
 const os = require('os')
 const path = require('path')
