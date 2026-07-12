@@ -18,14 +18,14 @@
   "repository": "nodeca/argparse",
   "scripts": {
     "lint": "eslint .",
-    "test": "npm run lint && nyc mocha",
-    "coverage": "npm run test && nyc report --reporter html"
+    "test": "npm run lint && mocha",
+    "coverage": "c8 --reporter html npm test"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.11.0",
     "@babel/plugin-syntax-class-properties": "^7.10.4",
+    "c8": "^11.0.0",
     "eslint": "^7.5.0",
-    "mocha": "^8.0.1",
-    "nyc": "^15.1.0"
+    "mocha": "^8.0.1"
   }
 }
