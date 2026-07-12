@@ -4,7 +4,6 @@ export default [
     ...neostandard(),
     {
         rules: {
-            // '@stylistic/array-bracket-spacing': 'off',
             '@stylistic/indent': 'off',
             '@stylistic/lines-between-class-members': 'off',
             '@stylistic/new-parens': 'off',
@@ -17,10 +16,6 @@ export default [
             '@stylistic/operator-linebreak': 'off',
             '@stylistic/padded-blocks': 'off',
             '@stylistic/quotes': 'off',
-            '@stylistic/space-before-function-paren': 'off',
-            '@stylistic/space-infix-ops': 'off',
-            '@stylistic/spaced-comment': 'off',
-            '@stylistic/yield-star-spacing': 'off',
             camelcase: 'off',
             'no-control-regex': 'off',
             'no-regex-spaces': 'off',

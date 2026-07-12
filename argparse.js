@@ -88,39 +88,39 @@ const sub = require('./lib/sub')
 const path = require('path')
 const repr = util.inspect
 
-function get_argv() {
+function get_argv () {
     // omit first argument (which is assumed to be interpreter - `node`, `coffee`, `ts-node`, etc.)
     return process.argv.slice(1)
 }
 
-function get_terminal_size() {
+function get_terminal_size () {
     return {
         columns: +process.env.COLUMNS || process.stdout.columns || 80
     }
 }
 
-function hasattr(object, name) {
+function hasattr (object, name) {
     return Object.prototype.hasOwnProperty.call(object, name)
 }
 
-function getattr(object, name, value) {
+function getattr (object, name, value) {
     return hasattr(object, name) ? object[name] : value
 }
 
-function setattr(object, name, value) {
+function setattr (object, name, value) {
     object[name] = value
 }
 
-function setdefault(object, name, value) {
+function setdefault (object, name, value) {
     if (!hasattr(object, name)) object[name] = value
     return object[name]
 }
 
-function delattr(object, name) {
+function delattr (object, name) {
     delete object[name]
 }
 
-function range(from, to, step=1) {
+function range (from, to, step = 1) {
     // range(10) is equivalent to range(0, 10)
     if (arguments.length === 1) [to, from] = [from, 0]
     if (typeof from !== 'number' || typeof to !== 'number' || typeof step !== 'number') {
@@ -137,7 +137,7 @@ function range(from, to, step=1) {
     return result
 }
 
-function splitlines(str, keepends = false) {
+function splitlines (str, keepends = false) {
     let result
     if (!keepends) {
         result = str.split(/\r\n|[\n\r\v\f\x1c\x1d\x1e\x85\u2028\u2029]/)
@@ -152,13 +152,13 @@ function splitlines(str, keepends = false) {
     return result
 }
 
-function _string_lstrip(string, prefix_chars) {
+function _string_lstrip (string, prefix_chars) {
     let idx = 0
     while (idx < string.length && prefix_chars.includes(string[idx])) idx++
     return idx ? string.slice(idx) : string
 }
 
-function _string_split(string, sep, maxsplit) {
+function _string_split (string, sep, maxsplit) {
     let result = string.split(sep)
     if (result.length > maxsplit) {
         result = result.slice(0, maxsplit).concat([result.slice(maxsplit).join(sep)])
@@ -166,7 +166,7 @@ function _string_split(string, sep, maxsplit) {
     return result
 }
 
-function _array_equal(array1, array2) {
+function _array_equal (array1, array2) {
     if (array1.length !== array2.length) return false
     for (let i = 0; i < array1.length; i++) {
         if (array1[i] !== array2[i]) return false
@@ -174,7 +174,7 @@ function _array_equal(array1, array2) {
     return true
 }
 
-function _array_remove(array, item) {
+function _array_remove (array, item) {
     let idx = array.indexOf(item)
     if (idx === -1) throw new TypeError(sub('%r not in list', item))
     array.splice(idx, 1)
@@ -183,7 +183,7 @@ function _array_remove(array, item) {
 // normalize choices to array;
 // this isn't required in python because `in` and `map` operators work with anything,
 // but in js dealing with multiple types here is too clunky
-function _choices_to_array(choices) {
+function _choices_to_array (choices) {
     if (choices === undefined) {
         return []
     } else if (Array.isArray(choices)) {
@@ -198,7 +198,7 @@ function _choices_to_array(choices) {
 }
 
 // decorator that allows a class to be called without new
-function _callable(cls) {
+function _callable (cls) {
     let result = { // object is needed for inferred class name
         [cls.name]: function (...args) {
             let this_class = new.target === result || !new.target
@@ -211,7 +211,7 @@ function _callable(cls) {
     return result[cls.name]
 }
 
-function _alias(object, from, to) {
+function _alias (object, from, to) {
     try {
         let name = object.constructor.name
         Object.defineProperty(object, from, {
@@ -223,7 +223,7 @@ function _alias(object, from, to) {
 }
 
 // decorator that allows snake_case class methods to be called with camelCase and vice versa
-function _camelcase_alias(_class) {
+function _camelcase_alias (_class) {
     for (let name of Object.getOwnPropertyNames(_class.prototype)) {
         let camelcase = name.replace(/\w_[a-z]/g, s => s[0] + s[2].toUpperCase())
         if (camelcase !== name) _alias(_class.prototype, camelcase, name)
@@ -231,14 +231,14 @@ function _camelcase_alias(_class) {
     return _class
 }
 
-function _to_legacy_name(key) {
+function _to_legacy_name (key) {
     key = key.replace(/\w_[a-z]/g, s => s[0] + s[2].toUpperCase())
     if (key === 'default') key = 'defaultValue'
     if (key === 'const') key = 'constant'
     return key
 }
 
-function _to_new_name(key) {
+function _to_new_name (key) {
     if (key === 'defaultValue') key = 'default'
     if (key === 'constant') key = 'const'
     key = key.replace(/[A-Z]/g, c => '_' + c.toLowerCase())
@@ -247,8 +247,8 @@ function _to_new_name(key) {
 
 // parse options
 let no_default = Symbol('no_default_value')
-function _parse_opts(args, descriptor) {
-    function get_name() {
+function _parse_opts (args, descriptor) {
+    function get_name () {
         let stack = new Error().stack.split('\n')
             .map(x => x.match(/^    at (.*) \(.*\)$/))
             .filter(Boolean)
@@ -277,7 +277,7 @@ function _parse_opts(args, descriptor) {
         if (old_name !== key && (old_name in kwargs)) {
             if (key in kwargs) {
                 // default and defaultValue specified at the same time, happens often in old tests
-                //throw new TypeError(sub('%s() got multiple values for argument %r', get_name(), key))
+                // throw new TypeError(sub('%s() got multiple values for argument %r', get_name(), key))
             } else {
                 kwargs[key] = kwargs[old_name]
             }
@@ -305,7 +305,7 @@ function _parse_opts(args, descriptor) {
                     if (new_name !== key && (key in kwargs)) {
                         if (new_name in kwargs) {
                             // default and defaultValue specified at the same time, happens often in old tests
-                            //throw new TypeError(sub('%s() got multiple values for argument %r', get_name(), new_name))
+                            // throw new TypeError(sub('%s() got multiple values for argument %r', get_name(), new_name))
                         } else {
                             kwargs[new_name] = kwargs[key]
                         }
@@ -367,7 +367,7 @@ function _parse_opts(args, descriptor) {
 }
 
 let _deprecations = {}
-function deprecate(id, string) {
+function deprecate (id, string) {
     _deprecations[id] = _deprecations[id] || util.deprecate(() => {}, string)
     _deprecations[id]()
 }
@@ -376,7 +376,7 @@ function deprecate(id, string) {
 // =============================
 // Utility functions and classes
 // =============================
-function _AttributeHolder(cls = Object) {
+function _AttributeHolder (cls = Object) {
     /*
      *  Abstract base class that provides __repr__.
      *
@@ -387,7 +387,7 @@ function _AttributeHolder(cls = Object) {
      */
 
     return class _AttributeHolder extends cls {
-        [util.inspect.custom]() {
+        [util.inspect.custom] () {
             let type_name = this.constructor.name
             let arg_strings = []
             let star_args = {}
@@ -407,22 +407,22 @@ function _AttributeHolder(cls = Object) {
             return sub('%s(%s)', type_name, arg_strings.join(', '))
         }
 
-        toString() {
+        toString () {
             return this[util.inspect.custom]()
         }
 
-        _get_kwargs() {
+        _get_kwargs () {
             return Object.entries(this)
         }
 
-        _get_args() {
+        _get_args () {
             return []
         }
     }
 }
 
 
-function _copy_items(items) {
+function _copy_items (items) {
     if (items === undefined) {
         return []
     }
@@ -441,7 +441,7 @@ const HelpFormatter = _camelcase_alias(_callable(class HelpFormatter {
      *  provided by the class are considered an implementation detail.
      */
 
-    constructor() {
+    constructor () {
         let [
             prog,
             indent_increment,
@@ -480,50 +480,50 @@ const HelpFormatter = _camelcase_alias(_callable(class HelpFormatter {
     // ===============================
     // Section and indentation methods
     // ===============================
-    _indent() {
+    _indent () {
         this._current_indent += this._indent_increment
         this._level += 1
     }
 
-    _dedent() {
+    _dedent () {
         this._current_indent -= this._indent_increment
         assert(this._current_indent >= 0, 'Indent decreased below 0.')
         this._level -= 1
     }
 
-    _add_item(func, args) {
+    _add_item (func, args) {
         this._current_section.items.push([func, args])
     }
 
     // ========================
     // Message building methods
     // ========================
-    start_section(heading) {
+    start_section (heading) {
         this._indent()
         let section = this._Section(this, this._current_section, heading)
         this._add_item(section.format_help.bind(section), [])
         this._current_section = section
     }
 
-    end_section() {
+    end_section () {
         this._current_section = this._current_section.parent
         this._dedent()
     }
 
-    add_text(text) {
+    add_text (text) {
         if (text !== SUPPRESS && text !== undefined) {
             this._add_item(this._format_text.bind(this), [text])
         }
     }
 
-    add_usage(usage, actions, groups, prefix = undefined) {
+    add_usage (usage, actions, groups, prefix = undefined) {
         if (usage !== SUPPRESS) {
             let args = [usage, actions, groups, prefix]
             this._add_item(this._format_usage.bind(this), args)
         }
     }
 
-    add_argument(action) {
+    add_argument (action) {
         if (action.help !== SUPPRESS) {
 
             // find all invocations
@@ -543,7 +543,7 @@ const HelpFormatter = _camelcase_alias(_callable(class HelpFormatter {
         }
     }
 
-    add_arguments(actions) {
+    add_arguments (actions) {
         for (let action of actions) {
             this.add_argument(action)
         }
@@ -552,7 +552,7 @@ const HelpFormatter = _camelcase_alias(_callable(class HelpFormatter {
     // =======================
     // Help-formatting methods
     // =======================
-    format_help() {
+    format_help () {
         let help = this._root_section.format_help()
         if (help) {
             help = help.replace(this._long_break_matcher, '\n\n')
@@ -561,11 +561,11 @@ const HelpFormatter = _camelcase_alias(_callable(class HelpFormatter {
         return help
     }
 
-    _join_parts(part_strings) {
+    _join_parts (part_strings) {
         return part_strings.filter(part => part && part !== SUPPRESS).join('')
     }
 
-    _format_usage(usage, actions, groups, prefix) {
+    _format_usage (usage, actions, groups, prefix) {
         if (prefix === undefined) {
             prefix = 'usage: '
         }
@@ -674,7 +674,7 @@ const HelpFormatter = _camelcase_alias(_callable(class HelpFormatter {
         return sub('%s%s\n\n', prefix, usage)
     }
 
-    _format_actions_usage(actions, groups) {
+    _format_actions_usage (actions, groups) {
         // find group indices and identify actions in groups
         let group_actions = new Set()
         let inserts = {}
@@ -794,7 +794,7 @@ const HelpFormatter = _camelcase_alias(_callable(class HelpFormatter {
         return text
     }
 
-    _format_text(text) {
+    _format_text (text) {
         if (text.includes('%(prog)')) {
             text = sub(text, { prog: this._prog })
         }
@@ -803,7 +803,7 @@ const HelpFormatter = _camelcase_alias(_callable(class HelpFormatter {
         return this._fill_text(text, text_width, indent) + '\n\n'
     }
 
-    _format_action(action) {
+    _format_action (action) {
         // determine the required width and the entry label
         let help_position = Math.min(this._action_max_length + 2,
                                      this._max_help_position)
@@ -856,7 +856,7 @@ const HelpFormatter = _camelcase_alias(_callable(class HelpFormatter {
         return this._join_parts(parts)
     }
 
-    _format_action_invocation(action) {
+    _format_action_invocation (action) {
         if (!action.option_strings.length) {
             let default_value = this._get_default_metavar_for_positional(action)
             let metavar = this._metavar_formatter(action, default_value)(1)[0]
@@ -884,7 +884,7 @@ const HelpFormatter = _camelcase_alias(_callable(class HelpFormatter {
         }
     }
 
-    _metavar_formatter(action, default_metavar) {
+    _metavar_formatter (action, default_metavar) {
         let result
         if (action.metavar !== undefined) {
             result = action.metavar
@@ -895,7 +895,7 @@ const HelpFormatter = _camelcase_alias(_callable(class HelpFormatter {
             result = default_metavar
         }
 
-        function format(tuple_size) {
+        function format (tuple_size) {
             if (Array.isArray(result)) {
                 return result
             } else {
@@ -905,7 +905,7 @@ const HelpFormatter = _camelcase_alias(_callable(class HelpFormatter {
         return format
     }
 
-    _format_args(action, default_metavar) {
+    _format_args (action, default_metavar) {
         let get_metavar = this._metavar_formatter(action, default_metavar)
         let result
         if (action.nargs === undefined) {
@@ -939,7 +939,7 @@ const HelpFormatter = _camelcase_alias(_callable(class HelpFormatter {
         return result
     }
 
-    _expand_help(action) {
+    _expand_help (action) {
         let params = Object.assign({ prog: this._prog }, action)
         for (let name of Object.keys(params)) {
             if (params[name] === SUPPRESS) {
@@ -966,15 +966,15 @@ const HelpFormatter = _camelcase_alias(_callable(class HelpFormatter {
         return sub(this._get_help_string(action), params)
     }
 
-    * _iter_indented_subactions(action) {
+    * _iter_indented_subactions (action) {
         if (typeof action._get_subactions === 'function') {
             this._indent()
-            yield* action._get_subactions()
+            yield * action._get_subactions()
             this._dedent()
         }
     }
 
-    _split_lines(text, width) {
+    _split_lines (text, width) {
         text = text.replace(this._whitespace_matcher, ' ').trim()
         // The textwrap module is used only for formatting help.
         // Delay its import for speeding up the common usage of argparse.
@@ -982,7 +982,7 @@ const HelpFormatter = _camelcase_alias(_callable(class HelpFormatter {
         return textwrap.wrap(text, { width })
     }
 
-    _fill_text(text, width, indent) {
+    _fill_text (text, width, indent) {
         text = text.replace(this._whitespace_matcher, ' ').trim()
         let textwrap = require('./lib/textwrap')
         return textwrap.fill(text, { width,
@@ -990,29 +990,29 @@ const HelpFormatter = _camelcase_alias(_callable(class HelpFormatter {
                                      subsequent_indent: indent })
     }
 
-    _get_help_string(action) {
+    _get_help_string (action) {
         return action.help
     }
 
-    _get_default_metavar_for_optional(action) {
+    _get_default_metavar_for_optional (action) {
         return action.dest.toUpperCase()
     }
 
-    _get_default_metavar_for_positional(action) {
+    _get_default_metavar_for_positional (action) {
         return action.dest
     }
 }))
 
 HelpFormatter.prototype._Section = _callable(class _Section {
 
-    constructor(formatter, parent, heading = undefined) {
+    constructor (formatter, parent, heading = undefined) {
         this.formatter = formatter
         this.parent = parent
         this.heading = heading
         this.items = []
     }
 
-    format_help() {
+    format_help () {
         // format the indented section
         if (this.parent !== undefined) {
             this.formatter._indent()
@@ -1050,7 +1050,7 @@ const RawDescriptionHelpFormatter = _camelcase_alias(_callable(class RawDescript
      *  provided by the class are considered an implementation detail.
      */
 
-    _fill_text(text, width, indent) {
+    _fill_text (text, width, indent) {
         return splitlines(text, true).map(line => indent + line).join('')
     }
 }))
@@ -1064,7 +1064,7 @@ const RawTextHelpFormatter = _camelcase_alias(_callable(class RawTextHelpFormatt
      *  provided by the class are considered an implementation detail.
      */
 
-    _split_lines(text/*, width*/) {
+    _split_lines (text/*, width */) {
         return splitlines(text)
     }
 }))
@@ -1078,7 +1078,7 @@ const ArgumentDefaultsHelpFormatter = _camelcase_alias(_callable(class ArgumentD
      *  provided by the class are considered an implementation detail.
      */
 
-    _get_help_string(action) {
+    _get_help_string (action) {
         let help = action.help
         // LEGACY (v1 compatibility): additional check for defaultValue needed
         if (!action.help.includes('%(default)') && !action.help.includes('%(defaultValue)')) {
@@ -1103,11 +1103,11 @@ const MetavarTypeHelpFormatter = _camelcase_alias(_callable(class MetavarTypeHel
      *  provided by the class are considered an implementation detail.
      */
 
-    _get_default_metavar_for_optional(action) {
+    _get_default_metavar_for_optional (action) {
         return typeof action.type === 'function' ? action.type.name : action.type
     }
 
-    _get_default_metavar_for_positional(action) {
+    _get_default_metavar_for_positional (action) {
         return typeof action.type === 'function' ? action.type.name : action.type
     }
 }))
@@ -1116,7 +1116,7 @@ const MetavarTypeHelpFormatter = _camelcase_alias(_callable(class MetavarTypeHel
 // =====================
 // Options and Arguments
 // =====================
-function _get_action_name(argument) {
+function _get_action_name (argument) {
     if (argument === undefined) {
         return undefined
     } else if (argument.option_strings.length) {
@@ -1139,7 +1139,7 @@ const ArgumentError = _callable(class ArgumentError extends Error {
      *  information about the argument that caused it.
      */
 
-    constructor(argument, message) {
+    constructor (argument, message) {
         super()
         this.name = 'ArgumentError'
         this._argument_name = _get_action_name(argument)
@@ -1147,7 +1147,7 @@ const ArgumentError = _callable(class ArgumentError extends Error {
         this.message = this.str()
     }
 
-    str() {
+    str () {
         let format
         if (this._argument_name === undefined) {
             format = '%(message)s'
@@ -1165,7 +1165,7 @@ const ArgumentTypeError = _callable(class ArgumentTypeError extends Error {
      * An error from trying to convert a command line string to a type.
      */
 
-    constructor(message) {
+    constructor (message) {
         super(message)
         this.name = 'ArgumentTypeError'
     }
@@ -1227,7 +1227,7 @@ const Action = _camelcase_alias(_callable(class Action extends _AttributeHolder(
      *          help string. If None, the 'dest' value will be used as the name.
      */
 
-    constructor() {
+    constructor () {
         let [
             option_strings,
             dest,
@@ -1267,7 +1267,7 @@ const Action = _camelcase_alias(_callable(class Action extends _AttributeHolder(
         this.metavar = metavar
     }
 
-    _get_kwargs() {
+    _get_kwargs () {
         let names = [
             'option_strings',
             'dest',
@@ -1282,11 +1282,11 @@ const Action = _camelcase_alias(_callable(class Action extends _AttributeHolder(
         return names.map(name => [name, getattr(this, name)])
     }
 
-    format_usage() {
+    format_usage () {
         return this.option_strings[0]
     }
 
-    call(/*parser, namespace, values, option_string = undefined*/) {
+    call (/* parser, namespace, values, option_string = undefined */) {
         throw new Error('.call() not defined')
     }
 }))
@@ -1294,7 +1294,7 @@ const Action = _camelcase_alias(_callable(class Action extends _AttributeHolder(
 
 const BooleanOptionalAction = _camelcase_alias(_callable(class BooleanOptionalAction extends Action {
 
-    constructor() {
+    constructor () {
         let [
             option_strings,
             dest,
@@ -1342,13 +1342,13 @@ const BooleanOptionalAction = _camelcase_alias(_callable(class BooleanOptionalAc
         })
     }
 
-    call(parser, namespace, values, option_string = undefined) {
+    call (parser, namespace, values, option_string = undefined) {
         if (this.option_strings.includes(option_string)) {
             setattr(namespace, this.dest, !option_string.startsWith('--no-'))
         }
     }
 
-    format_usage() {
+    format_usage () {
         return this.option_strings.join(' | ')
     }
 }))
@@ -1356,7 +1356,7 @@ const BooleanOptionalAction = _camelcase_alias(_callable(class BooleanOptionalAc
 
 const _StoreAction = _callable(class _StoreAction extends Action {
 
-    constructor() {
+    constructor () {
         let [
             option_strings,
             dest,
@@ -1403,7 +1403,7 @@ const _StoreAction = _callable(class _StoreAction extends Action {
         })
     }
 
-    call(parser, namespace, values/*, option_string = undefined*/) {
+    call (parser, namespace, values/*, option_string = undefined */) {
         setattr(namespace, this.dest, values)
     }
 })
@@ -1411,7 +1411,7 @@ const _StoreAction = _callable(class _StoreAction extends Action {
 
 const _StoreConstAction = _callable(class _StoreConstAction extends Action {
 
-    constructor() {
+    constructor () {
         let [
             option_strings,
             dest,
@@ -1441,7 +1441,7 @@ const _StoreConstAction = _callable(class _StoreConstAction extends Action {
         })
     }
 
-    call(parser, namespace/*, values, option_string = undefined*/) {
+    call (parser, namespace/*, values, option_string = undefined */) {
         setattr(namespace, this.dest, this.const)
     }
 })
@@ -1449,7 +1449,7 @@ const _StoreConstAction = _callable(class _StoreConstAction extends Action {
 
 const _StoreTrueAction = _callable(class _StoreTrueAction extends _StoreConstAction {
 
-    constructor() {
+    constructor () {
         let [
             option_strings,
             dest,
@@ -1478,7 +1478,7 @@ const _StoreTrueAction = _callable(class _StoreTrueAction extends _StoreConstAct
 
 const _StoreFalseAction = _callable(class _StoreFalseAction extends _StoreConstAction {
 
-    constructor() {
+    constructor () {
         let [
             option_strings,
             dest,
@@ -1507,7 +1507,7 @@ const _StoreFalseAction = _callable(class _StoreFalseAction extends _StoreConstA
 
 const _AppendAction = _callable(class _AppendAction extends Action {
 
-    constructor() {
+    constructor () {
         let [
             option_strings,
             dest,
@@ -1554,7 +1554,7 @@ const _AppendAction = _callable(class _AppendAction extends Action {
         })
     }
 
-    call(parser, namespace, values/*, option_string = undefined*/) {
+    call (parser, namespace, values/*, option_string = undefined */) {
         let items = getattr(namespace, this.dest, undefined)
         items = _copy_items(items)
         items.push(values)
@@ -1565,7 +1565,7 @@ const _AppendAction = _callable(class _AppendAction extends Action {
 
 const _AppendConstAction = _callable(class _AppendConstAction extends Action {
 
-    constructor() {
+    constructor () {
         let [
             option_strings,
             dest,
@@ -1596,7 +1596,7 @@ const _AppendConstAction = _callable(class _AppendConstAction extends Action {
         })
     }
 
-    call(parser, namespace/*, values, option_string = undefined*/) {
+    call (parser, namespace/*, values, option_string = undefined */) {
         let items = getattr(namespace, this.dest, undefined)
         items = _copy_items(items)
         items.push(this.const)
@@ -1607,7 +1607,7 @@ const _AppendConstAction = _callable(class _AppendConstAction extends Action {
 
 const _CountAction = _callable(class _CountAction extends Action {
 
-    constructor() {
+    constructor () {
         let [
             option_strings,
             dest,
@@ -1632,7 +1632,7 @@ const _CountAction = _callable(class _CountAction extends Action {
         })
     }
 
-    call(parser, namespace/*, values, option_string = undefined*/) {
+    call (parser, namespace/*, values, option_string = undefined */) {
         let count = getattr(namespace, this.dest, undefined)
         if (count === undefined) {
             count = 0
@@ -1644,7 +1644,7 @@ const _CountAction = _callable(class _CountAction extends Action {
 
 const _HelpAction = _callable(class _HelpAction extends Action {
 
-    constructor() {
+    constructor () {
         let [
             option_strings,
             dest,
@@ -1666,7 +1666,7 @@ const _HelpAction = _callable(class _HelpAction extends Action {
         })
     }
 
-    call(parser/*, namespace, values, option_string = undefined*/) {
+    call (parser/*, namespace, values, option_string = undefined */) {
         parser.print_help()
         parser.exit()
     }
@@ -1675,7 +1675,7 @@ const _HelpAction = _callable(class _HelpAction extends Action {
 
 const _VersionAction = _callable(class _VersionAction extends Action {
 
-    constructor() {
+    constructor () {
         let [
             option_strings,
             version,
@@ -1700,7 +1700,7 @@ const _VersionAction = _callable(class _VersionAction extends Action {
         this.version = version
     }
 
-    call(parser/*, namespace, values, option_string = undefined*/) {
+    call (parser/*, namespace, values, option_string = undefined */) {
         let version = this.version
         if (version === undefined) {
             version = parser.version
@@ -1715,7 +1715,7 @@ const _VersionAction = _callable(class _VersionAction extends Action {
 
 const _SubParsersAction = _camelcase_alias(_callable(class _SubParsersAction extends Action {
 
-    constructor() {
+    constructor () {
         let [
             option_strings,
             prog,
@@ -1752,7 +1752,7 @@ const _SubParsersAction = _camelcase_alias(_callable(class _SubParsersAction ext
         this._choices_actions = []
     }
 
-    add_parser() {
+    add_parser () {
         let [
             name,
             kwargs
@@ -1789,11 +1789,11 @@ const _SubParsersAction = _camelcase_alias(_callable(class _SubParsersAction ext
         return parser
     }
 
-    _get_subactions() {
+    _get_subactions () {
         return this._choices_actions
     }
 
-    call(parser, namespace, values/*, option_string = undefined*/) {
+    call (parser, namespace, values/*, option_string = undefined */) {
         let parser_name = values[0]
         let arg_strings = values.slice(1)
 
@@ -1834,7 +1834,7 @@ const _SubParsersAction = _camelcase_alias(_callable(class _SubParsersAction ext
 
 
 _SubParsersAction.prototype._ChoicesPseudoAction = _callable(class _ChoicesPseudoAction extends Action {
-    constructor(name, aliases, help) {
+    constructor (name, aliases, help) {
         let metavar = name, dest = name
         if (aliases.length) {
             metavar += sub(' (%s)', aliases.join(', '))
@@ -1845,7 +1845,7 @@ _SubParsersAction.prototype._ChoicesPseudoAction = _callable(class _ChoicesPseud
 
 
 const _ExtendAction = _callable(class _ExtendAction extends _AppendAction {
-    call(parser, namespace, values/*, option_string = undefined*/) {
+    call (parser, namespace, values/*, option_string = undefined */) {
         let items = getattr(namespace, this.dest, undefined)
         items = _copy_items(items)
         items = items.concat(values)
@@ -1875,7 +1875,7 @@ const FileType = _callable(class FileType extends Function {
      *          be handled. Accepts the same value as the builtin open() function.
      */
 
-    constructor() {
+    constructor () {
         let [
             flags,
             encoding,
@@ -1902,7 +1902,7 @@ const FileType = _callable(class FileType extends Function {
         super('return arguments.callee.call.apply(arguments.callee, arguments)')
 
         Object.defineProperty(this, 'name', {
-            get() {
+            get () {
                 return sub('FileType(%r)', flags)
             }
         })
@@ -1918,7 +1918,7 @@ const FileType = _callable(class FileType extends Function {
         if (fs !== undefined) this._options.fs = fs
     }
 
-    call(string) {
+    call (string) {
         // the special argument "-" means sys.std{in,out}
         if (string === '-') {
             if (this._flags.includes('r')) {
@@ -1952,21 +1952,21 @@ const FileType = _callable(class FileType extends Function {
         }
     }
 
-    [util.inspect.custom]() {
+    [util.inspect.custom] () {
         let args = [this._flags]
         let kwargs = Object.entries(this._options).map(([k, v]) => {
-            if (k === 'mode') v = { value: v, [util.inspect.custom]() { return '0o' + this.value.toString(8) } }
+            if (k === 'mode') v = { value: v, [util.inspect.custom] () { return '0o' + this.value.toString(8) } }
             return [k, v]
         })
         let args_str = []
                 .concat(args.filter(arg => arg !== -1).map(repr))
-                .concat(kwargs.filter(([/*kw*/, arg]) => arg !== undefined)
+                .concat(kwargs.filter(([/* kw */, arg]) => arg !== undefined)
                     .map(([kw, arg]) => sub('%s=%r', kw, arg)))
                 .join(', ')
         return sub('%s(%s)', this.constructor.name, args_str)
     }
 
-    toString() {
+    toString () {
         return this[util.inspect.custom]()
     }
 })
@@ -1982,7 +1982,7 @@ const Namespace = _callable(class Namespace extends _AttributeHolder() {
      *  string representation.
      */
 
-    constructor(options = {}) {
+    constructor (options = {}) {
         super()
         Object.assign(this, options)
     }
@@ -1994,7 +1994,7 @@ Namespace.prototype[Symbol.toStringTag] = undefined
 
 const _ActionsContainer = _camelcase_alias(_callable(class _ActionsContainer {
 
-    constructor() {
+    constructor () {
         let [
             description,
             prefix_chars,
@@ -2061,19 +2061,19 @@ const _ActionsContainer = _camelcase_alias(_callable(class _ActionsContainer {
     // ====================
     // Registration methods
     // ====================
-    register(registry_name, value, object) {
+    register (registry_name, value, object) {
         let registry = setdefault(this._registries, registry_name, {})
         registry[value] = object
     }
 
-    _registry_get(registry_name, value, default_value = undefined) {
+    _registry_get (registry_name, value, default_value = undefined) {
         return getattr(this._registries[registry_name], value, default_value)
     }
 
     // ==================================
     // Namespace default accessor methods
     // ==================================
-    set_defaults(kwargs) {
+    set_defaults (kwargs) {
         Object.assign(this._defaults, kwargs)
 
         // if these defaults match any existing arguments, replace
@@ -2085,7 +2085,7 @@ const _ActionsContainer = _camelcase_alias(_callable(class _ActionsContainer {
         }
     }
 
-    get_default(dest) {
+    get_default (dest) {
         for (let action of this._actions) {
             if (action.dest === dest && action.default !== undefined) {
                 return action.default
@@ -2098,7 +2098,7 @@ const _ActionsContainer = _camelcase_alias(_callable(class _ActionsContainer {
     // =======================
     // Adding argument actions
     // =======================
-    add_argument() {
+    add_argument () {
         /*
          *  add_argument(dest, ..., name=value, ...)
          *  add_argument(option_string, option_string, ..., name=value, ...)
@@ -2181,20 +2181,20 @@ const _ActionsContainer = _camelcase_alias(_callable(class _ActionsContainer {
         return this._add_action(action)
     }
 
-    add_argument_group() {
+    add_argument_group () {
         let group = _ArgumentGroup(this, ...arguments)
         this._action_groups.push(group)
         return group
     }
 
-    add_mutually_exclusive_group() {
+    add_mutually_exclusive_group () {
 
         let group = _MutuallyExclusiveGroup(this, ...arguments)
         this._mutually_exclusive_groups.push(group)
         return group
     }
 
-    _add_action(action) {
+    _add_action (action) {
         // resolve any conflicts
         this._check_conflict(action)
 
@@ -2220,11 +2220,11 @@ const _ActionsContainer = _camelcase_alias(_callable(class _ActionsContainer {
         return action
     }
 
-    _remove_action(action) {
+    _remove_action (action) {
         _array_remove(this._actions, action)
     }
 
-    _add_container_actions(container) {
+    _add_container_actions (container) {
         // collect groups by titles
         let title_group_map = {}
         for (let group of this._action_groups) {
@@ -2275,7 +2275,7 @@ const _ActionsContainer = _camelcase_alias(_callable(class _ActionsContainer {
         }
     }
 
-    _get_positional_kwargs() {
+    _get_positional_kwargs () {
         let [
             dest,
             kwargs
@@ -2303,7 +2303,7 @@ const _ActionsContainer = _camelcase_alias(_callable(class _ActionsContainer {
         return Object.assign(kwargs, { dest, option_strings: [] })
     }
 
-    _get_optional_kwargs() {
+    _get_optional_kwargs () {
         let [
             args,
             kwargs
@@ -2355,13 +2355,13 @@ const _ActionsContainer = _camelcase_alias(_callable(class _ActionsContainer {
         return Object.assign(kwargs, { dest, option_strings })
     }
 
-    _pop_action_class(kwargs, default_value = undefined) {
+    _pop_action_class (kwargs, default_value = undefined) {
         let action = getattr(kwargs, 'action', default_value)
         delete kwargs.action
         return this._registry_get('action', action, action)
     }
 
-    _get_handler() {
+    _get_handler () {
         // determine function from conflict handler string
         let handler_func_name = sub('_handle_conflict_%s', this.conflict_handler)
         if (typeof this[handler_func_name] === 'function') {
@@ -2372,7 +2372,7 @@ const _ActionsContainer = _camelcase_alias(_callable(class _ActionsContainer {
         }
     }
 
-    _check_conflict(action) {
+    _check_conflict (action) {
 
         // find all options that conflict with this option
         let confl_optionals = []
@@ -2390,7 +2390,7 @@ const _ActionsContainer = _camelcase_alias(_callable(class _ActionsContainer {
         }
     }
 
-    _handle_conflict_error(action, conflicting_actions) {
+    _handle_conflict_error (action, conflicting_actions) {
         let message = conflicting_actions.length === 1 ?
             'conflicting option string: %s' :
             'conflicting option strings: %s'
@@ -2398,7 +2398,7 @@ const _ActionsContainer = _camelcase_alias(_callable(class _ActionsContainer {
         throw new ArgumentError(action, sub(message, conflict_string))
     }
 
-    _handle_conflict_resolve(action, conflicting_actions) {
+    _handle_conflict_resolve (action, conflicting_actions) {
 
         // remove all conflicting options
         for (let [option_string, action] of conflicting_actions) {
@@ -2419,7 +2419,7 @@ const _ActionsContainer = _camelcase_alias(_callable(class _ActionsContainer {
 
 const _ArgumentGroup = _callable(class _ArgumentGroup extends _ActionsContainer {
 
-    constructor() {
+    constructor () {
         let [
             container,
             title,
@@ -2452,13 +2452,13 @@ const _ArgumentGroup = _callable(class _ArgumentGroup extends _ActionsContainer 
         this._mutually_exclusive_groups = container._mutually_exclusive_groups
     }
 
-    _add_action(action) {
+    _add_action (action) {
         action = super._add_action(action)
         this._group_actions.push(action)
         return action
     }
 
-    _remove_action(action) {
+    _remove_action (action) {
         super._remove_action(action)
         _array_remove(this._group_actions, action)
     }
@@ -2467,7 +2467,7 @@ const _ArgumentGroup = _callable(class _ArgumentGroup extends _ActionsContainer 
 
 const _MutuallyExclusiveGroup = _callable(class _MutuallyExclusiveGroup extends _ArgumentGroup {
 
-    constructor() {
+    constructor () {
         let [
             container,
             required
@@ -2481,7 +2481,7 @@ const _MutuallyExclusiveGroup = _callable(class _MutuallyExclusiveGroup extends 
         this._container = container
     }
 
-    _add_action(action) {
+    _add_action (action) {
         if (action.required) {
             let msg = 'mutually exclusive arguments must be optional'
             throw new TypeError(msg)
@@ -2491,7 +2491,7 @@ const _MutuallyExclusiveGroup = _callable(class _MutuallyExclusiveGroup extends 
         return action
     }
 
-    _remove_action(action) {
+    _remove_action (action) {
         this._container._remove_action(action)
         _array_remove(this._group_actions, action)
     }
@@ -2520,7 +2520,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
      *          error info when an error occurs
      */
 
-    constructor() {
+    constructor () {
         let [
             prog,
             usage,
@@ -2600,7 +2600,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
         this._subparsers = undefined
 
         // register types
-        function identity(string) {
+        function identity (string) {
             return string
         }
         this.register('type', undefined, identity)
@@ -2665,7 +2665,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
     // =======================
     // Pretty __repr__ methods
     // =======================
-    _get_kwargs() {
+    _get_kwargs () {
         let names = [
             'prog',
             'usage',
@@ -2680,7 +2680,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
     // ==================================
     // Optional/Positional adding methods
     // ==================================
-    add_subparsers() {
+    add_subparsers () {
         let [
             kwargs
         ] = _parse_opts(arguments, {
@@ -2724,7 +2724,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
         return action
     }
 
-    _add_action(action) {
+    _add_action (action) {
         if (action.option_strings.length) {
             this._optionals._add_action(action)
         } else {
@@ -2733,18 +2733,18 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
         return action
     }
 
-    _get_optional_actions() {
+    _get_optional_actions () {
         return this._actions.filter(action => action.option_strings.length)
     }
 
-    _get_positional_actions() {
+    _get_positional_actions () {
         return this._actions.filter(action => !action.option_strings.length)
     }
 
     // =====================================
     // Command line argument parsing methods
     // =====================================
-    parse_args(args = undefined, namespace = undefined) {
+    parse_args (args = undefined, namespace = undefined) {
         let argv
         [args, argv] = this.parse_known_args(args, namespace)
         if (argv && argv.length > 0) {
@@ -2754,7 +2754,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
         return args
     }
 
-    parse_known_args(args = undefined, namespace = undefined) {
+    parse_known_args (args = undefined, namespace = undefined) {
         if (args === undefined) {
             args = get_argv().slice(1)
         }
@@ -2805,7 +2805,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
         return [namespace, args]
     }
 
-    _parse_known_args(arg_strings, namespace) {
+    _parse_known_args (arg_strings, namespace) {
         // replace arg strings that are file references
         if (this.fromfile_prefix_chars !== undefined) {
             arg_strings = this._read_args_from_files(arg_strings)
@@ -3090,7 +3090,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
         return [namespace, extras]
     }
 
-    _read_args_from_files(arg_strings) {
+    _read_args_from_files (arg_strings) {
         // expand arguments referencing files
         let new_arg_strings = []
         for (let arg_string of arg_strings) {
@@ -3121,11 +3121,11 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
         return new_arg_strings
     }
 
-    convert_arg_line_to_args(arg_line) {
+    convert_arg_line_to_args (arg_line) {
         return [arg_line]
     }
 
-    _match_argument(action, arg_strings_pattern) {
+    _match_argument (action, arg_strings_pattern) {
         // match the pattern for this action to the arg strings
         let nargs_pattern = this._get_nargs_pattern(action)
         let match = arg_strings_pattern.match(new RegExp('^' + nargs_pattern))
@@ -3148,7 +3148,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
         return match[1].length
     }
 
-    _match_arguments_partial(actions, arg_strings_pattern) {
+    _match_arguments_partial (actions, arg_strings_pattern) {
         // progressively shorten the actions list by slicing off the
         // final actions until we find a match
         let result = []
@@ -3166,7 +3166,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
         return result
     }
 
-    _parse_optional(arg_string) {
+    _parse_optional (arg_string) {
         // if it's an empty string, it was meant to be a positional
         if (!arg_string) {
             return undefined
@@ -3234,7 +3234,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
         return [undefined, arg_string, undefined]
     }
 
-    _get_option_tuples(option_string) {
+    _get_option_tuples (option_string) {
         let result = []
 
         // option strings starting with two prefix characters are only
@@ -3288,7 +3288,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
         return result
     }
 
-    _get_nargs_pattern(action) {
+    _get_nargs_pattern (action) {
         // in all examples below, we have to allow for '--' args
         // which are represented as '-' in the pattern
         let nargs = action.nargs
@@ -3341,7 +3341,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
     // Alt command line argument parsing, allowing free intermix
     // ========================
 
-    parse_intermixed_args(args = undefined, namespace = undefined) {
+    parse_intermixed_args (args = undefined, namespace = undefined) {
         let argv
         [args, argv] = this.parse_known_intermixed_args(args, namespace)
         if (argv.length) {
@@ -3351,7 +3351,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
         return args
     }
 
-    parse_known_intermixed_args(args = undefined, namespace = undefined) {
+    parse_known_intermixed_args (args = undefined, namespace = undefined) {
         // returns a namespace and list of extras
         //
         // positional can be freely intermixed with optionals.  optionals are
@@ -3448,7 +3448,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
     // ========================
     // Value conversion methods
     // ========================
-    _get_values(action, arg_strings) {
+    _get_values (action, arg_strings) {
         // for everything but PARSER, REMAINDER args, strip out first '--'
         if (![PARSER, REMAINDER].includes(action.nargs)) {
             try {
@@ -3511,7 +3511,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
         return value
     }
 
-    _get_value(action, arg_string) {
+    _get_value (action, arg_string) {
         let type_func = this._registry_get('type', action.type, action.type)
         if (typeof type_func !== 'function') {
             let msg = '%r is not callable'
@@ -3539,7 +3539,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
         } catch (err) {
             // ArgumentTypeErrors indicate errors
             if (err instanceof ArgumentTypeError) {
-                //let name = getattr(action.type, 'name', repr(action.type))
+                // let name = getattr(action.type, 'name', repr(action.type))
                 let msg = err.message
                 throw new ArgumentError(action, msg)
 
@@ -3558,7 +3558,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
         return result
     }
 
-    _check_value(action, value) {
+    _check_value (action, value) {
         // converted value must be one of the choices (if specified)
         if (action.choices !== undefined && !_choices_to_array(action.choices).includes(value)) {
             let args = {value,
@@ -3571,14 +3571,14 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
     // =======================
     // Help-formatting methods
     // =======================
-    format_usage() {
+    format_usage () {
         let formatter = this._get_formatter()
         formatter.add_usage(this.usage, this._actions,
                             this._mutually_exclusive_groups)
         return formatter.format_help()
     }
 
-    format_help() {
+    format_help () {
         let formatter = this._get_formatter()
 
         // usage
@@ -3603,7 +3603,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
         return formatter.format_help()
     }
 
-    _get_formatter() {
+    _get_formatter () {
         // eslint-disable-next-line new-cap
         return new this.formatter_class({ prog: this.prog })
     }
@@ -3611,17 +3611,17 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
     // =====================
     // Help-printing methods
     // =====================
-    print_usage(file = undefined) {
+    print_usage (file = undefined) {
         if (file === undefined) file = process.stdout
         this._print_message(this.format_usage(), file)
     }
 
-    print_help(file = undefined) {
+    print_help (file = undefined) {
         if (file === undefined) file = process.stdout
         this._print_message(this.format_help(), file)
     }
 
-    _print_message(message, file = undefined) {
+    _print_message (message, file = undefined) {
         if (message) {
             if (file === undefined) file = process.stderr
             file.write(message)
@@ -3631,14 +3631,14 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
     // ===============
     // Exiting methods
     // ===============
-    exit(status = 0, message = undefined) {
+    exit (status = 0, message = undefined) {
         if (message) {
             this._print_message(message, process.stderr)
         }
         process.exit(status)
     }
 
-    error(message) {
+    error (message) {
         /*
          *  error(message: string)
          *
@@ -3682,11 +3682,11 @@ module.exports = {
 
 // LEGACY (v1 compatibility), Const alias
 Object.defineProperty(module.exports, 'Const', {
-    get() {
+    get () {
         let result = {}
         Object.entries({ ONE_OR_MORE, OPTIONAL, PARSER, REMAINDER, SUPPRESS, ZERO_OR_MORE }).forEach(([n, v]) => {
             Object.defineProperty(result, n, {
-                get() {
+                get () {
                     deprecate(n, sub('use argparse.%s instead of argparse.Const.%s', n, n))
                     return v
                 }
@@ -3694,7 +3694,7 @@ Object.defineProperty(module.exports, 'Const', {
         })
         Object.entries({ _UNRECOGNIZED_ARGS_ATTR }).forEach(([n, v]) => {
             Object.defineProperty(result, n, {
-                get() {
+                get () {
                     deprecate(n, sub('argparse.Const.%s is an internal symbol and will no longer be available', n))
                     return v
                 }
