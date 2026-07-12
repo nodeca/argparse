@@ -128,7 +128,7 @@ function range (from, to, step = 1) {
     }
     if (step === 0) throw new TypeError('range() arg 3 must not be zero')
 
-    let result = []
+    const result = []
     if (step > 0) {
         for (let i = from; i < to; i += step) result.push(i)
     } else {
@@ -143,7 +143,7 @@ function splitlines (str, keepends = false) {
         result = str.split(/\r\n|[\n\r\v\f\x1c\x1d\x1e\x85\u2028\u2029]/)
     } else {
         result = []
-        let parts = str.split(/(\r\n|[\n\r\v\f\x1c\x1d\x1e\x85\u2028\u2029])/)
+        const parts = str.split(/(\r\n|[\n\r\v\f\x1c\x1d\x1e\x85\u2028\u2029])/)
         for (let i = 0; i < parts.length; i += 2) {
             result.push(parts[i] + (i + 1 < parts.length ? parts[i + 1] : ''))
         }
@@ -175,7 +175,7 @@ function _array_equal (array1, array2) {
 }
 
 function _array_remove (array, item) {
-    let idx = array.indexOf(item)
+    const idx = array.indexOf(item)
     if (idx === -1) throw new TypeError(sub('%r not in list', item))
     array.splice(idx, 1)
 }
@@ -199,9 +199,9 @@ function _choices_to_array (choices) {
 
 // decorator that allows a class to be called without new
 function _callable (cls) {
-    let result = { // object is needed for inferred class name
+    const result = { // object is needed for inferred class name
         [cls.name]: function (...args) {
-            let this_class = new.target === result || !new.target
+            const this_class = new.target === result || !new.target
             return Reflect.construct(cls, args, this_class ? cls : new.target)
         }
     }
@@ -213,7 +213,7 @@ function _callable (cls) {
 
 function _alias (object, from, to) {
     try {
-        let name = object.constructor.name
+        const name = object.constructor.name
         Object.defineProperty(object, from, {
             value: util.deprecate(object[to], sub('%s.%s() is renamed to %s.%s()',
                 name, from, name, to)),
@@ -224,8 +224,8 @@ function _alias (object, from, to) {
 
 // decorator that allows snake_case class methods to be called with camelCase and vice versa
 function _camelcase_alias (_class) {
-    for (let name of Object.getOwnPropertyNames(_class.prototype)) {
-        let camelcase = name.replace(/\w_[a-z]/g, s => s[0] + s[2].toUpperCase())
+    for (const name of Object.getOwnPropertyNames(_class.prototype)) {
+        const camelcase = name.replace(/\w_[a-z]/g, s => s[0] + s[2].toUpperCase())
         if (camelcase !== name) _alias(_class.prototype, camelcase, name)
     }
     return _class
@@ -246,10 +246,10 @@ function _to_new_name (key) {
 }
 
 // parse options
-let no_default = Symbol('no_default_value')
+const no_default = Symbol('no_default_value')
 function _parse_opts (args, descriptor) {
     function get_name () {
-        let stack = new Error().stack.split('\n')
+        const stack = new Error().stack.split('\n')
             .map(x => x.match(/^    at (.*) \(.*\)$/))
             .filter(Boolean)
             .map(m => m[1])
@@ -262,8 +262,8 @@ function _parse_opts (args, descriptor) {
 
     args = Array.from(args)
     let kwargs = {}
-    let result = []
-    let last_opt = args.length && args[args.length - 1]
+    const result = []
+    const last_opt = args.length && args[args.length - 1]
 
     if (typeof last_opt === 'object' && last_opt !== null && !Array.isArray(last_opt) &&
         (!last_opt.constructor || last_opt.constructor.name === 'Object')) {
@@ -271,9 +271,9 @@ function _parse_opts (args, descriptor) {
     }
 
     // LEGACY (v1 compatibility): camelcase
-    let renames = []
-    for (let key of Object.keys(descriptor)) {
-        let old_name = _to_legacy_name(key)
+    const renames = []
+    for (const key of Object.keys(descriptor)) {
+        const old_name = _to_legacy_name(key)
         if (old_name !== key && (old_name in kwargs)) {
             if (key in kwargs) {
                 // default and defaultValue specified at the same time, happens often in old tests
@@ -286,22 +286,22 @@ function _parse_opts (args, descriptor) {
         }
     }
     if (renames.length) {
-        let name = get_name()
+        const name = get_name()
         deprecate('camelcase_' + name, sub('%s(): following options are renamed: %s',
             name, renames.map(([a, b]) => sub('%r -> %r', a, b))))
     }
     // end
 
-    let missing_positionals = []
-    let positional_count = args.length
+    const missing_positionals = []
+    const positional_count = args.length
 
-    for (let [key, def] of Object.entries(descriptor)) {
+    for (const [key, def] of Object.entries(descriptor)) {
         if (key[0] === '*') {
             if (key.length > 0 && key[1] === '*') {
                 // LEGACY (v1 compatibility): camelcase
-                let renames = []
-                for (let key of Object.keys(kwargs)) {
-                    let new_name = _to_new_name(key)
+                const renames = []
+                for (const key of Object.keys(kwargs)) {
+                    const new_name = _to_new_name(key)
                     if (new_name !== key && (key in kwargs)) {
                         if (new_name in kwargs) {
                             // default and defaultValue specified at the same time, happens often in old tests
@@ -314,7 +314,7 @@ function _parse_opts (args, descriptor) {
                     }
                 }
                 if (renames.length) {
-                    let name = get_name()
+                    const name = get_name()
                     deprecate('camelcase_' + name, sub('%s(): following options are renamed: %s',
                         name, renames.map(([a, b]) => sub('%r -> %r', a, b))))
                 }
@@ -345,8 +345,8 @@ function _parse_opts (args, descriptor) {
     }
 
     if (args.length) {
-        let from = Object.entries(descriptor).filter(([k, v]) => k[0] !== '*' && v !== no_default).length
-        let to = Object.entries(descriptor).filter(([k]) => k[0] !== '*').length
+        const from = Object.entries(descriptor).filter(([k, v]) => k[0] !== '*' && v !== no_default).length
+        const to = Object.entries(descriptor).filter(([k]) => k[0] !== '*').length
         throw new TypeError(sub('%s() takes %s positional argument%s but %s %s given',
             get_name(),
             from === to ? sub('from %s to %s', from, to) : to,
@@ -356,9 +356,9 @@ function _parse_opts (args, descriptor) {
     }
 
     if (missing_positionals.length) {
-        let strs = missing_positionals.map(repr)
+        const strs = missing_positionals.map(repr)
         if (strs.length > 1) strs[strs.length - 1] = 'and ' + strs[strs.length - 1]
-        let str_joined = strs.join(strs.length === 2 ? '' : ', ')
+        const str_joined = strs.join(strs.length === 2 ? '' : ', ')
         throw new TypeError(sub('%s() missing %i required positional argument%s: %s',
             get_name(), strs.length, strs.length === 1 ? '' : 's', str_joined))
     }
@@ -366,7 +366,7 @@ function _parse_opts (args, descriptor) {
     return result
 }
 
-let _deprecations = {}
+const _deprecations = {}
 function deprecate (id, string) {
     _deprecations[id] = _deprecations[id] || util.deprecate(() => {}, string)
     _deprecations[id]()
@@ -388,13 +388,13 @@ function _AttributeHolder (cls = Object) {
 
     return class _AttributeHolder extends cls {
         [util.inspect.custom] () {
-            let type_name = this.constructor.name
-            let arg_strings = []
-            let star_args = {}
-            for (let arg of this._get_args()) {
+            const type_name = this.constructor.name
+            const arg_strings = []
+            const star_args = {}
+            for (const arg of this._get_args()) {
                 arg_strings.push(repr(arg))
             }
-            for (let [name, value] of this._get_kwargs()) {
+            for (const [name, value] of this._get_kwargs()) {
                 if (/^[a-z_][a-z0-9_$]*$/i.test(name)) {
                     arg_strings.push(sub('%s=%r', name, value))
                 } else {
@@ -500,7 +500,7 @@ const HelpFormatter = _camelcase_alias(_callable(class HelpFormatter {
     // ========================
     start_section (heading) {
         this._indent()
-        let section = this._Section(this, this._current_section, heading)
+        const section = this._Section(this, this._current_section, heading)
         this._add_item(section.format_help.bind(section), [])
         this._current_section = section
     }
@@ -518,7 +518,7 @@ const HelpFormatter = _camelcase_alias(_callable(class HelpFormatter {
 
     add_usage (usage, actions, groups, prefix = undefined) {
         if (usage !== SUPPRESS) {
-            let args = [usage, actions, groups, prefix]
+            const args = [usage, actions, groups, prefix]
             this._add_item(this._format_usage.bind(this), args)
         }
     }
@@ -527,14 +527,14 @@ const HelpFormatter = _camelcase_alias(_callable(class HelpFormatter {
         if (action.help !== SUPPRESS) {
 
             // find all invocations
-            let invocations = [this._format_action_invocation(action)]
-            for (let subaction of this._iter_indented_subactions(action)) {
+            const invocations = [this._format_action_invocation(action)]
+            for (const subaction of this._iter_indented_subactions(action)) {
                 invocations.push(this._format_action_invocation(subaction))
             }
 
             // update the maximum item length
-            let invocation_length = Math.max(...invocations.map(invocation => invocation.length))
-            let action_length = invocation_length + this._current_indent
+            const invocation_length = Math.max(...invocations.map(invocation => invocation.length))
+            const action_length = invocation_length + this._current_indent
             this._action_max_length = Math.max(this._action_max_length,
                                                action_length)
 
@@ -544,7 +544,7 @@ const HelpFormatter = _camelcase_alias(_callable(class HelpFormatter {
     }
 
     add_arguments (actions) {
-        for (let action of actions) {
+        for (const action of actions) {
             this.add_argument(action)
         }
     }
@@ -580,12 +580,12 @@ const HelpFormatter = _camelcase_alias(_callable(class HelpFormatter {
 
         // if optionals and positionals are available, calculate usage
         } else if (usage === undefined) {
-            let prog = sub('%(prog)s', { prog: this._prog })
+            const prog = sub('%(prog)s', { prog: this._prog })
 
             // split optionals from positionals
-            let optionals = []
-            let positionals = []
-            for (let action of actions) {
+            const optionals = []
+            const positionals = []
+            for (const action of actions) {
                 if (action.option_strings.length) {
                     optionals.push(action)
                 } else {
@@ -594,25 +594,25 @@ const HelpFormatter = _camelcase_alias(_callable(class HelpFormatter {
             }
 
             // build full usage string
-            let action_usage = this._format_actions_usage([].concat(optionals).concat(positionals), groups)
+            const action_usage = this._format_actions_usage([].concat(optionals).concat(positionals), groups)
             usage = [prog, action_usage].map(String).join(' ')
 
             // wrap the usage parts if it's too long
-            let text_width = this._width - this._current_indent
+            const text_width = this._width - this._current_indent
             if (prefix.length + usage.length > text_width) {
 
                 // break usage into wrappable parts
-                let part_regexp = /\(.*?\)+(?=\s|$)|\[.*?\]+(?=\s|$)|\S+/g
-                let opt_usage = this._format_actions_usage(optionals, groups)
-                let pos_usage = this._format_actions_usage(positionals, groups)
-                let opt_parts = opt_usage.match(part_regexp) || []
-                let pos_parts = pos_usage.match(part_regexp) || []
+                const part_regexp = /\(.*?\)+(?=\s|$)|\[.*?\]+(?=\s|$)|\S+/g
+                const opt_usage = this._format_actions_usage(optionals, groups)
+                const pos_usage = this._format_actions_usage(positionals, groups)
+                const opt_parts = opt_usage.match(part_regexp) || []
+                const pos_parts = pos_usage.match(part_regexp) || []
                 assert(opt_parts.join(' ') === opt_usage)
                 assert(pos_parts.join(' ') === pos_usage)
 
                 // helper for wrapping lines
-                let get_lines = (parts, indent, prefix = undefined) => {
-                    let lines = []
+                const get_lines = (parts, indent, prefix = undefined) => {
+                    const lines = []
                     let line = []
                     let line_len
                     if (prefix !== undefined) {
@@ -620,7 +620,7 @@ const HelpFormatter = _camelcase_alias(_callable(class HelpFormatter {
                     } else {
                         line_len = indent.length - 1
                     }
-                    for (let part of parts) {
+                    for (const part of parts) {
                         if (line_len + 1 + part.length > text_width && line) {
                             lines.push(indent + line.join(' '))
                             line = []
@@ -642,7 +642,7 @@ const HelpFormatter = _camelcase_alias(_callable(class HelpFormatter {
 
                 // if prog is short, follow it with optionals or positionals
                 if (prefix.length + prog.length <= 0.75 * text_width) {
-                    let indent = ' '.repeat(prefix.length + prog.length + 1)
+                    const indent = ' '.repeat(prefix.length + prog.length + 1)
                     if (opt_parts.length) {
                         lines = get_lines([prog].concat(opt_parts), indent, prefix)
                         lines = lines.concat(get_lines(pos_parts, indent))
@@ -654,8 +654,8 @@ const HelpFormatter = _camelcase_alias(_callable(class HelpFormatter {
 
                 // if prog is long, put it on its own line
                 } else {
-                    let indent = ' '.repeat(prefix.length)
-                    let parts = [].concat(opt_parts).concat(pos_parts)
+                    const indent = ' '.repeat(prefix.length)
+                    const parts = [].concat(opt_parts).concat(pos_parts)
                     lines = get_lines(parts, indent)
                     if (lines.length > 1) {
                         lines = []
@@ -676,16 +676,16 @@ const HelpFormatter = _camelcase_alias(_callable(class HelpFormatter {
 
     _format_actions_usage (actions, groups) {
         // find group indices and identify actions in groups
-        let group_actions = new Set()
-        let inserts = {}
-        for (let group of groups) {
-            let start = actions.indexOf(group._group_actions[0])
+        const group_actions = new Set()
+        const inserts = {}
+        for (const group of groups) {
+            const start = actions.indexOf(group._group_actions[0])
             if (start === -1) {
                 continue
             } else {
-                let end = start + group._group_actions.length
+                const end = start + group._group_actions.length
                 if (_array_equal(actions.slice(start, end), group._group_actions)) {
-                    for (let action of group._group_actions) {
+                    for (const action of group._group_actions) {
                         group_actions.add(action)
                     }
                     if (!group.required) {
@@ -711,7 +711,7 @@ const HelpFormatter = _camelcase_alias(_callable(class HelpFormatter {
                             inserts[end] = ')'
                         }
                     }
-                    for (let i of range(start + 1, end)) {
+                    for (const i of range(start + 1, end)) {
                         inserts[i] = '|'
                     }
                 }
@@ -719,8 +719,8 @@ const HelpFormatter = _camelcase_alias(_callable(class HelpFormatter {
         }
 
         // collect all actions format strings
-        let parts = []
-        for (let [i, action] of Object.entries(actions)) {
+        const parts = []
+        for (const [i, action] of Object.entries(actions)) {
 
             // suppressed arguments are marked with None
             // remove | separators for suppressed arguments
@@ -734,7 +734,7 @@ const HelpFormatter = _camelcase_alias(_callable(class HelpFormatter {
 
             // produce all arg strings
             } else if (!action.option_strings.length) {
-                let default_value = this._get_default_metavar_for_positional(action)
+                const default_value = this._get_default_metavar_for_positional(action)
                 let part = this._format_args(action, default_value)
 
                 // if it's in a group, strip the outer []
@@ -749,7 +749,7 @@ const HelpFormatter = _camelcase_alias(_callable(class HelpFormatter {
 
             // produce the first way to invoke the option in brackets
             } else {
-                let option_string = action.option_strings[0]
+                const option_string = action.option_strings[0]
                 let part
 
                 // if the Optional doesn't take a value, format is:
@@ -760,8 +760,8 @@ const HelpFormatter = _camelcase_alias(_callable(class HelpFormatter {
                 // if the Optional takes a value, format is:
                 //    -s ARGS or --long ARGS
                 } else {
-                    let default_value = this._get_default_metavar_for_optional(action)
-                    let args_string = this._format_args(action, default_value)
+                    const default_value = this._get_default_metavar_for_optional(action)
+                    const args_string = this._format_args(action, default_value)
                     part = sub('%s %s', option_string, args_string)
                 }
 
@@ -776,7 +776,7 @@ const HelpFormatter = _camelcase_alias(_callable(class HelpFormatter {
         }
 
         // insert things at the necessary indices
-        for (let i of Object.keys(inserts).map(Number).sort((a, b) => b - a)) {
+        for (const i of Object.keys(inserts).map(Number).sort((a, b) => b - a)) {
             parts.splice(+i, 0, inserts[+i])
         }
 
@@ -798,47 +798,47 @@ const HelpFormatter = _camelcase_alias(_callable(class HelpFormatter {
         if (text.includes('%(prog)')) {
             text = sub(text, { prog: this._prog })
         }
-        let text_width = Math.max(this._width - this._current_indent, 11)
-        let indent = ' '.repeat(this._current_indent)
+        const text_width = Math.max(this._width - this._current_indent, 11)
+        const indent = ' '.repeat(this._current_indent)
         return this._fill_text(text, text_width, indent) + '\n\n'
     }
 
     _format_action (action) {
         // determine the required width and the entry label
-        let help_position = Math.min(this._action_max_length + 2,
+        const help_position = Math.min(this._action_max_length + 2,
                                      this._max_help_position)
-        let help_width = Math.max(this._width - help_position, 11)
-        let action_width = help_position - this._current_indent - 2
+        const help_width = Math.max(this._width - help_position, 11)
+        const action_width = help_position - this._current_indent - 2
         let action_header = this._format_action_invocation(action)
         let indent_first
 
         // no help; start on same line and add a final newline
         if (!action.help) {
-            let tup = [this._current_indent, '', action_header]
+            const tup = [this._current_indent, '', action_header]
             action_header = sub('%*s%s\n', ...tup)
 
         // short action name; start on the same line and pad two spaces
         } else if (action_header.length <= action_width) {
-            let tup = [this._current_indent, '', action_width, action_header]
+            const tup = [this._current_indent, '', action_width, action_header]
             action_header = sub('%*s%-*s  ', ...tup)
             indent_first = 0
 
         // long action name; start on the next line
         } else {
-            let tup = [this._current_indent, '', action_header]
+            const tup = [this._current_indent, '', action_header]
             action_header = sub('%*s%s\n', ...tup)
             indent_first = help_position
         }
 
         // collect the pieces of the action help
-        let parts = [action_header]
+        const parts = [action_header]
 
         // if there was help for the action, add lines of help text
         if (action.help) {
-            let help_text = this._expand_help(action)
-            let help_lines = this._split_lines(help_text, help_width)
+            const help_text = this._expand_help(action)
+            const help_lines = this._split_lines(help_text, help_width)
             parts.push(sub('%*s%s\n', indent_first, '', help_lines[0]))
-            for (let line of help_lines.slice(1)) {
+            for (const line of help_lines.slice(1)) {
                 parts.push(sub('%*s%s\n', help_position, '', line))
             }
 
@@ -848,7 +848,7 @@ const HelpFormatter = _camelcase_alias(_callable(class HelpFormatter {
         }
 
         // if there are any sub-actions, add their help as well
-        for (let subaction of this._iter_indented_subactions(action)) {
+        for (const subaction of this._iter_indented_subactions(action)) {
             parts.push(this._format_action(subaction))
         }
 
@@ -858,8 +858,8 @@ const HelpFormatter = _camelcase_alias(_callable(class HelpFormatter {
 
     _format_action_invocation (action) {
         if (!action.option_strings.length) {
-            let default_value = this._get_default_metavar_for_positional(action)
-            let metavar = this._metavar_formatter(action, default_value)(1)[0]
+            const default_value = this._get_default_metavar_for_positional(action)
+            const metavar = this._metavar_formatter(action, default_value)(1)[0]
             return metavar
 
         } else {
@@ -873,9 +873,9 @@ const HelpFormatter = _camelcase_alias(_callable(class HelpFormatter {
             // if the Optional takes a value, format is:
             //    -s ARGS, --long ARGS
             } else {
-                let default_value = this._get_default_metavar_for_optional(action)
-                let args_string = this._format_args(action, default_value)
-                for (let option_string of action.option_strings) {
+                const default_value = this._get_default_metavar_for_optional(action)
+                const args_string = this._format_args(action, default_value)
+                for (const option_string of action.option_strings) {
                     parts.push(sub('%s %s', option_string, args_string))
                 }
             }
@@ -889,7 +889,7 @@ const HelpFormatter = _camelcase_alias(_callable(class HelpFormatter {
         if (action.metavar !== undefined) {
             result = action.metavar
         } else if (action.choices !== undefined) {
-            let choice_strs = _choices_to_array(action.choices).map(String)
+            const choice_strs = _choices_to_array(action.choices).map(String)
             result = sub('{%s}', choice_strs.join(','))
         } else {
             result = default_metavar
@@ -906,14 +906,14 @@ const HelpFormatter = _camelcase_alias(_callable(class HelpFormatter {
     }
 
     _format_args (action, default_metavar) {
-        let get_metavar = this._metavar_formatter(action, default_metavar)
+        const get_metavar = this._metavar_formatter(action, default_metavar)
         let result
         if (action.nargs === undefined) {
             result = sub('%s', ...get_metavar(1))
         } else if (action.nargs === OPTIONAL) {
             result = sub('[%s]', ...get_metavar(1))
         } else if (action.nargs === ZERO_OR_MORE) {
-            let metavar = get_metavar(1)
+            const metavar = get_metavar(1)
             if (metavar.length === 2) {
                 result = sub('[%s [%s ...]]', ...metavar)
             } else {
@@ -940,24 +940,24 @@ const HelpFormatter = _camelcase_alias(_callable(class HelpFormatter {
     }
 
     _expand_help (action) {
-        let params = Object.assign({ prog: this._prog }, action)
-        for (let name of Object.keys(params)) {
+        const params = Object.assign({ prog: this._prog }, action)
+        for (const name of Object.keys(params)) {
             if (params[name] === SUPPRESS) {
                 delete params[name]
             }
         }
-        for (let name of Object.keys(params)) {
+        for (const name of Object.keys(params)) {
             if (params[name] && params[name].name) {
                 params[name] = params[name].name
             }
         }
         if (params.choices !== undefined) {
-            let choices_str = _choices_to_array(params.choices).map(String).join(', ')
+            const choices_str = _choices_to_array(params.choices).map(String).join(', ')
             params.choices = choices_str
         }
         // LEGACY (v1 compatibility): camelcase
-        for (let key of Object.keys(params)) {
-            let old_name = _to_legacy_name(key)
+        for (const key of Object.keys(params)) {
+            const old_name = _to_legacy_name(key)
             if (old_name !== key) {
                 params[old_name] = params[key]
             }
@@ -978,13 +978,13 @@ const HelpFormatter = _camelcase_alias(_callable(class HelpFormatter {
         text = text.replace(this._whitespace_matcher, ' ').trim()
         // The textwrap module is used only for formatting help.
         // Delay its import for speeding up the common usage of argparse.
-        let textwrap = require('./lib/textwrap')
+        const textwrap = require('./lib/textwrap')
         return textwrap.wrap(text, { width })
     }
 
     _fill_text (text, width, indent) {
         text = text.replace(this._whitespace_matcher, ' ').trim()
-        let textwrap = require('./lib/textwrap')
+        const textwrap = require('./lib/textwrap')
         return textwrap.fill(text, { width,
                                      initial_indent: indent,
                                      subsequent_indent: indent })
@@ -1017,7 +1017,7 @@ HelpFormatter.prototype._Section = _callable(class _Section {
         if (this.parent !== undefined) {
             this.formatter._indent()
         }
-        let item_help = this.formatter._join_parts(this.items.map(([func, args]) => func.apply(null, args)))
+        const item_help = this.formatter._join_parts(this.items.map(([func, args]) => func.apply(null, args)))
         if (this.parent !== undefined) {
             this.formatter._dedent()
         }
@@ -1030,7 +1030,7 @@ HelpFormatter.prototype._Section = _callable(class _Section {
         // add the heading if the section was non-empty
         let heading
         if (this.heading !== SUPPRESS && this.heading !== undefined) {
-            let current_indent = this.formatter._current_indent
+            const current_indent = this.formatter._current_indent
             heading = sub('%*s%s:\n', current_indent, '', this.heading)
         } else {
             heading = ''
@@ -1083,7 +1083,7 @@ const ArgumentDefaultsHelpFormatter = _camelcase_alias(_callable(class ArgumentD
         // LEGACY (v1 compatibility): additional check for defaultValue needed
         if (!action.help.includes('%(default)') && !action.help.includes('%(defaultValue)')) {
             if (action.default !== SUPPRESS) {
-                let defaulting_nargs = [OPTIONAL, ZERO_OR_MORE]
+                const defaulting_nargs = [OPTIONAL, ZERO_OR_MORE]
                 if (action.option_strings.length || defaulting_nargs.includes(action.nargs)) {
                     help += ' (default: %(default)s)'
                 }
@@ -1228,7 +1228,7 @@ const Action = _camelcase_alias(_callable(class Action extends _AttributeHolder(
      */
 
     constructor () {
-        let [
+        const [
             option_strings,
             dest,
             nargs,
@@ -1268,7 +1268,7 @@ const Action = _camelcase_alias(_callable(class Action extends _AttributeHolder(
     }
 
     _get_kwargs () {
-        let names = [
+        const names = [
             'option_strings',
             'dest',
             'nargs',
@@ -1315,7 +1315,7 @@ const BooleanOptionalAction = _camelcase_alias(_callable(class BooleanOptionalAc
             metavar: undefined
         })
 
-        let _option_strings = []
+        const _option_strings = []
         for (let option_string of option_strings) {
             _option_strings.push(option_string)
 
@@ -1357,7 +1357,7 @@ const BooleanOptionalAction = _camelcase_alias(_callable(class BooleanOptionalAc
 const _StoreAction = _callable(class _StoreAction extends Action {
 
     constructor () {
-        let [
+        const [
             option_strings,
             dest,
             nargs,
@@ -1412,7 +1412,7 @@ const _StoreAction = _callable(class _StoreAction extends Action {
 const _StoreConstAction = _callable(class _StoreConstAction extends Action {
 
     constructor () {
-        let [
+        const [
             option_strings,
             dest,
             const_value,
@@ -1450,7 +1450,7 @@ const _StoreConstAction = _callable(class _StoreConstAction extends Action {
 const _StoreTrueAction = _callable(class _StoreTrueAction extends _StoreConstAction {
 
     constructor () {
-        let [
+        const [
             option_strings,
             dest,
             default_value,
@@ -1479,7 +1479,7 @@ const _StoreTrueAction = _callable(class _StoreTrueAction extends _StoreConstAct
 const _StoreFalseAction = _callable(class _StoreFalseAction extends _StoreConstAction {
 
     constructor () {
-        let [
+        const [
             option_strings,
             dest,
             default_value,
@@ -1508,7 +1508,7 @@ const _StoreFalseAction = _callable(class _StoreFalseAction extends _StoreConstA
 const _AppendAction = _callable(class _AppendAction extends Action {
 
     constructor () {
-        let [
+        const [
             option_strings,
             dest,
             nargs,
@@ -1566,7 +1566,7 @@ const _AppendAction = _callable(class _AppendAction extends Action {
 const _AppendConstAction = _callable(class _AppendConstAction extends Action {
 
     constructor () {
-        let [
+        const [
             option_strings,
             dest,
             const_value,
@@ -1608,7 +1608,7 @@ const _AppendConstAction = _callable(class _AppendConstAction extends Action {
 const _CountAction = _callable(class _CountAction extends Action {
 
     constructor () {
-        let [
+        const [
             option_strings,
             dest,
             default_value,
@@ -1645,7 +1645,7 @@ const _CountAction = _callable(class _CountAction extends Action {
 const _HelpAction = _callable(class _HelpAction extends Action {
 
     constructor () {
-        let [
+        const [
             option_strings,
             dest,
             default_value,
@@ -1676,7 +1676,7 @@ const _HelpAction = _callable(class _HelpAction extends Action {
 const _VersionAction = _callable(class _VersionAction extends Action {
 
     constructor () {
-        let [
+        const [
             option_strings,
             version,
             dest,
@@ -1705,7 +1705,7 @@ const _VersionAction = _callable(class _VersionAction extends Action {
         if (version === undefined) {
             version = parser.version
         }
-        let formatter = parser._get_formatter()
+        const formatter = parser._get_formatter()
         formatter.add_text(version)
         parser._print_message(formatter.format_help(), process.stdout)
         parser.exit()
@@ -1716,7 +1716,7 @@ const _VersionAction = _callable(class _VersionAction extends Action {
 const _SubParsersAction = _camelcase_alias(_callable(class _SubParsersAction extends Action {
 
     constructor () {
-        let [
+        const [
             option_strings,
             prog,
             parser_class,
@@ -1734,7 +1734,7 @@ const _SubParsersAction = _camelcase_alias(_callable(class _SubParsersAction ext
             metavar: undefined
         })
 
-        let name_parser_map = {}
+        const name_parser_map = {}
 
         super({
             option_strings,
@@ -1753,7 +1753,7 @@ const _SubParsersAction = _camelcase_alias(_callable(class _SubParsersAction ext
     }
 
     add_parser () {
-        let [
+        const [
             name,
             kwargs
         ] = _parse_opts(arguments, {
@@ -1766,23 +1766,23 @@ const _SubParsersAction = _camelcase_alias(_callable(class _SubParsersAction ext
             kwargs.prog = sub('%s %s', this._prog_prefix, name)
         }
 
-        let aliases = getattr(kwargs, 'aliases', [])
+        const aliases = getattr(kwargs, 'aliases', [])
         delete kwargs.aliases
 
         // create a pseudo-action to hold the choice help
         if ('help' in kwargs) {
-            let help = kwargs.help
+            const help = kwargs.help
             delete kwargs.help
-            let choice_action = this._ChoicesPseudoAction(name, aliases, help)
+            const choice_action = this._ChoicesPseudoAction(name, aliases, help)
             this._choices_actions.push(choice_action)
         }
 
         // create the parser and add it to the map
-        let parser = new this._parser_class(kwargs)
+        const parser = new this._parser_class(kwargs)
         this._name_parser_map[name] = parser
 
         // make parser available under aliases also
-        for (let alias of aliases) {
+        for (const alias of aliases) {
             this._name_parser_map[alias] = parser
         }
 
@@ -1794,7 +1794,7 @@ const _SubParsersAction = _camelcase_alias(_callable(class _SubParsersAction ext
     }
 
     call (parser, namespace, values/*, option_string = undefined */) {
-        let parser_name = values[0]
+        const parser_name = values[0]
         let arg_strings = values.slice(1)
 
         // set the parser name if requested
@@ -1806,9 +1806,9 @@ const _SubParsersAction = _camelcase_alias(_callable(class _SubParsersAction ext
         if (hasattr(this._name_parser_map, parser_name)) {
             parser = this._name_parser_map[parser_name]
         } else {
-            let args = {parser_name,
+            const args = {parser_name,
                         choices: this._name_parser_map.join(', ')}
-            let msg = sub('unknown parser %(parser_name)r (choices: %(choices)s)', args)
+            const msg = sub('unknown parser %(parser_name)r (choices: %(choices)s)', args)
             throw new ArgumentError(this, msg)
         }
 
@@ -1821,7 +1821,7 @@ const _SubParsersAction = _camelcase_alias(_callable(class _SubParsersAction ext
         // namespace for the relevant parts.
         let subnamespace
         [subnamespace, arg_strings] = parser.parse_known_args(arg_strings, undefined)
-        for (let [key, value] of Object.entries(subnamespace)) {
+        for (const [key, value] of Object.entries(subnamespace)) {
             setattr(namespace, key, value)
         }
 
@@ -1835,7 +1835,8 @@ const _SubParsersAction = _camelcase_alias(_callable(class _SubParsersAction ext
 
 _SubParsersAction.prototype._ChoicesPseudoAction = _callable(class _ChoicesPseudoAction extends Action {
     constructor (name, aliases, help) {
-        let metavar = name, dest = name
+        let metavar = name
+        const dest = name
         if (aliases.length) {
             metavar += sub(' (%s)', aliases.join(', '))
         }
@@ -1876,7 +1877,7 @@ const FileType = _callable(class FileType extends Function {
      */
 
     constructor () {
-        let [
+        const [
             flags,
             encoding,
             mode,
@@ -1926,7 +1927,7 @@ const FileType = _callable(class FileType extends Function {
             } else if (this._flags.includes('w')) {
                 return process.stdout
             } else {
-                let msg = sub('argument "-" with mode %r', this._flags)
+                const msg = sub('argument "-" with mode %r', this._flags)
                 throw new TypeError(msg)
             }
         }
@@ -1936,29 +1937,29 @@ const FileType = _callable(class FileType extends Function {
         try {
             fd = fs.openSync(string, this._flags, this._options.mode)
         } catch (e) {
-            let args = { filename: string, error: e.message }
-            let message = "can't open '%(filename)s': %(error)s"
+            const args = { filename: string, error: e.message }
+            const message = "can't open '%(filename)s': %(error)s"
             throw new ArgumentTypeError(sub(message, args))
         }
 
-        let options = Object.assign({ fd, flags: this._flags }, this._options)
+        const options = Object.assign({ fd, flags: this._flags }, this._options)
         if (this._flags.includes('r')) {
             return fs.createReadStream(undefined, options)
         } else if (this._flags.includes('w')) {
             return fs.createWriteStream(undefined, options)
         } else {
-            let msg = sub('argument "%s" with mode %r', string, this._flags)
+            const msg = sub('argument "%s" with mode %r', string, this._flags)
             throw new TypeError(msg)
         }
     }
 
     [util.inspect.custom] () {
-        let args = [this._flags]
-        let kwargs = Object.entries(this._options).map(([k, v]) => {
+        const args = [this._flags]
+        const kwargs = Object.entries(this._options).map(([k, v]) => {
             if (k === 'mode') v = { value: v, [util.inspect.custom] () { return '0o' + this.value.toString(8) } }
             return [k, v]
         })
-        let args_str = []
+        const args_str = []
                 .concat(args.filter(arg => arg !== -1).map(repr))
                 .concat(kwargs.filter(([/* kw */, arg]) => arg !== undefined)
                     .map(([kw, arg]) => sub('%s=%r', kw, arg)))
@@ -1995,7 +1996,7 @@ Namespace.prototype[Symbol.toStringTag] = undefined
 const _ActionsContainer = _camelcase_alias(_callable(class _ActionsContainer {
 
     constructor () {
-        let [
+        const [
             description,
             prefix_chars,
             argument_default,
@@ -2030,7 +2031,7 @@ const _ActionsContainer = _camelcase_alias(_callable(class _ActionsContainer {
         this.register('action', 'extend', _ExtendAction)
         // LEGACY (v1 compatibility): camelcase variants
         ;['storeConst', 'storeTrue', 'storeFalse', 'appendConst'].forEach(old_name => {
-            let new_name = _to_new_name(old_name)
+            const new_name = _to_new_name(old_name)
             this.register('action', old_name, util.deprecate(this._registry_get('action', new_name),
                 sub('{action: "%s"} is renamed to {action: "%s"}', old_name, new_name)))
         })
@@ -2062,7 +2063,7 @@ const _ActionsContainer = _camelcase_alias(_callable(class _ActionsContainer {
     // Registration methods
     // ====================
     register (registry_name, value, object) {
-        let registry = setdefault(this._registries, registry_name, {})
+        const registry = setdefault(this._registries, registry_name, {})
         registry[value] = object
     }
 
@@ -2078,7 +2079,7 @@ const _ActionsContainer = _camelcase_alias(_callable(class _ActionsContainer {
 
         // if these defaults match any existing arguments, replace
         // the previous default on the object with the new one
-        for (let action of this._actions) {
+        for (const action of this._actions) {
             if (action.dest in kwargs) {
                 action.default = kwargs[action.dest]
             }
@@ -2086,7 +2087,7 @@ const _ActionsContainer = _camelcase_alias(_callable(class _ActionsContainer {
     }
 
     get_default (dest) {
-        for (let action of this._actions) {
+        for (const action of this._actions) {
             if (action.dest === dest && action.default !== undefined) {
                 return action.default
             }
@@ -2123,7 +2124,7 @@ const _ActionsContainer = _camelcase_alias(_callable(class _ActionsContainer {
         // if no positional args are supplied or only one is supplied and
         // it doesn't look like an option string, parse a positional
         // argument
-        let chars = this.prefix_chars
+        const chars = this.prefix_chars
         if (!args.length || args.length === 1 && !chars.includes(args[0][0])) {
             if (args.length && 'dest' in kwargs) {
                 throw new TypeError('dest supplied twice for positional argument')
@@ -2137,7 +2138,7 @@ const _ActionsContainer = _camelcase_alias(_callable(class _ActionsContainer {
 
         // if no default was supplied, use the parser-level default
         if (!('default' in kwargs)) {
-            let dest = kwargs.dest
+            const dest = kwargs.dest
             if (dest in this._defaults) {
                 kwargs.default = this._defaults[dest]
             } else if (this.argument_default !== undefined) {
@@ -2146,15 +2147,15 @@ const _ActionsContainer = _camelcase_alias(_callable(class _ActionsContainer {
         }
 
         // create the action object, and add it to the parser
-        let action_class = this._pop_action_class(kwargs)
+        const action_class = this._pop_action_class(kwargs)
         if (typeof action_class !== 'function') {
             throw new TypeError(sub('unknown action "%s"', action_class))
         }
         // eslint-disable-next-line new-cap
-        let action = new action_class(kwargs)
+        const action = new action_class(kwargs)
 
         // raise an error if the action type is not callable
-        let type_func = this._registry_get('type', action.type, action.type)
+        const type_func = this._registry_get('type', action.type, action.type)
         if (typeof type_func !== 'function') {
             throw new TypeError(sub('%r is not callable', type_func))
         }
@@ -2182,14 +2183,14 @@ const _ActionsContainer = _camelcase_alias(_callable(class _ActionsContainer {
     }
 
     add_argument_group () {
-        let group = _ArgumentGroup(this, ...arguments)
+        const group = _ArgumentGroup(this, ...arguments)
         this._action_groups.push(group)
         return group
     }
 
     add_mutually_exclusive_group () {
 
-        let group = _MutuallyExclusiveGroup(this, ...arguments)
+        const group = _MutuallyExclusiveGroup(this, ...arguments)
         this._mutually_exclusive_groups.push(group)
         return group
     }
@@ -2203,12 +2204,12 @@ const _ActionsContainer = _camelcase_alias(_callable(class _ActionsContainer {
         action.container = this
 
         // index the action by any option strings it has
-        for (let option_string of action.option_strings) {
+        for (const option_string of action.option_strings) {
             this._option_string_actions[option_string] = action
         }
 
         // set the flag if any option strings look like negative numbers
-        for (let option_string of action.option_strings) {
+        for (const option_string of action.option_strings) {
             if (this._negative_number_matcher.test(option_string)) {
                 if (!this._has_negative_number_optionals.length) {
                     this._has_negative_number_optionals.push(true)
@@ -2226,18 +2227,18 @@ const _ActionsContainer = _camelcase_alias(_callable(class _ActionsContainer {
 
     _add_container_actions (container) {
         // collect groups by titles
-        let title_group_map = {}
-        for (let group of this._action_groups) {
+        const title_group_map = {}
+        for (const group of this._action_groups) {
             if (group.title in title_group_map) {
-                let msg = 'cannot merge actions - two groups are named %r'
+                const msg = 'cannot merge actions - two groups are named %r'
                 throw new TypeError(sub(msg, group.title))
             }
             title_group_map[group.title] = group
         }
 
         // map each action to its group
-        let group_map = new Map()
-        for (let group of container._action_groups) {
+        const group_map = new Map()
+        for (const group of container._action_groups) {
 
             // if a group with the title exists, use that, otherwise
             // create a new group matching the container's group
@@ -2250,7 +2251,7 @@ const _ActionsContainer = _camelcase_alias(_callable(class _ActionsContainer {
             }
 
             // map the actions to their new group
-            for (let action of group._group_actions) {
+            for (const action of group._group_actions) {
                 group_map.set(action, title_group_map[group.title])
             }
         }
@@ -2258,25 +2259,25 @@ const _ActionsContainer = _camelcase_alias(_callable(class _ActionsContainer {
         // add container's mutually exclusive groups
         // NOTE: if add_mutually_exclusive_group ever gains title= and
         // description= then this code will need to be expanded as above
-        for (let group of container._mutually_exclusive_groups) {
-            let mutex_group = this.add_mutually_exclusive_group({
+        for (const group of container._mutually_exclusive_groups) {
+            const mutex_group = this.add_mutually_exclusive_group({
                 required: group.required
             })
 
             // map the actions to their new mutex group
-            for (let action of group._group_actions) {
+            for (const action of group._group_actions) {
                 group_map.set(action, mutex_group)
             }
         }
 
         // add all actions to this container or their group
-        for (let action of container._actions) {
+        for (const action of container._actions) {
             group_map.get(action)._add_action(action)
         }
     }
 
     _get_positional_kwargs () {
-        let [
+        const [
             dest,
             kwargs
         ] = _parse_opts(arguments, {
@@ -2286,7 +2287,7 @@ const _ActionsContainer = _camelcase_alias(_callable(class _ActionsContainer {
 
         // make sure required is not specified
         if ('required' in kwargs) {
-            let msg = "'required' is an invalid argument for positionals"
+            const msg = "'required' is an invalid argument for positionals"
             throw new TypeError(msg)
         }
 
@@ -2304,7 +2305,7 @@ const _ActionsContainer = _camelcase_alias(_callable(class _ActionsContainer {
     }
 
     _get_optional_kwargs () {
-        let [
+        const [
             args,
             kwargs
         ] = _parse_opts(arguments, {
@@ -2313,15 +2314,15 @@ const _ActionsContainer = _camelcase_alias(_callable(class _ActionsContainer {
         })
 
         // determine short and long option strings
-        let option_strings = []
-        let long_option_strings = []
+        const option_strings = []
+        const long_option_strings = []
         let option_string
         for (option_string of args) {
             // error on strings that don't start with an appropriate prefix
             if (!this.prefix_chars.includes(option_string[0])) {
-                let args = {option: option_string,
+                const args = {option: option_string,
                             prefix_chars: this.prefix_chars}
-                let msg = 'invalid option string %(option)r: ' +
+                const msg = 'invalid option string %(option)r: ' +
                           'must start with a character %(prefix_chars)r'
                 throw new TypeError(sub(msg, args))
             }
@@ -2345,7 +2346,7 @@ const _ActionsContainer = _camelcase_alias(_callable(class _ActionsContainer {
             }
             dest = _string_lstrip(dest_option_string, this.prefix_chars)
             if (!dest) {
-                let msg = 'dest= is required for options like %r'
+                const msg = 'dest= is required for options like %r'
                 throw new TypeError(sub(msg, option_string))
             }
             dest = dest.replace(/-/g, '_')
@@ -2356,18 +2357,18 @@ const _ActionsContainer = _camelcase_alias(_callable(class _ActionsContainer {
     }
 
     _pop_action_class (kwargs, default_value = undefined) {
-        let action = getattr(kwargs, 'action', default_value)
+        const action = getattr(kwargs, 'action', default_value)
         delete kwargs.action
         return this._registry_get('action', action, action)
     }
 
     _get_handler () {
         // determine function from conflict handler string
-        let handler_func_name = sub('_handle_conflict_%s', this.conflict_handler)
+        const handler_func_name = sub('_handle_conflict_%s', this.conflict_handler)
         if (typeof this[handler_func_name] === 'function') {
             return this[handler_func_name]
         } else {
-            let msg = 'invalid conflict_resolution value: %r'
+            const msg = 'invalid conflict_resolution value: %r'
             throw new TypeError(sub(msg, this.conflict_handler))
         }
     }
@@ -2375,33 +2376,33 @@ const _ActionsContainer = _camelcase_alias(_callable(class _ActionsContainer {
     _check_conflict (action) {
 
         // find all options that conflict with this option
-        let confl_optionals = []
-        for (let option_string of action.option_strings) {
+        const confl_optionals = []
+        for (const option_string of action.option_strings) {
             if (hasattr(this._option_string_actions, option_string)) {
-                let confl_optional = this._option_string_actions[option_string]
+                const confl_optional = this._option_string_actions[option_string]
                 confl_optionals.push([option_string, confl_optional])
             }
         }
 
         // resolve any conflicts
         if (confl_optionals.length) {
-            let conflict_handler = this._get_handler()
+            const conflict_handler = this._get_handler()
             conflict_handler.call(this, action, confl_optionals)
         }
     }
 
     _handle_conflict_error (action, conflicting_actions) {
-        let message = conflicting_actions.length === 1 ?
+        const message = conflicting_actions.length === 1 ?
             'conflicting option string: %s' :
             'conflicting option strings: %s'
-        let conflict_string = conflicting_actions.map(([option_string]) => option_string).join(', ')
+        const conflict_string = conflicting_actions.map(([option_string]) => option_string).join(', ')
         throw new ArgumentError(action, sub(message, conflict_string))
     }
 
     _handle_conflict_resolve (action, conflicting_actions) {
 
         // remove all conflicting options
-        for (let [option_string, action] of conflicting_actions) {
+        for (const [option_string, action] of conflicting_actions) {
 
             // remove the conflicting option
             _array_remove(action.option_strings, option_string)
@@ -2420,7 +2421,7 @@ const _ActionsContainer = _camelcase_alias(_callable(class _ActionsContainer {
 const _ArgumentGroup = _callable(class _ArgumentGroup extends _ActionsContainer {
 
     constructor () {
-        let [
+        const [
             container,
             title,
             description,
@@ -2468,7 +2469,7 @@ const _ArgumentGroup = _callable(class _ArgumentGroup extends _ActionsContainer 
 const _MutuallyExclusiveGroup = _callable(class _MutuallyExclusiveGroup extends _ArgumentGroup {
 
     constructor () {
-        let [
+        const [
             container,
             required
         ] = _parse_opts(arguments, {
@@ -2483,7 +2484,7 @@ const _MutuallyExclusiveGroup = _callable(class _MutuallyExclusiveGroup extends 
 
     _add_action (action) {
         if (action.required) {
-            let msg = 'mutually exclusive arguments must be optional'
+            const msg = 'mutually exclusive arguments must be optional'
             throw new TypeError(msg)
         }
         action = this._container._add_action(action)
@@ -2607,14 +2608,14 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
         this.register('type', null, identity)
         this.register('type', 'auto', identity)
         this.register('type', 'int', function (x) {
-            let result = Number(x)
+            const result = Number(x)
             if (!Number.isInteger(result)) {
                 throw new TypeError(sub('could not convert string to int: %r', x))
             }
             return result
         })
         this.register('type', 'float', function (x) {
-            let result = Number(x)
+            const result = Number(x)
             if (isNaN(result)) {
                 throw new TypeError(sub('could not convert string to float: %r', x))
             }
@@ -2628,7 +2629,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
 
         // add help argument if necessary
         // (using explicit default to override global argument_default)
-        let default_prefix = prefix_chars.includes('-') ? '-' : prefix_chars[0]
+        const default_prefix = prefix_chars.includes('-') ? '-' : prefix_chars[0]
         if (this.add_help) {
             this.add_argument(
                 default_prefix + 'h',
@@ -2656,7 +2657,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
         // end
 
         // add parent arguments and defaults
-        for (let parent of parents) {
+        for (const parent of parents) {
             this._add_container_actions(parent)
             Object.assign(this._defaults, parent._defaults)
         }
@@ -2666,7 +2667,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
     // Pretty __repr__ methods
     // =======================
     _get_kwargs () {
-        let names = [
+        const names = [
             'prog',
             'usage',
             'description',
@@ -2681,7 +2682,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
     // Optional/Positional adding methods
     // ==================================
     add_subparsers () {
-        let [
+        const [
             kwargs
         ] = _parse_opts(arguments, {
             '**kwargs': no_default
@@ -2695,8 +2696,8 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
         setdefault(kwargs, 'parser_class', this.constructor)
 
         if ('title' in kwargs || 'description' in kwargs) {
-            let title = getattr(kwargs, 'title', 'subcommands')
-            let description = getattr(kwargs, 'description', undefined)
+            const title = getattr(kwargs, 'title', 'subcommands')
+            const description = getattr(kwargs, 'description', undefined)
             delete kwargs.title
             delete kwargs.description
             this._subparsers = this.add_argument_group(title, description)
@@ -2707,17 +2708,17 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
         // prog defaults to the usage message of this parser, skipping
         // optional arguments and with no "usage:" prefix
         if (kwargs.prog === undefined) {
-            let formatter = this._get_formatter()
-            let positionals = this._get_positional_actions()
-            let groups = this._mutually_exclusive_groups
+            const formatter = this._get_formatter()
+            const positionals = this._get_positional_actions()
+            const groups = this._mutually_exclusive_groups
             formatter.add_usage(this.usage, positionals, groups, '')
             kwargs.prog = formatter.format_help().trim()
         }
 
         // create the parsers action and add it to the positionals list
-        let parsers_class = this._pop_action_class(kwargs, 'parsers')
+        const parsers_class = this._pop_action_class(kwargs, 'parsers')
         // eslint-disable-next-line new-cap
-        let action = new parsers_class(Object.assign({ option_strings: [] }, kwargs))
+        const action = new parsers_class(Object.assign({ option_strings: [] }, kwargs))
         this._subparsers._add_action(action)
 
         // return the created parsers action
@@ -2748,7 +2749,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
         let argv
         [args, argv] = this.parse_known_args(args, namespace)
         if (argv && argv.length > 0) {
-            let msg = 'unrecognized arguments: %s'
+            const msg = 'unrecognized arguments: %s'
             this.error(sub(msg, argv.join(' ')))
         }
         return args
@@ -2765,7 +2766,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
         }
 
         // add any action defaults that aren't present
-        for (let action of this._actions) {
+        for (const action of this._actions) {
             if (action.dest !== SUPPRESS) {
                 if (!hasattr(namespace, action.dest)) {
                     if (action.default !== SUPPRESS) {
@@ -2776,7 +2777,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
         }
 
         // add any parser defaults that aren't present
-        for (let dest of Object.keys(this._defaults)) {
+        for (const dest of Object.keys(this._defaults)) {
             if (!hasattr(namespace, dest)) {
                 setattr(namespace, dest, this._defaults[dest])
             }
@@ -2813,10 +2814,10 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
 
         // map all mutually exclusive arguments to the other arguments
         // they can't occur with
-        let action_conflicts = new Map()
-        for (let mutex_group of this._mutually_exclusive_groups) {
-            let group_actions = mutex_group._group_actions
-            for (let [i, mutex_action] of Object.entries(mutex_group._group_actions)) {
+        const action_conflicts = new Map()
+        for (const mutex_group of this._mutually_exclusive_groups) {
+            const group_actions = mutex_group._group_actions
+            for (const [i, mutex_action] of Object.entries(mutex_group._group_actions)) {
                 let conflicts = action_conflicts.get(mutex_action) || []
                 conflicts = conflicts.concat(group_actions.slice(0, +i))
                 conflicts = conflicts.concat(group_actions.slice(+i + 1))
@@ -2827,9 +2828,9 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
         // find all option indices, and determine the arg_string_pattern
         // which has an 'O' if there is an option at an index,
         // an 'A' if there is an argument, or a '-' if there is a '--'
-        let option_string_indices = {}
-        let arg_string_pattern_parts = []
-        let arg_strings_iter = Object.entries(arg_strings)[Symbol.iterator]()
+        const option_string_indices = {}
+        const arg_string_pattern_parts = []
+        const arg_strings_iter = Object.entries(arg_strings)[Symbol.iterator]()
         for (let [i, arg_string] of arg_strings_iter) {
 
             // all args after -- are non-options
@@ -2842,7 +2843,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
             // otherwise, add the arg to the arg strings
             // and note the index if it was an option
             } else {
-                let option_tuple = this._parse_optional(arg_string)
+                const option_tuple = this._parse_optional(arg_string)
                 let pattern
                 if (option_tuple === undefined) {
                     pattern = 'A'
@@ -2855,26 +2856,26 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
         }
 
         // join the pieces together to form the pattern
-        let arg_strings_pattern = arg_string_pattern_parts.join('')
+        const arg_strings_pattern = arg_string_pattern_parts.join('')
 
         // converts arg strings to the appropriate and then takes the action
-        let seen_actions = new Set()
-        let seen_non_default_actions = new Set()
+        const seen_actions = new Set()
+        const seen_non_default_actions = new Set()
         let extras
 
-        let take_action = (action, argument_strings, option_string = undefined) => {
+        const take_action = (action, argument_strings, option_string = undefined) => {
             seen_actions.add(action)
-            let argument_values = this._get_values(action, argument_strings)
+            const argument_values = this._get_values(action, argument_strings)
 
             // error if this argument is not allowed with other previously
             // seen arguments, assuming that actions that use the default
             // value don't really count as "present"
             if (argument_values !== action.default) {
                 seen_non_default_actions.add(action)
-                for (let conflict_action of action_conflicts.get(action) || []) {
+                for (const conflict_action of action_conflicts.get(action) || []) {
                     if (seen_non_default_actions.has(conflict_action)) {
-                        let msg = 'not allowed with argument %s'
-                        let action_name = _get_action_name(conflict_action)
+                        const msg = 'not allowed with argument %s'
+                        const action_name = _get_action_name(conflict_action)
                         throw new ArgumentError(action, sub(msg, action_name))
                     }
                 }
@@ -2888,15 +2889,15 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
         }
 
         // function to convert arg_strings into an optional action
-        let consume_optional = start_index => {
+        const consume_optional = start_index => {
 
             // get the optional identified at this index
-            let option_tuple = option_string_indices[start_index]
+            const option_tuple = option_string_indices[start_index]
             let [action, option_string, explicit_arg] = option_tuple
 
             // identify additional optionals in the same arg string
             // (e.g. -xyz is the same as -x -y -z if no args are required)
-            let action_tuples = []
+            const action_tuples = []
             let stop
             for (;;) {
 
@@ -2909,23 +2910,23 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
                 // if there is an explicit argument, try to match the
                 // optional's string arguments to only this
                 if (explicit_arg !== undefined) {
-                    let arg_count = this._match_argument(action, 'A')
+                    const arg_count = this._match_argument(action, 'A')
 
                     // if the action is a single-dash option and takes no
                     // arguments, try to parse more single-dash options out
                     // of the tail of the option string
-                    let chars = this.prefix_chars
+                    const chars = this.prefix_chars
                     if (arg_count === 0 && !chars.includes(option_string[1])) {
                         action_tuples.push([action, [], option_string])
-                        let char = option_string[0]
+                        const char = option_string[0]
                         option_string = char + explicit_arg[0]
-                        let new_explicit_arg = explicit_arg.slice(1) || undefined
-                        let optionals_map = this._option_string_actions
+                        const new_explicit_arg = explicit_arg.slice(1) || undefined
+                        const optionals_map = this._option_string_actions
                         if (hasattr(optionals_map, option_string)) {
                             action = optionals_map[option_string]
                             explicit_arg = new_explicit_arg
                         } else {
-                            let msg = 'ignored explicit argument %r'
+                            const msg = 'ignored explicit argument %r'
                             throw new ArgumentError(action, sub(msg, explicit_arg))
                         }
 
@@ -2933,14 +2934,14 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
                     // successfully matched the option; exit the loop
                     } else if (arg_count === 1) {
                         stop = start_index + 1
-                        let args = [explicit_arg]
+                        const args = [explicit_arg]
                         action_tuples.push([action, args, option_string])
                         break
 
                     // error if a double-dash option did not use the
                     // explicit argument
                     } else {
-                        let msg = 'ignored explicit argument %r'
+                        const msg = 'ignored explicit argument %r'
                         throw new ArgumentError(action, sub(msg, explicit_arg))
                     }
 
@@ -2948,11 +2949,11 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
                 // optional's string arguments with the following strings
                 // if successful, exit the loop
                 } else {
-                    let start = start_index + 1
-                    let selected_patterns = arg_strings_pattern.slice(start)
-                    let arg_count = this._match_argument(action, selected_patterns)
+                    const start = start_index + 1
+                    const selected_patterns = arg_strings_pattern.slice(start)
+                    const arg_count = this._match_argument(action, selected_patterns)
                     stop = start + arg_count
-                    let args = arg_strings.slice(start, stop)
+                    const args = arg_strings.slice(start, stop)
                     action_tuples.push([action, args, option_string])
                     break
                 }
@@ -2961,7 +2962,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
             // add the Optional to the list and return the index at which
             // the Optional's string args stopped
             assert(action_tuples.length)
-            for (let [action, args, option_string] of action_tuples) {
+            for (const [action, args, option_string] of action_tuples) {
                 take_action(action, args, option_string)
             }
             return stop
@@ -2972,17 +2973,17 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
         let positionals = this._get_positional_actions()
 
         // function to convert arg_strings into positional actions
-        let consume_positionals = start_index => {
+        const consume_positionals = start_index => {
             // match as many Positionals as possible
-            let selected_pattern = arg_strings_pattern.slice(start_index)
-            let arg_counts = this._match_arguments_partial(positionals, selected_pattern)
+            const selected_pattern = arg_strings_pattern.slice(start_index)
+            const arg_counts = this._match_arguments_partial(positionals, selected_pattern)
 
             // slice off the appropriate arg strings for each Positional
             // and add the Positional and its args to the list
             for (let i = 0; i < positionals.length && i < arg_counts.length; i++) {
-                let action = positionals[i]
-                let arg_count = arg_counts[i]
-                let args = arg_strings.slice(start_index, start_index + arg_count)
+                const action = positionals[i]
+                const arg_count = arg_counts[i]
+                const args = arg_strings.slice(start_index, start_index + arg_count)
                 start_index += arg_count
                 take_action(action, args)
             }
@@ -2997,16 +2998,16 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
         // passed the last option string
         extras = []
         let start_index = 0
-        let max_option_string_index = Math.max(-1, ...Object.keys(option_string_indices).map(Number))
+        const max_option_string_index = Math.max(-1, ...Object.keys(option_string_indices).map(Number))
         while (start_index <= max_option_string_index) {
 
             // consume any Positionals preceding the next option
-            let next_option_string_index = Math.min(
+            const next_option_string_index = Math.min(
 
                 ...Object.keys(option_string_indices).map(Number).filter(index => index >= start_index)
             )
             if (start_index !== next_option_string_index) {
-                let positionals_end_index = consume_positionals(start_index)
+                const positionals_end_index = consume_positionals(start_index)
 
                 // only try to parse the next optional if we didn't consume
                 // the option string during the positionals parsing
@@ -3021,7 +3022,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
             // if we consumed all the positionals we could and we're not
             // at the index of an option string, there were extra arguments
             if (!(start_index in option_string_indices)) {
-                let strings = arg_strings.slice(start_index, next_option_string_index)
+                const strings = arg_strings.slice(start_index, next_option_string_index)
                 extras = extras.concat(strings)
                 start_index = next_option_string_index
             }
@@ -3031,15 +3032,15 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
         }
 
         // consume any positionals following the last Optional
-        let stop_index = consume_positionals(start_index)
+        const stop_index = consume_positionals(start_index)
 
         // if we didn't consume all the argument strings, there were extras
         extras = extras.concat(arg_strings.slice(stop_index))
 
         // make sure all required actions were present and also convert
         // action defaults which were not given as arguments
-        let required_actions = []
-        for (let action of this._actions) {
+        const required_actions = []
+        for (const action of this._actions) {
             if (!seen_actions.has(action)) {
                 if (action.required) {
                     required_actions.push(_get_action_name(action))
@@ -3065,10 +3066,10 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
         }
 
         // make sure all required groups had one option present
-        for (let group of this._mutually_exclusive_groups) {
+        for (const group of this._mutually_exclusive_groups) {
             if (group.required) {
                 let no_actions_used = true
-                for (let action of group._group_actions) {
+                for (const action of group._group_actions) {
                     if (seen_non_default_actions.has(action)) {
                         no_actions_used = false
                         break
@@ -3077,10 +3078,10 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
 
                 // if no actions were used, report the error
                 if (no_actions_used) {
-                    let names = group._group_actions
+                    const names = group._group_actions
                         .filter(action => action.help !== SUPPRESS)
                         .map(action => _get_action_name(action))
-                    let msg = 'one of the arguments %s is required'
+                    const msg = 'one of the arguments %s is required'
                     this.error(sub(msg, names.join(' ')))
                 }
             }
@@ -3093,7 +3094,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
     _read_args_from_files (arg_strings) {
         // expand arguments referencing files
         let new_arg_strings = []
-        for (let arg_string of arg_strings) {
+        for (const arg_string of arg_strings) {
 
             // for regular arguments, just add them back into the list
             if (!arg_string || !this.fromfile_prefix_chars.includes(arg_string[0])) {
@@ -3102,10 +3103,10 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
             // replace arguments referencing files with the file content
             } else {
                 try {
-                    let args_file = fs.readFileSync(arg_string.slice(1), 'utf8')
+                    const args_file = fs.readFileSync(arg_string.slice(1), 'utf8')
                     let arg_strings = []
-                    for (let arg_line of splitlines(args_file)) {
-                        for (let arg of this.convert_arg_line_to_args(arg_line)) {
+                    for (const arg_line of splitlines(args_file)) {
+                        for (const arg of this.convert_arg_line_to_args(arg_line)) {
                             arg_strings.push(arg)
                         }
                     }
@@ -3127,12 +3128,12 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
 
     _match_argument (action, arg_strings_pattern) {
         // match the pattern for this action to the arg strings
-        let nargs_pattern = this._get_nargs_pattern(action)
-        let match = arg_strings_pattern.match(new RegExp('^' + nargs_pattern))
+        const nargs_pattern = this._get_nargs_pattern(action)
+        const match = arg_strings_pattern.match(new RegExp('^' + nargs_pattern))
 
         // raise an exception if we weren't able to find a match
         if (match === null) {
-            let nargs_errors = {
+            const nargs_errors = {
                 undefined: 'expected one argument',
                 [OPTIONAL]: 'expected at most one argument',
                 [ONE_OR_MORE]: 'expected at least one argument'
@@ -3152,10 +3153,10 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
         // progressively shorten the actions list by slicing off the
         // final actions until we find a match
         let result = []
-        for (let i of range(actions.length, 0, -1)) {
-            let actions_slice = actions.slice(0, i)
-            let pattern = actions_slice.map(action => this._get_nargs_pattern(action)).join('')
-            let match = arg_strings_pattern.match(new RegExp('^' + pattern))
+        for (const i of range(actions.length, 0, -1)) {
+            const actions_slice = actions.slice(0, i)
+            const pattern = actions_slice.map(action => this._get_nargs_pattern(action)).join('')
+            const match = arg_strings_pattern.match(new RegExp('^' + pattern))
             if (match !== null) {
                 result = result.concat(match.slice(1).map(string => string.length))
                 break
@@ -3179,7 +3180,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
 
         // if the option string is present in the parser, return the action
         if (arg_string in this._option_string_actions) {
-            let action = this._option_string_actions[arg_string]
+            const action = this._option_string_actions[arg_string]
             return [action, arg_string, undefined]
         }
 
@@ -3190,28 +3191,28 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
 
         // if the option string before the "=" is present, return the action
         if (arg_string.includes('=')) {
-            let [option_string, explicit_arg] = _string_split(arg_string, '=', 1)
+            const [option_string, explicit_arg] = _string_split(arg_string, '=', 1)
             if (option_string in this._option_string_actions) {
-                let action = this._option_string_actions[option_string]
+                const action = this._option_string_actions[option_string]
                 return [action, option_string, explicit_arg]
             }
         }
 
         // search through all possible prefixes of the option string
         // and all actions in the parser for possible interpretations
-        let option_tuples = this._get_option_tuples(arg_string)
+        const option_tuples = this._get_option_tuples(arg_string)
 
         // if multiple actions match, the option string was ambiguous
         if (option_tuples.length > 1) {
-            let options = option_tuples.map(([, option_string]) => option_string).join(', ')
-            let args = {option: arg_string, matches: options}
-            let msg = 'ambiguous option: %(option)s could match %(matches)s'
+            const options = option_tuples.map(([, option_string]) => option_string).join(', ')
+            const args = {option: arg_string, matches: options}
+            const msg = 'ambiguous option: %(option)s could match %(matches)s'
             this.error(sub(msg, args))
 
         // if exactly one action matched, this segmentation is good,
         // so return the parsed action
         } else if (option_tuples.length === 1) {
-            let [option_tuple] = option_tuples
+            const [option_tuple] = option_tuples
             return option_tuple
         }
 
@@ -3235,11 +3236,11 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
     }
 
     _get_option_tuples (option_string) {
-        let result = []
+        const result = []
 
         // option strings starting with two prefix characters are only
         // split at the '='
-        let chars = this.prefix_chars
+        const chars = this.prefix_chars
         if (chars.includes(option_string[0]) && chars.includes(option_string[1])) {
             if (this.allow_abbrev) {
                 let option_prefix, explicit_arg
@@ -3249,10 +3250,10 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
                     option_prefix = option_string
                     explicit_arg = undefined
                 }
-                for (let option_string of Object.keys(this._option_string_actions)) {
+                for (const option_string of Object.keys(this._option_string_actions)) {
                     if (option_string.startsWith(option_prefix)) {
-                        let action = this._option_string_actions[option_string]
-                        let tup = [action, option_string, explicit_arg]
+                        const action = this._option_string_actions[option_string]
+                        const tup = [action, option_string, explicit_arg]
                         result.push(tup)
                     }
                 }
@@ -3262,19 +3263,19 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
         // but multiple character options always have to have their argument
         // separate
         } else if (chars.includes(option_string[0]) && !chars.includes(option_string[1])) {
-            let option_prefix = option_string
-            let explicit_arg = undefined
-            let short_option_prefix = option_string.slice(0, 2)
-            let short_explicit_arg = option_string.slice(2)
+            const option_prefix = option_string
+            const explicit_arg = undefined
+            const short_option_prefix = option_string.slice(0, 2)
+            const short_explicit_arg = option_string.slice(2)
 
-            for (let option_string of Object.keys(this._option_string_actions)) {
+            for (const option_string of Object.keys(this._option_string_actions)) {
                 if (option_string === short_option_prefix) {
-                    let action = this._option_string_actions[option_string]
-                    let tup = [action, option_string, short_explicit_arg]
+                    const action = this._option_string_actions[option_string]
+                    const tup = [action, option_string, short_explicit_arg]
                     result.push(tup)
                 } else if (option_string.startsWith(option_prefix)) {
-                    let action = this._option_string_actions[option_string]
-                    let tup = [action, option_string, explicit_arg]
+                    const action = this._option_string_actions[option_string]
+                    const tup = [action, option_string, explicit_arg]
                     result.push(tup)
                 }
             }
@@ -3291,7 +3292,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
     _get_nargs_pattern (action) {
         // in all examples below, we have to allow for '--' args
         // which are represented as '-' in the pattern
-        let nargs = action.nargs
+        const nargs = action.nargs
         let nargs_pattern
 
         // the default (None) is assumed to be a single argument
@@ -3345,7 +3346,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
         let argv
         [args, argv] = this.parse_known_intermixed_args(args, namespace)
         if (argv.length) {
-            let msg = 'unrecognized arguments: %s'
+            const msg = 'unrecognized arguments: %s'
             this.error(sub(msg, argv.join(' ')))
         }
         return args
@@ -3365,15 +3366,15 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
         // namespace
 
         let extras
-        let positionals = this._get_positional_actions()
-        let a = positionals.filter(action => [PARSER, REMAINDER].includes(action.nargs))
+        const positionals = this._get_positional_actions()
+        const a = positionals.filter(action => [PARSER, REMAINDER].includes(action.nargs))
         if (a.length) {
             throw new TypeError(sub('parse_intermixed_args: positional arg' +
                                     ' with nargs=%s', a[0].nargs))
         }
 
-        for (let group of this._mutually_exclusive_groups) {
-            for (let action of group._group_actions) {
+        for (const group of this._mutually_exclusive_groups) {
+            for (const action of group._group_actions) {
                 if (positionals.includes(action)) {
                     throw new TypeError('parse_intermixed_args: positional in' +
                                         ' mutuallyExclusiveGroup')
@@ -3390,7 +3391,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
                     // capture the full usage for use in error messages
                     this.usage = this.format_usage().slice(7)
                 }
-                for (let action of positionals) {
+                for (const action of positionals) {
                     // deactivate positionals
                     action.save_nargs = action.nargs
                     // action.nargs = 0
@@ -3400,9 +3401,9 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
                 }
                 [namespace, remaining_args] = this.parse_known_args(args,
                                                                       namespace)
-                for (let action of positionals) {
+                for (const action of positionals) {
                     // remove the empty positional values from namespace
-                    let attr = getattr(namespace, action.dest)
+                    const attr = getattr(namespace, action.dest)
                     if (Array.isArray(attr) && attr.length === 0) {
 
                         console.warn(sub('Do not expect %s in %s', action.dest, namespace))
@@ -3411,20 +3412,20 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
                 }
             } finally {
                 // restore nargs and usage before exiting
-                for (let action of positionals) {
+                for (const action of positionals) {
                     action.nargs = action.save_nargs
                     action.default = action.save_default
                 }
             }
-            let optionals = this._get_optional_actions()
+            const optionals = this._get_optional_actions()
             try {
                 // parse positionals.  optionals aren't normally required, but
                 // they could be, so make sure they aren't.
-                for (let action of optionals) {
+                for (const action of optionals) {
                     action.save_required = action.required
                     action.required = false
                 }
-                for (let group of this._mutually_exclusive_groups) {
+                for (const group of this._mutually_exclusive_groups) {
                     group.save_required = group.required
                     group.required = false
                 }
@@ -3432,10 +3433,10 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
                                                               namespace)
             } finally {
                 // restore parser values before exiting
-                for (let action of optionals) {
+                for (const action of optionals) {
                     action.required = action.save_required
                 }
-                for (let group of this._mutually_exclusive_groups) {
+                for (const group of this._mutually_exclusive_groups) {
                     group.required = group.save_required
                 }
             }
@@ -3482,7 +3483,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
 
         // single argument or optional argument produces a single value
         } else if (arg_strings.length === 1 && [undefined, OPTIONAL].includes(action.nargs)) {
-            let arg_string = arg_strings[0]
+            const arg_string = arg_strings[0]
             value = this._get_value(action, arg_string)
             this._check_value(action, value)
 
@@ -3502,7 +3503,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
         // all other types of nargs produce a list
         } else {
             value = arg_strings.map(v => this._get_value(action, v))
-            for (let v of value) {
+            for (const v of value) {
                 this._check_value(action, v)
             }
         }
@@ -3512,9 +3513,9 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
     }
 
     _get_value (action, arg_string) {
-        let type_func = this._registry_get('type', action.type, action.type)
+        const type_func = this._registry_get('type', action.type, action.type)
         if (typeof type_func !== 'function') {
-            let msg = '%r is not callable'
+            const msg = '%r is not callable'
             throw new ArgumentError(action, sub(msg, type_func))
         }
 
@@ -3540,14 +3541,14 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
             // ArgumentTypeErrors indicate errors
             if (err instanceof ArgumentTypeError) {
                 // let name = getattr(action.type, 'name', repr(action.type))
-                let msg = err.message
+                const msg = err.message
                 throw new ArgumentError(action, msg)
 
             // TypeErrors or ValueErrors also indicate errors
             } else if (err instanceof TypeError) {
-                let name = getattr(action.type, 'name', repr(action.type))
-                let args = {type: name, value: arg_string}
-                let msg = 'invalid %(type)s value: %(value)r'
+                const name = getattr(action.type, 'name', repr(action.type))
+                const args = {type: name, value: arg_string}
+                const msg = 'invalid %(type)s value: %(value)r'
                 throw new ArgumentError(action, sub(msg, args))
             } else {
                 throw err
@@ -3561,9 +3562,9 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
     _check_value (action, value) {
         // converted value must be one of the choices (if specified)
         if (action.choices !== undefined && !_choices_to_array(action.choices).includes(value)) {
-            let args = {value,
+            const args = {value,
                         choices: _choices_to_array(action.choices).map(repr).join(', ')}
-            let msg = 'invalid choice: %(value)r (choose from %(choices)s)'
+            const msg = 'invalid choice: %(value)r (choose from %(choices)s)'
             throw new ArgumentError(action, sub(msg, args))
         }
     }
@@ -3572,14 +3573,14 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
     // Help-formatting methods
     // =======================
     format_usage () {
-        let formatter = this._get_formatter()
+        const formatter = this._get_formatter()
         formatter.add_usage(this.usage, this._actions,
                             this._mutually_exclusive_groups)
         return formatter.format_help()
     }
 
     format_help () {
-        let formatter = this._get_formatter()
+        const formatter = this._get_formatter()
 
         // usage
         formatter.add_usage(this.usage, this._actions,
@@ -3589,7 +3590,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
         formatter.add_text(this.description)
 
         // positionals, optionals and user-defined groups
-        for (let action_group of this._action_groups) {
+        for (const action_group of this._action_groups) {
             formatter.start_section(action_group.title)
             formatter.add_text(action_group.description)
             formatter.add_arguments(action_group._group_actions)
@@ -3653,7 +3654,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
         if (this.debug === true) throw new Error(message)
         // end
         this.print_usage(process.stderr)
-        let args = {prog: this.prog, message}
+        const args = {prog: this.prog, message}
         this.exit(2, sub('%(prog)s: error: %(message)s\n', args))
     }
 }))
@@ -3683,7 +3684,7 @@ module.exports = {
 // LEGACY (v1 compatibility), Const alias
 Object.defineProperty(module.exports, 'Const', {
     get () {
-        let result = {}
+        const result = {}
         Object.entries({ ONE_OR_MORE, OPTIONAL, PARSER, REMAINDER, SUPPRESS, ZERO_OR_MORE }).forEach(([n, v]) => {
             Object.defineProperty(result, n, {
                 get () {

@@ -23,8 +23,7 @@ export default [
             'no-unmodified-loop-condition': 'off',
             'no-useless-constructor': 'off',
             'no-useless-escape': 'off',
-            'one-var': 'off',
-            'prefer-const': 'off'
+            'one-var': 'off'
         }
     }
 ]
