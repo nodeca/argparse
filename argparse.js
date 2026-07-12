@@ -211,40 +211,6 @@ function _callable (cls) {
     return result[cls.name]
 }
 
-function _alias (object, from, to) {
-    try {
-        const name = object.constructor.name
-        Object.defineProperty(object, from, {
-            value: util.deprecate(object[to], sub('%s.%s() is renamed to %s.%s()',
-                name, from, name, to)),
-            enumerable: false
-        })
-    } catch {}
-}
-
-// decorator that allows snake_case class methods to be called with camelCase and vice versa
-function _camelcase_alias (_class) {
-    for (const name of Object.getOwnPropertyNames(_class.prototype)) {
-        const camelcase = name.replace(/\w_[a-z]/g, s => s[0] + s[2].toUpperCase())
-        if (camelcase !== name) _alias(_class.prototype, camelcase, name)
-    }
-    return _class
-}
-
-function _to_legacy_name (key) {
-    key = key.replace(/\w_[a-z]/g, s => s[0] + s[2].toUpperCase())
-    if (key === 'default') key = 'defaultValue'
-    if (key === 'const') key = 'constant'
-    return key
-}
-
-function _to_new_name (key) {
-    if (key === 'defaultValue') key = 'default'
-    if (key === 'constant') key = 'const'
-    key = key.replace(/[A-Z]/g, c => '_' + c.toLowerCase())
-    return key
-}
-
 // parse options
 const no_default = Symbol('no_default_value')
 function _parse_opts (args, descriptor) {
@@ -270,55 +236,12 @@ function _parse_opts (args, descriptor) {
         kwargs = Object.assign({}, args.pop())
     }
 
-    // LEGACY (v1 compatibility): camelcase
-    const renames = []
-    for (const key of Object.keys(descriptor)) {
-        const old_name = _to_legacy_name(key)
-        if (old_name !== key && (old_name in kwargs)) {
-            if (key in kwargs) {
-                // default and defaultValue specified at the same time, happens often in old tests
-                // throw new TypeError(sub('%s() got multiple values for argument %r', get_name(), key))
-            } else {
-                kwargs[key] = kwargs[old_name]
-            }
-            renames.push([old_name, key])
-            delete kwargs[old_name]
-        }
-    }
-    if (renames.length) {
-        const name = get_name()
-        deprecate('camelcase_' + name, sub('%s(): following options are renamed: %s',
-            name, renames.map(([a, b]) => sub('%r -> %r', a, b))))
-    }
-    // end
-
     const missing_positionals = []
     const positional_count = args.length
 
     for (const [key, def] of Object.entries(descriptor)) {
         if (key[0] === '*') {
             if (key.length > 0 && key[1] === '*') {
-                // LEGACY (v1 compatibility): camelcase
-                const renames = []
-                for (const key of Object.keys(kwargs)) {
-                    const new_name = _to_new_name(key)
-                    if (new_name !== key && (key in kwargs)) {
-                        if (new_name in kwargs) {
-                            // default and defaultValue specified at the same time, happens often in old tests
-                            // throw new TypeError(sub('%s() got multiple values for argument %r', get_name(), new_name))
-                        } else {
-                            kwargs[new_name] = kwargs[key]
-                        }
-                        renames.push([key, new_name])
-                        delete kwargs[key]
-                    }
-                }
-                if (renames.length) {
-                    const name = get_name()
-                    deprecate('camelcase_' + name, sub('%s(): following options are renamed: %s',
-                        name, renames.map(([a, b]) => sub('%r -> %r', a, b))))
-                }
-                // end
                 result.push(kwargs)
                 kwargs = {}
             } else {
@@ -365,13 +288,6 @@ function _parse_opts (args, descriptor) {
 
     return result
 }
-
-const _deprecations = {}
-function deprecate (id, string) {
-    _deprecations[id] = _deprecations[id] || util.deprecate(() => {}, string)
-    _deprecations[id]()
-}
-
 
 // =============================
 // Utility functions and classes
@@ -433,7 +349,7 @@ function _copy_items (items) {
 // ===============
 // Formatting Help
 // ===============
-const HelpFormatter = _camelcase_alias(_callable(class HelpFormatter {
+const HelpFormatter = _callable(class HelpFormatter {
     /*
      *  Formatter for generating usage messages and argument help strings.
      *
@@ -955,14 +871,6 @@ const HelpFormatter = _camelcase_alias(_callable(class HelpFormatter {
             const choices_str = _choices_to_array(params.choices).map(String).join(', ')
             params.choices = choices_str
         }
-        // LEGACY (v1 compatibility): camelcase
-        for (const key of Object.keys(params)) {
-            const old_name = _to_legacy_name(key)
-            if (old_name !== key) {
-                params[old_name] = params[key]
-            }
-        }
-        // end
         return sub(this._get_help_string(action), params)
     }
 
@@ -1001,7 +909,7 @@ const HelpFormatter = _camelcase_alias(_callable(class HelpFormatter {
     _get_default_metavar_for_positional (action) {
         return action.dest
     }
-}))
+})
 
 HelpFormatter.prototype._Section = _callable(class _Section {
 
@@ -1042,7 +950,7 @@ HelpFormatter.prototype._Section = _callable(class _Section {
 })
 
 
-const RawDescriptionHelpFormatter = _camelcase_alias(_callable(class RawDescriptionHelpFormatter extends HelpFormatter {
+const RawDescriptionHelpFormatter = _callable(class RawDescriptionHelpFormatter extends HelpFormatter {
     /*
      *  Help message formatter which retains any formatting in descriptions.
      *
@@ -1053,10 +961,10 @@ const RawDescriptionHelpFormatter = _camelcase_alias(_callable(class RawDescript
     _fill_text (text, width, indent) {
         return splitlines(text, true).map(line => indent + line).join('')
     }
-}))
+})
 
 
-const RawTextHelpFormatter = _camelcase_alias(_callable(class RawTextHelpFormatter extends RawDescriptionHelpFormatter {
+const RawTextHelpFormatter = _callable(class RawTextHelpFormatter extends RawDescriptionHelpFormatter {
     /*
      *  Help message formatter which retains formatting of all help text.
      *
@@ -1067,10 +975,10 @@ const RawTextHelpFormatter = _camelcase_alias(_callable(class RawTextHelpFormatt
     _split_lines (text/*, width */) {
         return splitlines(text)
     }
-}))
+})
 
 
-const ArgumentDefaultsHelpFormatter = _camelcase_alias(_callable(class ArgumentDefaultsHelpFormatter extends HelpFormatter {
+const ArgumentDefaultsHelpFormatter = _callable(class ArgumentDefaultsHelpFormatter extends HelpFormatter {
     /*
      *  Help message formatter which adds default values to argument help.
      *
@@ -1080,8 +988,7 @@ const ArgumentDefaultsHelpFormatter = _camelcase_alias(_callable(class ArgumentD
 
     _get_help_string (action) {
         let help = action.help
-        // LEGACY (v1 compatibility): additional check for defaultValue needed
-        if (!action.help.includes('%(default)') && !action.help.includes('%(defaultValue)')) {
+        if (!action.help.includes('%(default)')) {
             if (action.default !== SUPPRESS) {
                 const defaulting_nargs = [OPTIONAL, ZERO_OR_MORE]
                 if (action.option_strings.length || defaulting_nargs.includes(action.nargs)) {
@@ -1091,10 +998,10 @@ const ArgumentDefaultsHelpFormatter = _camelcase_alias(_callable(class ArgumentD
         }
         return help
     }
-}))
+})
 
 
-const MetavarTypeHelpFormatter = _camelcase_alias(_callable(class MetavarTypeHelpFormatter extends HelpFormatter {
+const MetavarTypeHelpFormatter = _callable(class MetavarTypeHelpFormatter extends HelpFormatter {
     /*
      *  Help message formatter which uses the argument 'type' as the default
      *  metavar value (instead of the argument 'dest')
@@ -1110,7 +1017,7 @@ const MetavarTypeHelpFormatter = _camelcase_alias(_callable(class MetavarTypeHel
     _get_default_metavar_for_positional (action) {
         return typeof action.type === 'function' ? action.type.name : action.type
     }
-}))
+})
 
 
 // =====================
@@ -1175,7 +1082,7 @@ const ArgumentTypeError = _callable(class ArgumentTypeError extends Error {
 // ==============
 // Action classes
 // ==============
-const Action = _camelcase_alias(_callable(class Action extends _AttributeHolder(Function) {
+const Action = _callable(class Action extends _AttributeHolder(Function) {
     /*
      *  Information about how to convert command line strings to Python objects.
      *
@@ -1289,10 +1196,10 @@ const Action = _camelcase_alias(_callable(class Action extends _AttributeHolder(
     call (/* parser, namespace, values, option_string = undefined */) {
         throw new Error('.call() not defined')
     }
-}))
+})
 
 
-const BooleanOptionalAction = _camelcase_alias(_callable(class BooleanOptionalAction extends Action {
+const BooleanOptionalAction = _callable(class BooleanOptionalAction extends Action {
 
     constructor () {
         let [
@@ -1351,7 +1258,7 @@ const BooleanOptionalAction = _camelcase_alias(_callable(class BooleanOptionalAc
     format_usage () {
         return this.option_strings.join(' | ')
     }
-}))
+})
 
 
 const _StoreAction = _callable(class _StoreAction extends Action {
@@ -1713,7 +1620,7 @@ const _VersionAction = _callable(class _VersionAction extends Action {
 })
 
 
-const _SubParsersAction = _camelcase_alias(_callable(class _SubParsersAction extends Action {
+const _SubParsersAction = _callable(class _SubParsersAction extends Action {
 
     constructor () {
         const [
@@ -1830,7 +1737,7 @@ const _SubParsersAction = _camelcase_alias(_callable(class _SubParsersAction ext
             getattr(namespace, _UNRECOGNIZED_ARGS_ATTR).push(...arg_strings)
         }
     }
-}))
+})
 
 
 _SubParsersAction.prototype._ChoicesPseudoAction = _callable(class _ChoicesPseudoAction extends Action {
@@ -1993,7 +1900,7 @@ const Namespace = _callable(class Namespace extends _AttributeHolder() {
 Namespace.prototype[Symbol.toStringTag] = undefined
 
 
-const _ActionsContainer = _camelcase_alias(_callable(class _ActionsContainer {
+const _ActionsContainer = _callable(class _ActionsContainer {
 
     constructor () {
         const [
@@ -2029,14 +1936,6 @@ const _ActionsContainer = _camelcase_alias(_callable(class _ActionsContainer {
         this.register('action', 'version', _VersionAction)
         this.register('action', 'parsers', _SubParsersAction)
         this.register('action', 'extend', _ExtendAction)
-        // LEGACY (v1 compatibility): camelcase variants
-        ;['storeConst', 'storeTrue', 'storeFalse', 'appendConst'].forEach(old_name => {
-            const new_name = _to_new_name(old_name)
-            this.register('action', old_name, util.deprecate(this._registry_get('action', new_name),
-                sub('{action: "%s"} is renamed to {action: "%s"}', old_name, new_name)))
-        })
-        // end
-
         // raise an exception if the conflict handler is invalid
         this._get_handler()
 
@@ -2111,16 +2010,12 @@ const _ActionsContainer = _camelcase_alias(_callable(class _ActionsContainer {
             '*args': no_default,
             '**kwargs': no_default
         })
-        // LEGACY (v1 compatibility), old-style add_argument([ args ], { options })
-        if (args.length === 1 && Array.isArray(args[0])) {
-            args = args[0]
-            deprecate('argument-array',
-                sub('use add_argument(%(args)s, {...}) instead of add_argument([ %(args)s ], { ... })', {
-                    args: args.map(repr).join(', ')
-                }))
+        // argparse v1 accepted an array of argument names here. Python argparse
+        // accepts only individual string names and rejects a list; reject it
+        // explicitly because JS would otherwise coerce the array to a string.
+        if (args.some(arg => typeof arg !== 'string')) {
+            throw new TypeError('argument name must be a string')
         }
-        // end
-
         // if no positional args are supplied or only one is supplied and
         // it doesn't look like an option string, parse a positional
         // argument
@@ -2415,7 +2310,7 @@ const _ActionsContainer = _camelcase_alias(_callable(class _ActionsContainer {
             }
         }
     }
-}))
+})
 
 
 const _ArgumentGroup = _callable(class _ArgumentGroup extends _ActionsContainer {
@@ -2499,7 +2394,7 @@ const _MutuallyExclusiveGroup = _callable(class _MutuallyExclusiveGroup extends 
 })
 
 
-const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _AttributeHolder(_ActionsContainer) {
+const ArgumentParser = _callable(class ArgumentParser extends _AttributeHolder(_ActionsContainer) {
     /*
      *  Object for parsing command line strings into Python objects.
      *
@@ -2535,9 +2430,7 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
             conflict_handler,
             add_help,
             allow_abbrev,
-            exit_on_error,
-            debug, // LEGACY (v1 compatibility), debug mode
-            version // LEGACY (v1 compatibility), version
+            exit_on_error
         ] = _parse_opts(arguments, {
             prog: undefined,
             usage: undefined,
@@ -2551,26 +2444,8 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
             conflict_handler: 'error',
             add_help: true,
             allow_abbrev: true,
-            exit_on_error: true,
-            debug: undefined, // LEGACY (v1 compatibility), debug mode
-            version: undefined // LEGACY (v1 compatibility), version
+            exit_on_error: true
         })
-
-        // LEGACY (v1 compatibility)
-        if (debug !== undefined) {
-            deprecate('debug',
-                'The "debug" argument to ArgumentParser is deprecated. Please ' +
-                'override ArgumentParser.exit function instead.'
-            )
-        }
-
-        if (version !== undefined) {
-            deprecate('version',
-                'The "version" argument to ArgumentParser is deprecated. Please use ' +
-                "add_argument(..., { action: 'version', version: 'N', ... }) instead."
-            )
-        }
-        // end
 
         super({
             description,
@@ -2592,9 +2467,6 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
         this.add_help = add_help
         this.allow_abbrev = allow_abbrev
         this.exit_on_error = exit_on_error
-        // LEGACY (v1 compatibility), debug mode
-        this.debug = debug
-        // end
 
         this._positionals = this.add_argument_group('positional arguments')
         this._optionals = this.add_argument_group('optional arguments')
@@ -2622,10 +2494,6 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
             return result
         })
         this.register('type', 'str', String)
-        // LEGACY (v1 compatibility): custom types
-        this.register('type', 'string',
-            util.deprecate(String, 'use {type:"str"} or {type:String} instead of {type:"string"}'))
-        // end
 
         // add help argument if necessary
         // (using explicit default to override global argument_default)
@@ -2641,21 +2509,6 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
                 }
             )
         }
-        // LEGACY (v1 compatibility), version
-        if (version) {
-            this.add_argument(
-                default_prefix + 'v',
-                default_prefix.repeat(2) + 'version',
-                {
-                    action: 'version',
-                    default: SUPPRESS,
-                    version: this.version,
-                    help: "show program's version number and exit"
-                }
-            )
-        }
-        // end
-
         // add parent arguments and defaults
         for (const parent of parents) {
             this._add_container_actions(parent)
@@ -3650,14 +3503,11 @@ const ArgumentParser = _camelcase_alias(_callable(class ArgumentParser extends _
          *  should either exit or raise an exception.
          */
 
-        // LEGACY (v1 compatibility), debug mode
-        if (this.debug === true) throw new Error(message)
-        // end
         this.print_usage(process.stderr)
         const args = {prog: this.prog, message}
         this.exit(2, sub('%(prog)s: error: %(message)s\n', args))
     }
-}))
+})
 
 
 module.exports = {
@@ -3680,29 +3530,3 @@ module.exports = {
     SUPPRESS,
     ZERO_OR_MORE
 }
-
-// LEGACY (v1 compatibility), Const alias
-Object.defineProperty(module.exports, 'Const', {
-    get () {
-        const result = {}
-        Object.entries({ ONE_OR_MORE, OPTIONAL, PARSER, REMAINDER, SUPPRESS, ZERO_OR_MORE }).forEach(([n, v]) => {
-            Object.defineProperty(result, n, {
-                get () {
-                    deprecate(n, sub('use argparse.%s instead of argparse.Const.%s', n, n))
-                    return v
-                }
-            })
-        })
-        Object.entries({ _UNRECOGNIZED_ARGS_ATTR }).forEach(([n, v]) => {
-            Object.defineProperty(result, n, {
-                get () {
-                    deprecate(n, sub('argparse.Const.%s is an internal symbol and will no longer be available', n))
-                    return v
-                }
-            })
-        })
-        return result
-    },
-    enumerable: false
-})
-// end
