@@ -2370,10 +2370,28 @@ class WFile {
     }
 
     test_modified_invalid_action () {
-        const parser = new ErrorRaisingArgumentParser()
+        const parser = argparse.ArgumentParser({ exit_on_error: false })
         const action = parser.add_argument('--foo')
         action.type = 1
-        this.assertRaises(ArgumentParserError, () => parser.parse_args(['--foo', 'bar']))
+        let cm = this.assertRaises(TypeError, () => parser.parse_args(['--foo', 'bar']))
+        this.assertRegex(String(cm.exception), /1 is not callable/)
+        action.type = []
+        cm = this.assertRaises(TypeError, () => parser.parse_args(['--foo', 'bar']))
+        this.assertRegex(String(cm.exception), /\[\] is not callable/)
+        // It is impossible to distinguish a TypeError raised due to a mismatch
+        // of the required function arguments from a TypeError raised for an incorrect
+        // argument value, and using the heavy inspection machinery is not worthwhile
+        // as it does not reliably work in all cases.
+        // Therefore, a generic ArgumentError is raised to handle this logical error.
+        function pow (a, b) {
+            if (b === undefined) throw new TypeError('missing argument')
+            return Math.pow(a, b)
+        }
+        action.type = pow
+        cm = this.assertRaises(argparse.ArgumentError, () =>
+            parser.parse_args(['--foo', 'bar']))
+        this.assertRegex(String(cm.exception),
+            /argument --foo: invalid pow value: 'bar'/)
     }
 }).run()
 
@@ -2528,7 +2546,7 @@ class WFile {
             subparsers_kwargs.help = 'command help'
         }
         const subparsers = parser.add_subparsers(subparsers_kwargs)
-        const cm = this.assertRaises(argparse.ArgumentError, () => parser.add_subparsers())
+        const cm = this.assertRaises(TypeError, () => parser.add_subparsers())
         this.assertRegex(cm.exception.message, /cannot have multiple subparser arguments/)
 
         // add first sub-parser
@@ -5938,17 +5956,24 @@ VV VV VV
     }
 
     test_invalid_option_strings () {
-        this.assertValueError('--')
-        this.assertValueError('---')
+        this.assertTypeError('-', { errmsg: 'dest= is required' })
+        this.assertTypeError('--', { errmsg: 'dest= is required' })
+        this.assertTypeError('---', { errmsg: 'dest= is required' })
     }
 
     test_invalid_prefix () {
-        this.assertValueError('--foo', '+foo')
+        this.assertValueError('--foo', '+foo', {
+            errmsg: 'must start with a character'
+        })
     }
 
     test_invalid_type () {
-        this.assertValueError('--foo', { type: 'Number' })
-        this.assertValueError('--foo', { type: [Number, Number] })
+        this.assertTypeError('--foo', {
+            type: 'Number', errmsg: "'Number' is not callable"
+        })
+        this.assertTypeError('--foo', {
+            type: [Number, Number], errmsg: 'is not callable'
+        })
     }
 
     test_version_missing_params () {
@@ -5956,9 +5981,11 @@ VV VV VV
     }
 
     test_invalid_action () {
-        this.assertValueError('-x', { action: 'foo' })
-        this.assertValueError('foo', { action: 'baz' })
-        this.assertValueError('--foo', { action: ['store', 'append'] })
+        this.assertValueError('-x', { action: 'foo', errmsg: 'unknown action' })
+        this.assertValueError('foo', { action: 'baz', errmsg: 'unknown action' })
+        this.assertValueError('--foo', {
+            action: ['store', 'append'], errmsg: 'unknown action'
+        })
         this.assertValueError('--foo', { action: 'store-true', errmsg: 'unknown action' })
     }
 
@@ -6160,14 +6187,16 @@ VV VV VV
         const parser = argparse.ArgumentParser()
         const sp = parser.add_subparsers()
         sp.add_parser('fullname', { aliases: ['alias'] })
-        this.assertRaises(argparse.ArgumentError,
-                          () => sp.add_parser('fullname'))
-        this.assertRaises(argparse.ArgumentError,
-                          () => sp.add_parser('alias'))
-        this.assertRaises(argparse.ArgumentError,
-                          () => sp.add_parser('other', { aliases: ['fullname'] }))
-        this.assertRaises(argparse.ArgumentError,
-                          () => sp.add_parser('other', { aliases: ['alias'] }))
+        let cm = this.assertRaises(TypeError, () => sp.add_parser('fullname'))
+        this.assertRegex(String(cm.exception), /conflicting subparser: fullname/)
+        cm = this.assertRaises(TypeError, () => sp.add_parser('alias'))
+        this.assertRegex(String(cm.exception), /conflicting subparser: alias/)
+        cm = this.assertRaises(TypeError, () =>
+            sp.add_parser('other', { aliases: ['fullname'] }))
+        this.assertRegex(String(cm.exception), /conflicting subparser alias: fullname/)
+        cm = this.assertRaises(TypeError, () =>
+            sp.add_parser('other', { aliases: ['alias'] }))
+        this.assertRegex(String(cm.exception), /conflicting subparser alias: alias/)
     }
 }).run()
 
