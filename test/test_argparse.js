@@ -5754,6 +5754,21 @@ VV VV VV
         args = parser.parse_args(['a', '--', 'b', '--', 'c'])
         this.assertEqual(NS({ foo: 'a', bar: ['b', '--', 'c'] }), args)
     }
+
+    test_subparser_after_multiple_argument_option () {
+        const parser = argparse.ArgumentParser({ exit_on_error: false })
+        parser.add_argument('--foo', { nargs: '*' })
+        const subparsers = parser.add_subparsers()
+        const parser1 = subparsers.add_parser('run')
+        parser1.add_argument('-f')
+        parser1.add_argument('bar', { nargs: '*' })
+
+        const args = parser.parse_args(['--foo', 'x', 'y', '--', 'run', 'a', 'b', '-f', 'c'])
+        this.assertEqual(NS({ foo: ['x', 'y'], f: 'c', bar: ['a', 'b'] }), args)
+        const cm = this.assertRaises(argparse.ArgumentError,
+            () => parser.parse_args(['--foo', 'x', '--', '--', 'run', 'a', 'b']))
+        this.assertRegex(cm.exception.message, /invalid choice: '--'/)
+    }
 }).run()
 
 // ===========================
