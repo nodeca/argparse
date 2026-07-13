@@ -1629,6 +1629,19 @@ class ParserTestCase extends TestCase {
     ]
 }).run()
 
+;(new class TestPositionalsActionExtend extends ParserTestCase {
+    /* Test the 'extend' action */
+
+    argument_signatures = [
+        Sig('spam', { action: 'extend' }),
+        Sig('spam', { action: 'extend', nargs: 2 }),
+    ]
+    failures = ['', '--foo', 'a', 'a b', 'a b c d']
+    successes = [
+        ['a b c', NS({ spam: ['a', 'b', 'c'] })],
+    ]
+}).run()
+
 // ========================================
 // Combined optionals and positionals tests
 // ========================================
@@ -1664,6 +1677,32 @@ class ParserTestCase extends TestCase {
         ['a', NS({ x: 'a', y: false })],
         ['-k4', NS({ x: undefined, y: true })],
         ['-k4 a', NS({ x: 'a', y: true })],
+    ]
+}).run()
+
+;(new class TestOptionalsAndPositionalsAppend extends ParserTestCase {
+    argument_signatures = [
+        Sig('foo', { nargs: '*', action: 'append' }),
+        Sig('--bar'),
+    ]
+    failures = ['-foo']
+    successes = [
+        ['a b', NS({ foo: [['a', 'b']], bar: undefined })],
+        ['--bar a b', NS({ foo: [['b']], bar: 'a' })],
+        ['a b --bar c', NS({ foo: [['a', 'b']], bar: 'c' })],
+    ]
+}).run()
+
+;(new class TestOptionalsAndPositionalsExtend extends ParserTestCase {
+    argument_signatures = [
+        Sig('foo', { nargs: '*', action: 'extend' }),
+        Sig('--bar'),
+    ]
+    failures = ['-foo']
+    successes = [
+        ['a b', NS({ foo: ['a', 'b'], bar: undefined })],
+        ['--bar a b', NS({ foo: ['b'], bar: 'a' })],
+        ['a b --bar c', NS({ foo: ['a', 'b'], bar: 'c' })],
     ]
 }).run()
 
@@ -2052,6 +2091,12 @@ class WFile {
     ]
 }).run()
 
+;(new class TestFileTypeInvalid extends TestCase {
+    test_invalid_file_type () {
+        this.assertRaises(TypeError, () => argparse.FileType('b')('-test'))
+    }
+}).run()
+
 
 ;(new class TestFileTypeMissingInitialization extends TestCase {
     /*
@@ -2267,6 +2312,25 @@ class WFile {
     successes = [
         ['--foo f1 --foo f2 f3 f4', NS({ foo: ['f1', 'f2', 'f3', 'f4'] })],
     ]
+}).run()
+
+;(new class TestInvalidAction extends TestCase {
+    /* Test invalid user defined Action */
+
+    ActionWithoutCall = class ActionWithoutCall extends argparse.Action {}
+
+    test_invalid_type () {
+        const parser = argparse.ArgumentParser()
+        parser.add_argument('--foo', { action: this.ActionWithoutCall })
+        this.assertRaises(Error, () => parser.parse_args(['--foo', 'bar']))
+    }
+
+    test_modified_invalid_action () {
+        const parser = new ErrorRaisingArgumentParser()
+        const action = parser.add_argument('--foo')
+        action.type = 1
+        this.assertRaises(ArgumentParserError, () => parser.parse_args(['--foo', 'bar']))
+    }
 }).run()
 
 
@@ -3110,6 +3174,10 @@ class WFile {
               -w W
               -x X
         `, progname, progname ? ' ' : '')))
+    }
+
+    test_wrong_type_parents () {
+        this.assertRaises(TypeError, () => new ErrorRaisingArgumentParser({ parents: [1] }))
     }
 
     test_mutex_groups_parents () {
@@ -5649,9 +5717,17 @@ VV VV VV
         this.assertValueError('---')
     }
 
+    test_invalid_prefix () {
+        this.assertValueError('--foo', '+foo')
+    }
+
     test_invalid_type () {
         this.assertValueError('--foo', { type: 'Number' })
         this.assertValueError('--foo', { type: [Number, Number] })
+    }
+
+    test_version_missing_params () {
+        this.assertTypeError('command', { action: 'version' })
     }
 
 /*
@@ -6472,6 +6548,11 @@ VV VV VV
         this.assertRegex(cm.exception.message,
                          /argument badger: not allowed with argument --foo/)
         this.assertEqual(group.required, true)
+    }
+
+    test_invalid_args () {
+        const parser = new ErrorRaisingArgumentParser({ prog: 'PROG' })
+        this.assertRaises(ArgumentParserError, () => parser.parse_intermixed_args(['a']))
     }
 }).run()
 
