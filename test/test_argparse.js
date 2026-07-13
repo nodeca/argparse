@@ -3307,12 +3307,12 @@ class TestMutuallyExclusiveLong extends MEMixin_TestCase {
     ]
 
     usage_when_not_required = `\
-    usage: PROG [-h] [--abcde ABCDE] [--fghij FGHIJ]
-                [--klmno KLMNO | --pqrst PQRST]
+    usage: PROG [-h] [--abcde ABCDE] [--fghij FGHIJ] [--klmno KLMNO |
+                --pqrst PQRST]
     `
     usage_when_required = `\
-    usage: PROG [-h] [--abcde ABCDE] [--fghij FGHIJ]
-                (--klmno KLMNO | --pqrst PQRST)
+    usage: PROG [-h] [--abcde ABCDE] [--fghij FGHIJ] (--klmno KLMNO |
+                --pqrst PQRST)
     `
     help = `\
 
@@ -4868,6 +4868,25 @@ VV VV VV
         const usage = textwrap.dedent(`\
         usage: PROG [-h] [--spam SPAM | [--hax HAX | --hex HEX] | --eggs EGGS]
                     [--num NUM]
+        `)
+        this.assertEqual(parser.format_usage(), usage)
+    }
+
+    test_long_mutex_groups_wrap () {
+        const parser = argparse.ArgumentParser({ prog: 'PROG' })
+        const g = parser.add_mutually_exclusive_group()
+        g.add_argument('--op1', { metavar: 'MET', nargs: '?' })
+        g.add_argument('--op2', { metavar: ['MET1', 'MET2'], nargs: '*' })
+        g.add_argument('--op3', { nargs: '*' })
+        g.add_argument('--op4', { metavar: ['MET1', 'MET2'], nargs: '+' })
+        g.add_argument('--op5', { nargs: '+' })
+        g.add_argument('--op6', { nargs: 3 })
+        g.add_argument('--op7', { metavar: ['MET1', 'MET2', 'MET3'], nargs: 3 })
+
+        const usage = textwrap.dedent(`\
+        usage: PROG [-h] [--op1 [MET] | --op2 [MET1 [MET2 ...]] | --op3 [OP3 ...] |
+                    --op4 MET1 [MET2 ...] | --op5 OP5 [OP5 ...] | --op6 OP6 OP6 OP6 |
+                    --op7 MET1 MET2 MET3]
         `)
         this.assertEqual(parser.format_usage(), usage)
     }
