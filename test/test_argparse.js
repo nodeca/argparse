@@ -1904,7 +1904,7 @@ const TempDirMixin_ParserTestCase = TempDirMixin(ParserTestCase)
     setUp () {
         super.setUp()
         const file_texts = [
-            ['hello', 'hello world!\n'],
+            ['hello', this.hello + '\n'],
             ['recursive', '-a\n' +
                           'A\n' +
                           '@hello'],
@@ -1922,13 +1922,14 @@ const TempDirMixin_ParserTestCase = TempDirMixin(ParserTestCase)
         Sig('y', { nargs: '+' }),
     ]
     failures = ['', '-b', 'X', '@invalid', '@missing']
+    hello = 'hello world!é'
     successes = [
         ['X Y', NS({ a: undefined, x: 'X', y: ['Y'] })],
         ['X -a A Y Z', NS({ a: 'A', x: 'X', y: ['Y', 'Z'] })],
-        ['@hello X', NS({ a: undefined, x: 'hello world!', y: ['X'] })],
-        ['X @hello', NS({ a: undefined, x: 'X', y: ['hello world!'] })],
-        ['-a B @recursive Y Z', NS({ a: 'A', x: 'hello world!', y: ['Y', 'Z'] })],
-        ['X @recursive Z -a B', NS({ a: 'B', x: 'X', y: ['hello world!', 'Z'] })],
+        ['@hello X', NS({ a: undefined, x: this.hello, y: ['X'] })],
+        ['X @hello', NS({ a: undefined, x: 'X', y: [this.hello] })],
+        ['-a B @recursive Y Z', NS({ a: 'A', x: this.hello, y: ['Y', 'Z'] })],
+        ['X @recursive Z -a B', NS({ a: 'B', x: 'X', y: [this.hello, 'Z'] })],
         [["-a", "", "X", "Y"], NS({ a: '', x: 'X', y: ['Y'] })],
     ]
 }).run()
