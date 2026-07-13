@@ -7224,11 +7224,27 @@ VV VV VV
     test_ambiguous_option () {
         this.parser.add_argument('--foobaz')
         this.parser.add_argument('--fooble', { action: 'store_true' })
-        const cm = this.assertRaises(argparse.ArgumentError, () => {
+        this.parser.add_argument('--foogle')
+        let cm = this.assertRaises(argparse.ArgumentError, () => {
             this.parser.parse_args(['--foob'])
         })
         this.assertRegex(cm.exception.message,
                          /ambiguous option: --foob could match --foobaz, --fooble/)
+        cm = this.assertRaises(argparse.ArgumentError, () => {
+            this.parser.parse_args(['--foob=1'])
+        })
+        this.assertRegex(cm.exception.message,
+                         /ambiguous option: --foob=1 could match --foobaz, --fooble$/)
+        cm = this.assertRaises(argparse.ArgumentError, () => {
+            this.parser.parse_args(['--foob', '1', '--foogle', '2'])
+        })
+        this.assertRegex(cm.exception.message,
+                         /ambiguous option: --foob could match --foobaz, --fooble$/)
+        cm = this.assertRaises(argparse.ArgumentError, () => {
+            this.parser.parse_args(['--foob=1', '--foogle', '2'])
+        })
+        this.assertRegex(cm.exception.message,
+                         /ambiguous option: --foob=1 could match --foobaz, --fooble$/)
     }
 
     test_os_error () {
