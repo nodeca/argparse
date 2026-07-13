@@ -799,7 +799,7 @@ class ParserTestCase extends TestCase {
     argument_signatures = [
         Sig('-f', { choices: 'abc' }),
         Sig('-g', { type: 'int', choices: Array(5).fill(0).map((x, i) => i) })]
-    failures = ['a', '-f d', '-fad', '-ga', '-g 6']
+    failures = ['a', '-f d', '-f ab', '-fad', '-ga', '-g 6']
     successes = [
         ['', NS({ f: undefined, g: undefined })],
         ['-f a', NS({ f: 'a', g: undefined })],
@@ -2246,7 +2246,7 @@ class WFile {
         }
         const parser1 = subparsers.add_parser('1', parser1_kwargs)
         parser1.add_argument('-w', { type: 'int', help: 'w help' })
-        parser1.add_argument('x', { choices: 'abc', help: 'x help' })
+        parser1.add_argument('x', { choices: ['a', 'b', 'c'], help: 'x help' })
 
         // add second sub-parser
         const parser2_kwargs = { description: '2 description' }
@@ -2254,7 +2254,7 @@ class WFile {
             parser2_kwargs.help = '2 help'
         }
         const parser2 = subparsers.add_parser('2', parser2_kwargs)
-        parser2.add_argument('-y', { choices: '123', help: 'y help' })
+        parser2.add_argument('-y', { choices: ['1', '2', '3'], help: 'y help' })
         parser2.add_argument('z', { type: 'str', nargs: '*', help: 'z help' })
 
         // add third sub-parser
@@ -4403,7 +4403,7 @@ VV VV VV
             help: 'x %(prog)s %(default)s %(type)s %%' }),
         Sig('-y', { action: 'store_const', default: 42, const: 'XXX',
             help: 'y %(prog)s %(default)s %(const)s' }),
-        Sig('--foo', { choices: 'abc',
+        Sig('--foo', { choices: ['a', 'b', 'c'],
             help: 'foo %(prog)s %(default)s %(choices)s' }),
         Sig('--bar', { default: 'baz', choices: [1, 2], metavar: 'BBB',
             help: 'bar %(prog)s %(default)s %(dest)s' }),
@@ -5048,7 +5048,7 @@ VV VV VV
         for action in ['store_const', 'store_true', 'store_false',
                        'append_const', 'count']:
             for attrs in [dict(type=int), dict(nargs='+'),
-                          dict(choices='ab')]:
+                          dict(choices=['a', 'b'])]:
                 this.assertTypeError('-x', action=action, **attrs)
     }
 
