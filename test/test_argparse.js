@@ -2830,6 +2830,13 @@ class TestMutuallyExclusiveGroupErrors extends TestCase {
               `
         this.assertEqual(parser.format_help(), textwrap.dedent(expected))
     }
+
+    test_empty_group () {
+        // See issue 26952
+        const parser = argparse.ArgumentParser()
+        parser.add_mutually_exclusive_group()
+        this.assertRaises(TypeError, () => parser.parse_args(['-h']))
+    }
 }
 
 function MEMixin (cls) {
