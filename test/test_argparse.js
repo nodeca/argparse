@@ -884,6 +884,26 @@ class ParserTestCase extends TestCase {
 }).run()
 
 
+;(new class TestConstActionsMissingConstKwarg extends ParserTestCase {
+    /* Tests that const gets default value of undefined when not provided */
+
+    argument_signatures = [
+        Sig('-f', { action: 'append_const' }),
+        Sig('--foo', { action: 'append_const' }),
+        Sig('-b', { action: 'store_const' }),
+        Sig('--bar', { action: 'store_const' }),
+    ]
+    failures = ['-f v', '--foo=bar', '--foo bar']
+    successes = [
+        ['', NS({ f: undefined, foo: undefined, b: undefined, bar: undefined })],
+        ['-f', NS({ f: [undefined], foo: undefined, b: undefined, bar: undefined })],
+        ['--foo', NS({ f: undefined, foo: [undefined], b: undefined, bar: undefined })],
+        ['-b', NS({ f: undefined, foo: undefined, b: undefined, bar: undefined })],
+        ['--bar', NS({ f: undefined, foo: undefined, b: undefined, bar: undefined })],
+    ]
+}).run()
+
+
 ;(new class TestOptionalsActionAppendConst extends ParserTestCase {
     /* Tests the append_const action for an Optional */
 
