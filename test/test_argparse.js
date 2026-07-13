@@ -203,254 +203,6 @@ class TestCase extends JSTestCase {
 }).run()
 
 
-// ===========
-// Color tests
-// ===========
-
-;(new class TestColorized extends TestCase {
-    setUp () {
-        super.setUp()
-        this.can_colorize = _colorize.can_colorize
-        _colorize.can_colorize = () => true
-        this.theme = _colorize.get_theme({ force_color: true }).argparse
-    }
-
-    tearDown () {
-        _colorize.can_colorize = this.can_colorize
-    }
-
-    test_argparse_color () {
-        const parser = argparse.ArgumentParser({
-            color: true,
-            description: 'Colorful help',
-            formatter_class: argparse.ArgumentDefaultsHelpFormatter,
-            prefix_chars: '-+',
-            prog: 'PROG'
-        })
-        const group = parser.add_mutually_exclusive_group()
-        group.add_argument('-v', '--verbose', { action: 'store_true', help: 'more spam' })
-        group.add_argument('-q', '--quiet', { action: 'store_true', help: 'less spam' })
-        parser.add_argument('x', { type: 'int', help: 'the base' })
-        parser.add_argument('y', { type: 'int', help: 'the exponent', deprecated: true })
-        parser.add_argument('this_indeed_is_a_very_long_action_name', {
-            type: 'int',
-            help: 'the exponent'
-        })
-        parser.add_argument('-o', '--optional1', { action: 'store_true', deprecated: true })
-        parser.add_argument('--optional2', { help: 'pick one' })
-        parser.add_argument('--optional3', { choices: ['X', 'Y', 'Z'] })
-        parser.add_argument('--optional4', { choices: ['X', 'Y', 'Z'], help: 'pick one' })
-        parser.add_argument('--optional5', { choices: ['X', 'Y', 'Z'], help: 'pick one' })
-        parser.add_argument('--optional6', { choices: ['X', 'Y', 'Z'], help: 'pick one' })
-        parser.add_argument('-p', '--optional7', {
-            choices: ['Aaaaa', 'Bbbbb', 'Ccccc', 'Ddddd'],
-            help: 'pick one'
-        })
-        parser.add_argument('+f')
-        parser.add_argument('++bar')
-        parser.add_argument('-+baz')
-        parser.add_argument('-c', '--count')
-
-        const subparsers = parser.add_subparsers({
-            title: 'subcommands',
-            description: 'valid subcommands',
-            help: 'additional help'
-        })
-        subparsers.add_parser('sub1', { deprecated: true, help: 'sub1 help' })
-        const sub2 = subparsers.add_parser('sub2', { deprecated: true, help: 'sub2 help' })
-        sub2.add_argument('--baz', { choices: ['X', 'Y', 'Z'], help: 'baz help' })
-
-        const {
-            prog,
-            heading,
-            summary_long_option: long,
-            summary_short_option: short,
-            summary_label: label,
-            summary_action: pos,
-            long_option: long_b,
-            short_option: short_b,
-            label: label_b,
-            action: pos_b,
-            reset
-        } = this.theme
-
-        this.assertEqual(textwrap.dedent(`\
-            ${heading}usage: ${reset}${prog}PROG${reset} [${short}-h${reset}] [${short}-v${reset} | ${short}-q${reset}] [${short}-o${reset}] [${long}--optional2 ${label}OPTIONAL2${reset}] [${long}--optional3 ${label}{X,Y,Z}${reset}]
-                        [${long}--optional4 ${label}{X,Y,Z}${reset}] [${long}--optional5 ${label}{X,Y,Z}${reset}] [${long}--optional6 ${label}{X,Y,Z}${reset}]
-                        [${short}-p ${label}{Aaaaa,Bbbbb,Ccccc,Ddddd}${reset}] [${short}+f ${label}F${reset}] [${long}++bar ${label}BAR${reset}] [${long}-+baz ${label}BAZ${reset}]
-                        [${short}-c ${label}COUNT${reset}]
-                        ${pos}x${reset} ${pos}y${reset} ${pos}this_indeed_is_a_very_long_action_name${reset} ${pos}{sub1,sub2} ...${reset}
-
-            Colorful help
-
-            ${heading}positional arguments:${reset}
-              ${pos_b}x${reset}                     the base
-              ${pos_b}y${reset}                     the exponent
-              ${pos_b}this_indeed_is_a_very_long_action_name${reset}
-                                    the exponent
-
-            ${heading}options:${reset}
-              ${short_b}-h${reset}, ${long_b}--help${reset}            show this help message and exit
-              ${short_b}-v${reset}, ${long_b}--verbose${reset}         more spam (default: false)
-              ${short_b}-q${reset}, ${long_b}--quiet${reset}           less spam (default: false)
-              ${short_b}-o${reset}, ${long_b}--optional1${reset}
-              ${long_b}--optional2${reset} ${label_b}OPTIONAL2${reset}
-                                    pick one (default: undefined)
-              ${long_b}--optional3${reset} ${label_b}{X,Y,Z}${reset}
-              ${long_b}--optional4${reset} ${label_b}{X,Y,Z}${reset}   pick one (default: undefined)
-              ${long_b}--optional5${reset} ${label_b}{X,Y,Z}${reset}   pick one (default: undefined)
-              ${long_b}--optional6${reset} ${label_b}{X,Y,Z}${reset}   pick one (default: undefined)
-              ${short_b}-p${reset}, ${long_b}--optional7${reset} ${label_b}{Aaaaa,Bbbbb,Ccccc,Ddddd}${reset}
-                                    pick one (default: undefined)
-              ${short_b}+f${reset} ${label_b}F${reset}
-              ${long_b}++bar${reset} ${label_b}BAR${reset}
-              ${long_b}-+baz${reset} ${label_b}BAZ${reset}
-              ${short_b}-c${reset}, ${long_b}--count${reset} ${label_b}COUNT${reset}
-
-            ${heading}subcommands:${reset}
-              valid subcommands
-
-              ${pos_b}{sub1,sub2}${reset}           additional help
-                ${pos_b}sub1${reset}                sub1 help
-                ${pos_b}sub2${reset}                sub2 help
-        `), parser.format_help())
-    }
-
-    test_argparse_color_mutually_exclusive_group_usage () {
-        const parser = argparse.ArgumentParser({ color: true, prog: 'PROG' })
-        const group = parser.add_mutually_exclusive_group()
-        group.add_argument('--foo', { action: 'store_true', help: 'FOO' })
-        group.add_argument('--spam', { help: 'SPAM' })
-        group.add_argument('badger', { nargs: '*', help: 'BADGER' })
-
-        const {
-            prog,
-            heading,
-            summary_long_option: long,
-            summary_short_option: short,
-            summary_label: label,
-            summary_action: pos,
-            reset
-        } = this.theme
-
-        this.assertEqual(
-            `${heading}usage: ${reset}${prog}PROG${reset} [${short}-h${reset}] ` +
-            `[${long}--foo${reset} | ${long}--spam ${label}SPAM${reset} | ` +
-            `${pos}badger ...${reset}]\n`,
-            parser.format_usage()
-        )
-    }
-
-    test_argparse_color_custom_usage () {
-        const parser = argparse.ArgumentParser({
-            add_help: false,
-            color: true,
-            description: 'Test prog and usage colors',
-            prog: 'PROG',
-            usage: '[prefix] %(prog)s [suffix]'
-        })
-        const { heading, prog, prog_extra: usage, reset } = this.theme
-
-        this.assertEqual(textwrap.dedent(`\
-            ${heading}usage: ${reset}${usage}[prefix] ${prog}PROG${reset}${usage} [suffix]${reset}
-
-            Test prog and usage colors
-        `), parser.format_help())
-    }
-
-    test_custom_formatter_function () {
-        function custom_formatter (options) {
-            return argparse.RawTextHelpFormatter({ ...options, indent_increment: 5 })
-        }
-
-        const parser = argparse.ArgumentParser({
-            prog: 'PROG',
-            prefix_chars: '-+',
-            formatter_class: custom_formatter,
-            color: true
-        })
-        parser.add_argument('+f', '++foo', { help: 'foo help' })
-        parser.add_argument('spam', { help: 'spam help' })
-
-        const {
-            prog,
-            heading,
-            summary_short_option: short,
-            summary_label: label,
-            summary_action: pos,
-            long_option: long_b,
-            short_option: short_b,
-            label: label_b,
-            action: pos_b,
-            reset
-        } = this.theme
-
-        this.assertEqual(textwrap.dedent(`\
-            ${heading}usage: ${reset}${prog}PROG${reset} [${short}-h${reset}] [${short}+f ${label}FOO${reset}] ${pos}spam${reset}
-
-            ${heading}positional arguments:${reset}
-                 ${pos_b}spam${reset}           spam help
-
-            ${heading}options:${reset}
-                 ${short_b}-h${reset}, ${long_b}--help${reset}     show this help message and exit
-                 ${short_b}+f${reset}, ${long_b}++foo${reset} ${label_b}FOO${reset}  foo help
-        `), parser.format_help())
-    }
-
-    test_custom_formatter_class () {
-        class CustomFormatter extends argparse.RawTextHelpFormatter {
-            constructor (options) {
-                super({ ...options, indent_increment: 5 })
-            }
-        }
-
-        const parser = argparse.ArgumentParser({
-            prog: 'PROG',
-            prefix_chars: '-+',
-            formatter_class: CustomFormatter,
-            color: true
-        })
-        parser.add_argument('+f', '++foo', { help: 'foo help' })
-        parser.add_argument('spam', { help: 'spam help' })
-
-        const {
-            prog,
-            heading,
-            summary_short_option: short,
-            summary_label: label,
-            summary_action: pos,
-            long_option: long_b,
-            short_option: short_b,
-            label: label_b,
-            action: pos_b,
-            reset
-        } = this.theme
-
-        this.assertEqual(textwrap.dedent(`\
-            ${heading}usage: ${reset}${prog}PROG${reset} [${short}-h${reset}] [${short}+f ${label}FOO${reset}] ${pos}spam${reset}
-
-            ${heading}positional arguments:${reset}
-                 ${pos_b}spam${reset}           spam help
-
-            ${heading}options:${reset}
-                 ${short_b}-h${reset}, ${long_b}--help${reset}     show this help message and exit
-                 ${short_b}+f${reset}, ${long_b}++foo${reset} ${label_b}FOO${reset}  foo help
-        `), parser.format_help())
-    }
-
-    test_subparser_prog_is_stored_without_color () {
-        const parser = argparse.ArgumentParser({ prog: 'complex', color: true })
-        const sub = parser.add_subparsers({ dest: 'command' })
-        const demo_parser = sub.add_parser('demo')
-
-        assert(!demo_parser.prog.includes('\x1b['))
-
-        demo_parser.color = false
-        assert(!demo_parser.format_help().includes('\x1b['))
-    }
-}).run()
-
-
 function TempDirMixin (cls) {
     return class TempDirMixin extends cls {
 
@@ -2679,44 +2431,6 @@ class WFile {
     ]
 }).run()
 
-;(new class TestInvalidAction extends TestCase {
-    /* Test invalid user defined Action */
-
-    ActionWithoutCall = class ActionWithoutCall extends argparse.Action {}
-
-    test_invalid_type () {
-        const parser = argparse.ArgumentParser()
-        parser.add_argument('--foo', { action: this.ActionWithoutCall })
-        this.assertRaises(Error, () => parser.parse_args(['--foo', 'bar']))
-    }
-
-    test_modified_invalid_action () {
-        const parser = argparse.ArgumentParser({ exit_on_error: false })
-        const action = parser.add_argument('--foo')
-        action.type = 1
-        let cm = this.assertRaises(TypeError, () => parser.parse_args(['--foo', 'bar']))
-        this.assertRegex(String(cm.exception), /1 is not callable/)
-        action.type = []
-        cm = this.assertRaises(TypeError, () => parser.parse_args(['--foo', 'bar']))
-        this.assertRegex(String(cm.exception), /\[\] is not callable/)
-        // It is impossible to distinguish a TypeError raised due to a mismatch
-        // of the required function arguments from a TypeError raised for an incorrect
-        // argument value, and using the heavy inspection machinery is not worthwhile
-        // as it does not reliably work in all cases.
-        // Therefore, a generic ArgumentError is raised to handle this logical error.
-        function pow (a, b) {
-            if (b === undefined) throw new TypeError('missing argument')
-            return Math.pow(a, b)
-        }
-        action.type = pow
-        cm = this.assertRaises(argparse.ArgumentError, () =>
-            parser.parse_args(['--foo', 'bar']))
-        this.assertRegex(String(cm.exception),
-            /argument --foo: invalid pow value: 'bar'/)
-    }
-}).run()
-
-
 ;(new class TestNegativeNumber extends ParserTestCase {
     /* Test parsing negative numbers */
 
@@ -2824,6 +2538,44 @@ class WFile {
             parser.parse_args(['3']))
         assert(cm.exception.stderr.includes(
             "error: argument foo: invalid choice: '3' (choose from '1', '2')"))
+    }
+}).run()
+
+
+;(new class TestInvalidAction extends TestCase {
+    /* Test invalid user defined Action */
+
+    ActionWithoutCall = class ActionWithoutCall extends argparse.Action {}
+
+    test_invalid_type () {
+        const parser = argparse.ArgumentParser()
+        parser.add_argument('--foo', { action: this.ActionWithoutCall })
+        this.assertRaises(Error, () => parser.parse_args(['--foo', 'bar']))
+    }
+
+    test_modified_invalid_action () {
+        const parser = argparse.ArgumentParser({ exit_on_error: false })
+        const action = parser.add_argument('--foo')
+        action.type = 1
+        let cm = this.assertRaises(TypeError, () => parser.parse_args(['--foo', 'bar']))
+        this.assertRegex(String(cm.exception), /1 is not callable/)
+        action.type = []
+        cm = this.assertRaises(TypeError, () => parser.parse_args(['--foo', 'bar']))
+        this.assertRegex(String(cm.exception), /\[\] is not callable/)
+        // It is impossible to distinguish a TypeError raised due to a mismatch
+        // of the required function arguments from a TypeError raised for an incorrect
+        // argument value, and using the heavy inspection machinery is not worthwhile
+        // as it does not reliably work in all cases.
+        // Therefore, a generic ArgumentError is raised to handle this logical error.
+        function pow (a, b) {
+            if (b === undefined) throw new TypeError('missing argument')
+            return Math.pow(a, b)
+        }
+        action.type = pow
+        cm = this.assertRaises(argparse.ArgumentError, () =>
+            parser.parse_args(['--foo', 'bar']))
+        this.assertRegex(String(cm.exception),
+            /argument --foo: invalid pow value: 'bar'/)
     }
 }).run()
 
@@ -6330,10 +6082,6 @@ VV VV VV
         })
     }
 
-    test_version_missing_params () {
-        this.assertTypeError('command', { action: 'version' })
-    }
-
     test_invalid_action () {
         this.assertValueError('-x', { action: 'foo', errmsg: 'unknown action' })
         this.assertValueError('foo', { action: 'baz', errmsg: 'unknown action' })
@@ -6397,6 +6145,10 @@ VV VV VV
         }
     }
 
+
+    test_version_missing_params () {
+        this.assertTypeError('command', { action: 'version' })
+    }
 /*
     test_no_argument_no_const_actions() {
         # options with zero arguments
@@ -7865,5 +7617,253 @@ VV VV VV
         })
         this.assertRegex(cm.exception.message,
                          /no such file or directory.*no-such-file/i)
+    }
+}).run()
+
+
+// ===========
+// Color tests
+// ===========
+
+;(new class TestColorized extends TestCase {
+    setUp () {
+        super.setUp()
+        this.can_colorize = _colorize.can_colorize
+        _colorize.can_colorize = () => true
+        this.theme = _colorize.get_theme({ force_color: true }).argparse
+    }
+
+    tearDown () {
+        _colorize.can_colorize = this.can_colorize
+    }
+
+    test_argparse_color () {
+        const parser = argparse.ArgumentParser({
+            color: true,
+            description: 'Colorful help',
+            formatter_class: argparse.ArgumentDefaultsHelpFormatter,
+            prefix_chars: '-+',
+            prog: 'PROG'
+        })
+        const group = parser.add_mutually_exclusive_group()
+        group.add_argument('-v', '--verbose', { action: 'store_true', help: 'more spam' })
+        group.add_argument('-q', '--quiet', { action: 'store_true', help: 'less spam' })
+        parser.add_argument('x', { type: 'int', help: 'the base' })
+        parser.add_argument('y', { type: 'int', help: 'the exponent', deprecated: true })
+        parser.add_argument('this_indeed_is_a_very_long_action_name', {
+            type: 'int',
+            help: 'the exponent'
+        })
+        parser.add_argument('-o', '--optional1', { action: 'store_true', deprecated: true })
+        parser.add_argument('--optional2', { help: 'pick one' })
+        parser.add_argument('--optional3', { choices: ['X', 'Y', 'Z'] })
+        parser.add_argument('--optional4', { choices: ['X', 'Y', 'Z'], help: 'pick one' })
+        parser.add_argument('--optional5', { choices: ['X', 'Y', 'Z'], help: 'pick one' })
+        parser.add_argument('--optional6', { choices: ['X', 'Y', 'Z'], help: 'pick one' })
+        parser.add_argument('-p', '--optional7', {
+            choices: ['Aaaaa', 'Bbbbb', 'Ccccc', 'Ddddd'],
+            help: 'pick one'
+        })
+        parser.add_argument('+f')
+        parser.add_argument('++bar')
+        parser.add_argument('-+baz')
+        parser.add_argument('-c', '--count')
+
+        const subparsers = parser.add_subparsers({
+            title: 'subcommands',
+            description: 'valid subcommands',
+            help: 'additional help'
+        })
+        subparsers.add_parser('sub1', { deprecated: true, help: 'sub1 help' })
+        const sub2 = subparsers.add_parser('sub2', { deprecated: true, help: 'sub2 help' })
+        sub2.add_argument('--baz', { choices: ['X', 'Y', 'Z'], help: 'baz help' })
+
+        const {
+            prog,
+            heading,
+            summary_long_option: long,
+            summary_short_option: short,
+            summary_label: label,
+            summary_action: pos,
+            long_option: long_b,
+            short_option: short_b,
+            label: label_b,
+            action: pos_b,
+            reset
+        } = this.theme
+
+        this.assertEqual(textwrap.dedent(`\
+            ${heading}usage: ${reset}${prog}PROG${reset} [${short}-h${reset}] [${short}-v${reset} | ${short}-q${reset}] [${short}-o${reset}] [${long}--optional2 ${label}OPTIONAL2${reset}] [${long}--optional3 ${label}{X,Y,Z}${reset}]
+                        [${long}--optional4 ${label}{X,Y,Z}${reset}] [${long}--optional5 ${label}{X,Y,Z}${reset}] [${long}--optional6 ${label}{X,Y,Z}${reset}]
+                        [${short}-p ${label}{Aaaaa,Bbbbb,Ccccc,Ddddd}${reset}] [${short}+f ${label}F${reset}] [${long}++bar ${label}BAR${reset}] [${long}-+baz ${label}BAZ${reset}]
+                        [${short}-c ${label}COUNT${reset}]
+                        ${pos}x${reset} ${pos}y${reset} ${pos}this_indeed_is_a_very_long_action_name${reset} ${pos}{sub1,sub2} ...${reset}
+
+            Colorful help
+
+            ${heading}positional arguments:${reset}
+              ${pos_b}x${reset}                     the base
+              ${pos_b}y${reset}                     the exponent
+              ${pos_b}this_indeed_is_a_very_long_action_name${reset}
+                                    the exponent
+
+            ${heading}options:${reset}
+              ${short_b}-h${reset}, ${long_b}--help${reset}            show this help message and exit
+              ${short_b}-v${reset}, ${long_b}--verbose${reset}         more spam (default: false)
+              ${short_b}-q${reset}, ${long_b}--quiet${reset}           less spam (default: false)
+              ${short_b}-o${reset}, ${long_b}--optional1${reset}
+              ${long_b}--optional2${reset} ${label_b}OPTIONAL2${reset}
+                                    pick one (default: undefined)
+              ${long_b}--optional3${reset} ${label_b}{X,Y,Z}${reset}
+              ${long_b}--optional4${reset} ${label_b}{X,Y,Z}${reset}   pick one (default: undefined)
+              ${long_b}--optional5${reset} ${label_b}{X,Y,Z}${reset}   pick one (default: undefined)
+              ${long_b}--optional6${reset} ${label_b}{X,Y,Z}${reset}   pick one (default: undefined)
+              ${short_b}-p${reset}, ${long_b}--optional7${reset} ${label_b}{Aaaaa,Bbbbb,Ccccc,Ddddd}${reset}
+                                    pick one (default: undefined)
+              ${short_b}+f${reset} ${label_b}F${reset}
+              ${long_b}++bar${reset} ${label_b}BAR${reset}
+              ${long_b}-+baz${reset} ${label_b}BAZ${reset}
+              ${short_b}-c${reset}, ${long_b}--count${reset} ${label_b}COUNT${reset}
+
+            ${heading}subcommands:${reset}
+              valid subcommands
+
+              ${pos_b}{sub1,sub2}${reset}           additional help
+                ${pos_b}sub1${reset}                sub1 help
+                ${pos_b}sub2${reset}                sub2 help
+        `), parser.format_help())
+    }
+
+    test_argparse_color_mutually_exclusive_group_usage () {
+        const parser = argparse.ArgumentParser({ color: true, prog: 'PROG' })
+        const group = parser.add_mutually_exclusive_group()
+        group.add_argument('--foo', { action: 'store_true', help: 'FOO' })
+        group.add_argument('--spam', { help: 'SPAM' })
+        group.add_argument('badger', { nargs: '*', help: 'BADGER' })
+
+        const {
+            prog,
+            heading,
+            summary_long_option: long,
+            summary_short_option: short,
+            summary_label: label,
+            summary_action: pos,
+            reset
+        } = this.theme
+
+        this.assertEqual(
+            `${heading}usage: ${reset}${prog}PROG${reset} [${short}-h${reset}] ` +
+            `[${long}--foo${reset} | ${long}--spam ${label}SPAM${reset} | ` +
+            `${pos}badger ...${reset}]\n`,
+            parser.format_usage()
+        )
+    }
+
+    test_argparse_color_custom_usage () {
+        const parser = argparse.ArgumentParser({
+            add_help: false,
+            color: true,
+            description: 'Test prog and usage colors',
+            prog: 'PROG',
+            usage: '[prefix] %(prog)s [suffix]'
+        })
+        const { heading, prog, prog_extra: usage, reset } = this.theme
+
+        this.assertEqual(textwrap.dedent(`\
+            ${heading}usage: ${reset}${usage}[prefix] ${prog}PROG${reset}${usage} [suffix]${reset}
+
+            Test prog and usage colors
+        `), parser.format_help())
+    }
+
+    test_custom_formatter_function () {
+        function custom_formatter (options) {
+            return argparse.RawTextHelpFormatter({ ...options, indent_increment: 5 })
+        }
+
+        const parser = argparse.ArgumentParser({
+            prog: 'PROG',
+            prefix_chars: '-+',
+            formatter_class: custom_formatter,
+            color: true
+        })
+        parser.add_argument('+f', '++foo', { help: 'foo help' })
+        parser.add_argument('spam', { help: 'spam help' })
+
+        const {
+            prog,
+            heading,
+            summary_short_option: short,
+            summary_label: label,
+            summary_action: pos,
+            long_option: long_b,
+            short_option: short_b,
+            label: label_b,
+            action: pos_b,
+            reset
+        } = this.theme
+
+        this.assertEqual(textwrap.dedent(`\
+            ${heading}usage: ${reset}${prog}PROG${reset} [${short}-h${reset}] [${short}+f ${label}FOO${reset}] ${pos}spam${reset}
+
+            ${heading}positional arguments:${reset}
+                 ${pos_b}spam${reset}           spam help
+
+            ${heading}options:${reset}
+                 ${short_b}-h${reset}, ${long_b}--help${reset}     show this help message and exit
+                 ${short_b}+f${reset}, ${long_b}++foo${reset} ${label_b}FOO${reset}  foo help
+        `), parser.format_help())
+    }
+
+    test_custom_formatter_class () {
+        class CustomFormatter extends argparse.RawTextHelpFormatter {
+            constructor (options) {
+                super({ ...options, indent_increment: 5 })
+            }
+        }
+
+        const parser = argparse.ArgumentParser({
+            prog: 'PROG',
+            prefix_chars: '-+',
+            formatter_class: CustomFormatter,
+            color: true
+        })
+        parser.add_argument('+f', '++foo', { help: 'foo help' })
+        parser.add_argument('spam', { help: 'spam help' })
+
+        const {
+            prog,
+            heading,
+            summary_short_option: short,
+            summary_label: label,
+            summary_action: pos,
+            long_option: long_b,
+            short_option: short_b,
+            label: label_b,
+            action: pos_b,
+            reset
+        } = this.theme
+
+        this.assertEqual(textwrap.dedent(`\
+            ${heading}usage: ${reset}${prog}PROG${reset} [${short}-h${reset}] [${short}+f ${label}FOO${reset}] ${pos}spam${reset}
+
+            ${heading}positional arguments:${reset}
+                 ${pos_b}spam${reset}           spam help
+
+            ${heading}options:${reset}
+                 ${short_b}-h${reset}, ${long_b}--help${reset}     show this help message and exit
+                 ${short_b}+f${reset}, ${long_b}++foo${reset} ${label_b}FOO${reset}  foo help
+        `), parser.format_help())
+    }
+
+    test_subparser_prog_is_stored_without_color () {
+        const parser = argparse.ArgumentParser({ prog: 'complex', color: true })
+        const sub = parser.add_subparsers({ dest: 'command' })
+        const demo_parser = sub.add_parser('demo')
+
+        assert(!demo_parser.prog.includes('\x1b['))
+
+        demo_parser.color = false
+        assert(!demo_parser.format_help().includes('\x1b['))
     }
 }).run()
