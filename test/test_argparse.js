@@ -738,9 +738,9 @@ class ParserTestCase extends TestCase {
         Sig('-w', { nargs: '?' }),
         Sig('-x', { nargs: '?', const: 42 }),
         Sig('-y', { nargs: '?', default: 'spam' }),
-        Sig('-z', { nargs: '?', type: 'int', const: '42', default: '84' }),
+        Sig('-z', { nargs: '?', type: 'int', const: '42', default: '84', choices: [1, 2] }),
     ]
-    failures = ['2']
+    failures = ['2', '-z a', '-z 42', '-z 84']
     successes = [
         ['', NS({ w: undefined, x: undefined, y: 'spam', z: 84 })],
         ['-w', NS({ w: undefined, x: undefined, y: 'spam', z: 84 })],
@@ -1165,8 +1165,8 @@ class ParserTestCase extends TestCase {
 ;(new class TestPositionalsNargsZeroOrMoreDefault extends ParserTestCase {
     /* Test a Positional that specifies unlimited nargs and a default */
 
-    argument_signatures = [Sig('foo', { nargs: '*', default: 'bar' })]
-    failures = ['-x']
+    argument_signatures = [Sig('foo', { nargs: '*', default: 'bar', choices: ['a', 'b'] })]
+    failures = ['-x', 'bar', 'a c']
     successes = [
         ['', NS({ foo: 'bar' })],
         ['a', NS({ foo: ['a'] })],
@@ -1202,8 +1202,8 @@ class ParserTestCase extends TestCase {
 ;(new class TestPositionalsNargsOptionalDefault extends ParserTestCase {
     /* Tests an Optional Positional with a default value */
 
-    argument_signatures = [Sig('foo', { nargs: '?', default: 42 })]
-    failures = ['-x', 'a b']
+    argument_signatures = [Sig('foo', { nargs: '?', default: 42, choices: ['a', 'b'] })]
+    failures = ['-x', 'a b', '42']
     successes = [
         ['', NS({ foo: 42 })],
         ['a', NS({ foo: 'a' })],
@@ -1218,9 +1218,9 @@ class ParserTestCase extends TestCase {
      */
 
     argument_signatures = [
-        Sig('foo', { nargs: '?', type: 'int', default: '42' }),
+        Sig('foo', { nargs: '?', type: 'int', default: '42', choices: [1, 2] }),
     ]
-    failures = ['-x', 'a b', '1 2']
+    failures = ['-x', 'a b', '1 2', '42']
     successes = [
         ['', NS({ foo: 42 })],
         ['1', NS({ foo: 1 })],
