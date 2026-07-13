@@ -893,6 +893,48 @@ class ParserTestCase extends TestCase {
 
         this.assertRegex(String(cm.exception), /got an unexpected keyword argument 'const'/)
     }
+
+    test_deprecated_init_kw () {
+        // See gh-92248
+        const parser = argparse.ArgumentParser()
+        const warnings = []
+        const emitWarning = process.emitWarning
+        process.emitWarning = warning => warnings.push(warning)
+        try {
+            parser.add_argument('-a', {
+                action: argparse.BooleanOptionalAction,
+                type: undefined
+            })
+            parser.add_argument('-b', {
+                action: argparse.BooleanOptionalAction,
+                type: Boolean
+            })
+            parser.add_argument('-c', {
+                action: argparse.BooleanOptionalAction,
+                metavar: undefined
+            })
+            parser.add_argument('-d', {
+                action: argparse.BooleanOptionalAction,
+                metavar: 'd'
+            })
+            parser.add_argument('-e', {
+                action: argparse.BooleanOptionalAction,
+                choices: undefined
+            })
+            parser.add_argument('-f', {
+                action: argparse.BooleanOptionalAction,
+                choices: []
+            })
+        } finally {
+            process.emitWarning = emitWarning
+        }
+
+        this.assertEqual([
+            "'type' is deprecated as of Python 3.12 and will be removed in Python 3.14.",
+            "'metavar' is deprecated as of Python 3.12 and will be removed in Python 3.14.",
+            "'choices' is deprecated as of Python 3.12 and will be removed in Python 3.14."
+        ], warnings)
+    }
 }).run()
 
 ;(new class TestBooleanOptionalActionRequired extends ParserTestCase {
