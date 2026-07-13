@@ -2145,6 +2145,28 @@ class WFile {
     ]
 }).run()
 
+
+;(new class TestNegativeNumber extends ParserTestCase {
+    /* Test parsing negative numbers */
+
+    argument_signatures = [
+        Sig('--int', { type: 'int' }),
+        Sig('--float', { type: 'float' }),
+    ]
+    failures = [
+        '--float -_.45',
+        '--float -1__000.0',
+        '--int -1__000',
+    ]
+    successes = [
+        ['--int -1000 --float -1000.0', NS({ int: -1000, float: -1000.0 })],
+        ['--int -1_000 --float -1_000.0', NS({ int: -1000, float: -1000.0 })],
+        ['--int -1_000_000 --float -1_000_000.0', NS({ int: -1000000, float: -1000000.0 })],
+        ['--float -1_000.0', NS({ int: undefined, float: -1000.0 })],
+        ['--float -1_000_000.0_0', NS({ int: undefined, float: -1000000.0 })],
+    ]
+}).run()
+
 // ================
 // Subparsers tests
 // ================
