@@ -5338,6 +5338,7 @@ VV VV VV
     argument_signatures = [
         Sig('--foo', { help: 'foo help - oh and by the way, %(default)s' }),
         Sig('--bar', { action: 'store_true', help: 'bar help' }),
+        Sig('--required', { required: true, help: 'some help' }),
         Sig('--taz', { action: argparse.BooleanOptionalAction,
             help: 'Whether to taz it', default: true }),
         Sig('--corge', { action: argparse.BooleanOptionalAction,
@@ -5351,8 +5352,8 @@ VV VV VV
          [Sig('--baz', { type: 'int', default: 42, help: 'baz help' })]],
     ]
     usage = `\
-        usage: PROG [-h] [--foo FOO] [--bar] [--taz | --no-taz] [--corge | --no-corge]
-                    [--quux QUUX] [--baz BAZ]
+        usage: PROG [-h] [--foo FOO] [--bar] --required REQUIRED [--taz | --no-taz]
+                    [--corge | --no-corge] [--quux QUUX] [--baz BAZ]
                     spam [badger]
         `
     help = this.usage + `\
@@ -5367,6 +5368,7 @@ VV VV VV
           -h, --help           show this help message and exit
           --foo FOO            foo help - oh and by the way, undefined
           --bar                bar help (default: false)
+          --required REQUIRED  some help
           --taz, --no-taz      Whether to taz it (default: true)
           --corge, --no-corge  Whether to corge it
           --quux QUUX          Set the quux (default: 42)
