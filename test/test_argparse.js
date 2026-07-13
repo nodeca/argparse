@@ -17,6 +17,7 @@ const path = require('path')
 const stream = require('stream')
 const util = require('util')
 const argparse = require('../')
+const _colorize = require('../lib/_colorize')
 const textwrap = require('../lib/textwrap')
 const sub = require('../lib/sub')
 
@@ -25,6 +26,12 @@ class JSTestCase {
 
     run () {
         describe(this.constructor.name, () => {
+            let restore_color
+            if (this.force_color !== undefined) {
+                beforeEach(() => {
+                    restore_color = force_color(this.force_color)
+                })
+            }
             for (const method of this) {
                 if (method === 'setUp') {
                     beforeEach(() => this[method]())
@@ -35,8 +42,23 @@ class JSTestCase {
                     it.skip(method, () => this[method]())
                 } else if (typeof method === 'string' && method.startsWith('test') &&
                     this[method] !== undefined) {
-                    it(method, () => this[method]())
+                    const test = () => this[method]()
+                    if (this.force_not_colorized?.has(method)) {
+                        it(method, () => {
+                            const restore = force_color(false)
+                            try {
+                                test()
+                            } finally {
+                                restore()
+                            }
+                        })
+                    } else {
+                        it(method, test)
+                    }
                 }
+            }
+            if (this.force_color !== undefined) {
+                afterEach(() => restore_color())
             }
         })
     }
@@ -104,6 +126,29 @@ function captured_stderr (fn) {
 }
 
 
+function force_color (color) {
+    const old_can_colorize = _colorize.can_colorize
+    const env_names = ['FORCE_COLOR', 'NO_COLOR', 'PYTHON_COLORS']
+    const old_env = env_names.map(name => ({
+        name,
+        present: Object.prototype.hasOwnProperty.call(process.env, name),
+        value: process.env[name]
+    }))
+
+    _colorize.can_colorize = () => color
+    for (const name of env_names) delete process.env[name]
+    process.env[color ? 'FORCE_COLOR' : 'NO_COLOR'] = '1'
+
+    return () => {
+        _colorize.can_colorize = old_can_colorize
+        for (const name of env_names) delete process.env[name]
+        for (const { name, present, value } of old_env) {
+            if (present) process.env[name] = value
+        }
+    }
+}
+
+
 class TestCase extends JSTestCase {
 
     setUp () {
@@ -154,6 +199,254 @@ class TestCase extends JSTestCase {
                 Object.defineProperty(process, 'exit', old_exit)
             }
         }
+    }
+}).run()
+
+
+// ===========
+// Color tests
+// ===========
+
+;(new class TestColorized extends TestCase {
+    setUp () {
+        super.setUp()
+        this.can_colorize = _colorize.can_colorize
+        _colorize.can_colorize = () => true
+        this.theme = _colorize.get_theme({ force_color: true }).argparse
+    }
+
+    tearDown () {
+        _colorize.can_colorize = this.can_colorize
+    }
+
+    test_argparse_color () {
+        const parser = argparse.ArgumentParser({
+            color: true,
+            description: 'Colorful help',
+            formatter_class: argparse.ArgumentDefaultsHelpFormatter,
+            prefix_chars: '-+',
+            prog: 'PROG'
+        })
+        const group = parser.add_mutually_exclusive_group()
+        group.add_argument('-v', '--verbose', { action: 'store_true', help: 'more spam' })
+        group.add_argument('-q', '--quiet', { action: 'store_true', help: 'less spam' })
+        parser.add_argument('x', { type: 'int', help: 'the base' })
+        parser.add_argument('y', { type: 'int', help: 'the exponent', deprecated: true })
+        parser.add_argument('this_indeed_is_a_very_long_action_name', {
+            type: 'int',
+            help: 'the exponent'
+        })
+        parser.add_argument('-o', '--optional1', { action: 'store_true', deprecated: true })
+        parser.add_argument('--optional2', { help: 'pick one' })
+        parser.add_argument('--optional3', { choices: ['X', 'Y', 'Z'] })
+        parser.add_argument('--optional4', { choices: ['X', 'Y', 'Z'], help: 'pick one' })
+        parser.add_argument('--optional5', { choices: ['X', 'Y', 'Z'], help: 'pick one' })
+        parser.add_argument('--optional6', { choices: ['X', 'Y', 'Z'], help: 'pick one' })
+        parser.add_argument('-p', '--optional7', {
+            choices: ['Aaaaa', 'Bbbbb', 'Ccccc', 'Ddddd'],
+            help: 'pick one'
+        })
+        parser.add_argument('+f')
+        parser.add_argument('++bar')
+        parser.add_argument('-+baz')
+        parser.add_argument('-c', '--count')
+
+        const subparsers = parser.add_subparsers({
+            title: 'subcommands',
+            description: 'valid subcommands',
+            help: 'additional help'
+        })
+        subparsers.add_parser('sub1', { deprecated: true, help: 'sub1 help' })
+        const sub2 = subparsers.add_parser('sub2', { deprecated: true, help: 'sub2 help' })
+        sub2.add_argument('--baz', { choices: ['X', 'Y', 'Z'], help: 'baz help' })
+
+        const {
+            prog,
+            heading,
+            summary_long_option: long,
+            summary_short_option: short,
+            summary_label: label,
+            summary_action: pos,
+            long_option: long_b,
+            short_option: short_b,
+            label: label_b,
+            action: pos_b,
+            reset
+        } = this.theme
+
+        this.assertEqual(textwrap.dedent(`\
+            ${heading}usage: ${reset}${prog}PROG${reset} [${short}-h${reset}] [${short}-v${reset} | ${short}-q${reset}] [${short}-o${reset}] [${long}--optional2 ${label}OPTIONAL2${reset}] [${long}--optional3 ${label}{X,Y,Z}${reset}]
+                        [${long}--optional4 ${label}{X,Y,Z}${reset}] [${long}--optional5 ${label}{X,Y,Z}${reset}] [${long}--optional6 ${label}{X,Y,Z}${reset}]
+                        [${short}-p ${label}{Aaaaa,Bbbbb,Ccccc,Ddddd}${reset}] [${short}+f ${label}F${reset}] [${long}++bar ${label}BAR${reset}] [${long}-+baz ${label}BAZ${reset}]
+                        [${short}-c ${label}COUNT${reset}]
+                        ${pos}x${reset} ${pos}y${reset} ${pos}this_indeed_is_a_very_long_action_name${reset} ${pos}{sub1,sub2} ...${reset}
+
+            Colorful help
+
+            ${heading}positional arguments:${reset}
+              ${pos_b}x${reset}                     the base
+              ${pos_b}y${reset}                     the exponent
+              ${pos_b}this_indeed_is_a_very_long_action_name${reset}
+                                    the exponent
+
+            ${heading}options:${reset}
+              ${short_b}-h${reset}, ${long_b}--help${reset}            show this help message and exit
+              ${short_b}-v${reset}, ${long_b}--verbose${reset}         more spam (default: false)
+              ${short_b}-q${reset}, ${long_b}--quiet${reset}           less spam (default: false)
+              ${short_b}-o${reset}, ${long_b}--optional1${reset}
+              ${long_b}--optional2${reset} ${label_b}OPTIONAL2${reset}
+                                    pick one (default: undefined)
+              ${long_b}--optional3${reset} ${label_b}{X,Y,Z}${reset}
+              ${long_b}--optional4${reset} ${label_b}{X,Y,Z}${reset}   pick one (default: undefined)
+              ${long_b}--optional5${reset} ${label_b}{X,Y,Z}${reset}   pick one (default: undefined)
+              ${long_b}--optional6${reset} ${label_b}{X,Y,Z}${reset}   pick one (default: undefined)
+              ${short_b}-p${reset}, ${long_b}--optional7${reset} ${label_b}{Aaaaa,Bbbbb,Ccccc,Ddddd}${reset}
+                                    pick one (default: undefined)
+              ${short_b}+f${reset} ${label_b}F${reset}
+              ${long_b}++bar${reset} ${label_b}BAR${reset}
+              ${long_b}-+baz${reset} ${label_b}BAZ${reset}
+              ${short_b}-c${reset}, ${long_b}--count${reset} ${label_b}COUNT${reset}
+
+            ${heading}subcommands:${reset}
+              valid subcommands
+
+              ${pos_b}{sub1,sub2}${reset}           additional help
+                ${pos_b}sub1${reset}                sub1 help
+                ${pos_b}sub2${reset}                sub2 help
+        `), parser.format_help())
+    }
+
+    test_argparse_color_mutually_exclusive_group_usage () {
+        const parser = argparse.ArgumentParser({ color: true, prog: 'PROG' })
+        const group = parser.add_mutually_exclusive_group()
+        group.add_argument('--foo', { action: 'store_true', help: 'FOO' })
+        group.add_argument('--spam', { help: 'SPAM' })
+        group.add_argument('badger', { nargs: '*', help: 'BADGER' })
+
+        const {
+            prog,
+            heading,
+            summary_long_option: long,
+            summary_short_option: short,
+            summary_label: label,
+            summary_action: pos,
+            reset
+        } = this.theme
+
+        this.assertEqual(
+            `${heading}usage: ${reset}${prog}PROG${reset} [${short}-h${reset}] ` +
+            `[${long}--foo${reset} | ${long}--spam ${label}SPAM${reset} | ` +
+            `${pos}badger ...${reset}]\n`,
+            parser.format_usage()
+        )
+    }
+
+    test_argparse_color_custom_usage () {
+        const parser = argparse.ArgumentParser({
+            add_help: false,
+            color: true,
+            description: 'Test prog and usage colors',
+            prog: 'PROG',
+            usage: '[prefix] %(prog)s [suffix]'
+        })
+        const { heading, prog, prog_extra: usage, reset } = this.theme
+
+        this.assertEqual(textwrap.dedent(`\
+            ${heading}usage: ${reset}${usage}[prefix] ${prog}PROG${reset}${usage} [suffix]${reset}
+
+            Test prog and usage colors
+        `), parser.format_help())
+    }
+
+    test_custom_formatter_function () {
+        function custom_formatter (options) {
+            return argparse.RawTextHelpFormatter({ ...options, indent_increment: 5 })
+        }
+
+        const parser = argparse.ArgumentParser({
+            prog: 'PROG',
+            prefix_chars: '-+',
+            formatter_class: custom_formatter,
+            color: true
+        })
+        parser.add_argument('+f', '++foo', { help: 'foo help' })
+        parser.add_argument('spam', { help: 'spam help' })
+
+        const {
+            prog,
+            heading,
+            summary_short_option: short,
+            summary_label: label,
+            summary_action: pos,
+            long_option: long_b,
+            short_option: short_b,
+            label: label_b,
+            action: pos_b,
+            reset
+        } = this.theme
+
+        this.assertEqual(textwrap.dedent(`\
+            ${heading}usage: ${reset}${prog}PROG${reset} [${short}-h${reset}] [${short}+f ${label}FOO${reset}] ${pos}spam${reset}
+
+            ${heading}positional arguments:${reset}
+                 ${pos_b}spam${reset}           spam help
+
+            ${heading}options:${reset}
+                 ${short_b}-h${reset}, ${long_b}--help${reset}     show this help message and exit
+                 ${short_b}+f${reset}, ${long_b}++foo${reset} ${label_b}FOO${reset}  foo help
+        `), parser.format_help())
+    }
+
+    test_custom_formatter_class () {
+        class CustomFormatter extends argparse.RawTextHelpFormatter {
+            constructor (options) {
+                super({ ...options, indent_increment: 5 })
+            }
+        }
+
+        const parser = argparse.ArgumentParser({
+            prog: 'PROG',
+            prefix_chars: '-+',
+            formatter_class: CustomFormatter,
+            color: true
+        })
+        parser.add_argument('+f', '++foo', { help: 'foo help' })
+        parser.add_argument('spam', { help: 'spam help' })
+
+        const {
+            prog,
+            heading,
+            summary_short_option: short,
+            summary_label: label,
+            summary_action: pos,
+            long_option: long_b,
+            short_option: short_b,
+            label: label_b,
+            action: pos_b,
+            reset
+        } = this.theme
+
+        this.assertEqual(textwrap.dedent(`\
+            ${heading}usage: ${reset}${prog}PROG${reset} [${short}-h${reset}] [${short}+f ${label}FOO${reset}] ${pos}spam${reset}
+
+            ${heading}positional arguments:${reset}
+                 ${pos_b}spam${reset}           spam help
+
+            ${heading}options:${reset}
+                 ${short_b}-h${reset}, ${long_b}--help${reset}     show this help message and exit
+                 ${short_b}+f${reset}, ${long_b}++foo${reset} ${label_b}FOO${reset}  foo help
+        `), parser.format_help())
+    }
+
+    test_subparser_prog_is_stored_without_color () {
+        const parser = argparse.ArgumentParser({ prog: 'complex', color: true })
+        const sub = parser.add_subparsers({ dest: 'command' })
+        const demo_parser = sub.add_parser('demo')
+
+        assert(!demo_parser.prog.includes('\x1b['))
+
+        demo_parser.color = false
+        assert(!demo_parser.format_help().includes('\x1b['))
     }
 }).run()
 
@@ -1142,6 +1435,7 @@ Color.BLUE = new Color('blue')
 const colors = [Color.RED, Color.GREEN, Color.BLUE]
 
 ;(new class TestStrEnumChoices extends TestCase {
+    force_not_colorized = new Set(['test_help_message_contains_enum_choices'])
 
     test_parse_enum_value () {
         const parser = argparse.ArgumentParser()
@@ -2541,6 +2835,8 @@ class WFile {
 ;(new class TestAddSubparsers extends TestCase {
     /* Test the add_subparsers method */
 
+    force_color = false
+
     assertArgumentParserError (...args) {
         this.assertRaises(ArgumentParserError, ...args)
     }
@@ -3217,6 +3513,8 @@ class WFile {
 ;(new class TestParentParsers extends TestCase {
     /* Tests that parsers can be created with parent parsers */
 
+    force_color = false
+
     assertArgumentParserError (...args) {
         this.assertRaises(ArgumentParserError, ...args)
     }
@@ -3442,6 +3740,7 @@ class WFile {
 // ==============================
 
 class TestMutuallyExclusiveGroupErrors extends TestCase {
+    force_color = false
 
     test_invalid_add_argument_group () {
         const parser = new ErrorRaisingArgumentParser()
@@ -3550,6 +3849,13 @@ class TestMutuallyExclusiveGroupErrors extends TestCase {
 
 function MEMixin (cls) {
     return class MEMixin extends cls {
+
+        force_not_colorized = new Set([
+            'test_usage_when_not_required',
+            'test_usage_when_required',
+            'test_help_when_not_required',
+            'test_help_when_required'
+        ])
 
         test_failures_when_not_required () {
             const parser = this.get_parser({ required: false })
@@ -4289,6 +4595,7 @@ class HelpTestCase extends TestCase {
 
     constructor () {
         super()
+        this.force_not_colorized = new Set()
 
         class AddTests {
 
@@ -4301,6 +4608,7 @@ class HelpTestCase extends TestCase {
                                        this.test_print_file]) {
                     const test_name = sub('%s_%s', test_func.name, func_suffix)
                     test_class[test_name] = () => test_func.call(this, test_class)
+                    test_class.force_not_colorized.add(test_name)
                 }
             }
 
@@ -5119,6 +5427,7 @@ VV VV VV
 
 
 ;(new class TestHelpUsageNoWhitespaceCrash extends TestCase {
+    force_color = false
 
     test_all_suppressed_mutex_followed_by_long_arg () {
         // https://github.com/python/cpython/issues/62090
@@ -5845,6 +6154,8 @@ VV VV VV
 
 
 ;(new class TestHelpCustomHelpFormatter extends TestCase {
+    force_color = false
+
     test_custom_formatter_function () {
         function custom_formatter (options) {
             return argparse.RawTextHelpFormatter({
@@ -6184,6 +6495,7 @@ VV VV VV
 // ================================
 
 ;(new class TestConflictHandling extends TestCase {
+    force_not_colorized = new Set(['test_resolve_error'])
 
     test_bad_type () {
         this.assertRaises(TypeError,
@@ -6250,6 +6562,8 @@ VV VV VV
 
 ;(new class TestOptionalsHelpVersionActions extends TestCase {
     /* Test the help and version actions */
+
+    force_color = false
 
     assertPrintHelpExit (parser, args_str) {
         const cm = this.assertRaises(ArgumentParserError, () =>
@@ -6464,6 +6778,7 @@ VV VV VV
 // =======================
 
 ;(new class TestArgumentTypeError extends TestCase {
+    force_not_colorized = new Set(['test_argument_type_error'])
 
     test_argument_type_error () {
 
@@ -7308,6 +7623,7 @@ VV VV VV
 // ============================
 
 ;(new class TestWrappingMetavar extends TestCase {
+    force_not_colorized = new Set(['test_help_with_metavar'])
 
     setUp () {
         super.setUp()
