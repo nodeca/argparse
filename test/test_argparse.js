@@ -3512,11 +3512,11 @@ class TestMutuallyExclusiveGroupErrors extends TestCase {
         this.assertEqual(cmd_foo.format_help(), textwrap.dedent(expected))
     }
 
-    test_empty_group () {
+    test_usage_empty_group () {
         // See issue 26952
-        const parser = argparse.ArgumentParser()
+        const parser = new ErrorRaisingArgumentParser({ prog: 'PROG' })
         parser.add_mutually_exclusive_group()
-        this.assertRaises(TypeError, () => parser.parse_args(['-h']))
+        this.assertEqual(parser.format_usage(), 'usage: PROG [-h]\n')
     }
 
     test_nested_mutex_groups () {
@@ -3809,28 +3809,31 @@ class TestMutuallyExclusiveOptionalsMixed extends MEMixin_TestCase {
         group.add_argument('-b', { action: 'store_true', help: 'b help' })
         parser.add_argument('-y', { action: 'store_true', help: 'y help' })
         group.add_argument('-c', { action: 'store_true', help: 'c help' })
+        parser.add_argument('-z', { action: 'store_true', help: 'z help' })
         return parser
     }
 
     failures = ['-a -b', '-b -c', '-a -c', '-a -b -c']
     successes = [
-        ['-a', NS({ a: true, b: false, c: false, x: false, y: false })],
-        ['-b', NS({ a: false, b: true, c: false, x: false, y: false })],
-        ['-c', NS({ a: false, b: false, c: true, x: false, y: false })],
-        ['-a -x', NS({ a: true, b: false, c: false, x: true, y: false })],
-        ['-y -b', NS({ a: false, b: true, c: false, x: false, y: true })],
-        ['-x -y -c', NS({ a: false, b: false, c: true, x: true, y: true })],
+        ['-a', NS({ a: true, b: false, c: false, x: false, y: false, z: false })],
+        ['-b', NS({ a: false, b: true, c: false, x: false, y: false, z: false })],
+        ['-c', NS({ a: false, b: false, c: true, x: false, y: false, z: false })],
+        ['-a -x', NS({ a: true, b: false, c: false, x: true, y: false, z: false })],
+        ['-y -b', NS({ a: false, b: true, c: false, x: false, y: true, z: false })],
+        ['-x -y -c', NS({ a: false, b: false, c: true, x: true, y: true, z: false })],
     ]
     successes_when_not_required = [
-        ['', NS({ a: false, b: false, c: false, x: false, y: false })],
-        ['-x', NS({ a: false, b: false, c: false, x: true, y: false })],
-        ['-y', NS({ a: false, b: false, c: false, x: false, y: true })],
+        ['', NS({ a: false, b: false, c: false, x: false, y: false, z: false })],
+        ['-x', NS({ a: false, b: false, c: false, x: true, y: false, z: false })],
+        ['-y', NS({ a: false, b: false, c: false, x: false, y: true, z: false })],
     ]
 
-    usage_when_required = `\
-        usage: PROG [-h] [-x] [-a] [-b] [-y] [-c]
+    usage_when_not_required = `\
+        usage: PROG [-h] [-x] [-a | -b | -c] [-y] [-z]
         `
-    usage_when_not_required = this.usage_when_required
+    usage_when_required = `\
+        usage: PROG [-h] [-x] (-a | -b | -c) [-y] [-z]
+        `
     help = `\
 
         options:
@@ -3840,6 +3843,7 @@ class TestMutuallyExclusiveOptionalsMixed extends MEMixin_TestCase {
           -b          b help
           -y          y help
           -c          c help
+          -z          z help
         `
 }
 
@@ -3896,26 +3900,29 @@ class TestMutuallyExclusiveOptionalsAndPositionalsMixed extends MEMixin_TestCase
         group.add_argument('a', { nargs: '?', help: 'a help' })
         group.add_argument('-b', { action: 'store_true', help: 'b help' })
         group.add_argument('-c', { action: 'store_true', help: 'c help' })
+        parser.add_argument('-z', { action: 'store_true', help: 'z help' })
         return parser
     }
 
     failures = ['X A -b', '-b -c', '-c X A']
     successes = [
-        ['X A', NS({ a: 'A', b: false, c: false, x: 'X', y: false })],
-        ['X -b', NS({ a: undefined, b: true, c: false, x: 'X', y: false })],
-        ['X -c', NS({ a: undefined, b: false, c: true, x: 'X', y: false })],
-        ['X A -y', NS({ a: 'A', b: false, c: false, x: 'X', y: true })],
-        ['X -y -b', NS({ a: undefined, b: true, c: false, x: 'X', y: true })],
+        ['X A', NS({ a: 'A', b: false, c: false, x: 'X', y: false, z: false })],
+        ['X -b', NS({ a: undefined, b: true, c: false, x: 'X', y: false, z: false })],
+        ['X -c', NS({ a: undefined, b: false, c: true, x: 'X', y: false, z: false })],
+        ['X A -y', NS({ a: 'A', b: false, c: false, x: 'X', y: true, z: false })],
+        ['X -y -b', NS({ a: undefined, b: true, c: false, x: 'X', y: true, z: false })],
     ]
     successes_when_not_required = [
-        ['X', NS({ a: undefined, b: false, c: false, x: 'X', y: false })],
-        ['X -y', NS({ a: undefined, b: false, c: false, x: 'X', y: true })],
+        ['X', NS({ a: undefined, b: false, c: false, x: 'X', y: false, z: false })],
+        ['X -y', NS({ a: undefined, b: false, c: false, x: 'X', y: true, z: false })],
     ]
 
-    usage_when_required = `\
-        usage: PROG [-h] [-y] [-b] [-c] x [a]
+    usage_when_not_required = `\
+        usage: PROG [-h] [-y] [-z] x [-b | -c | a]
         `
-    usage_when_not_required = this.usage_when_required
+    usage_when_required = `\
+        usage: PROG [-h] [-y] [-z] x (-b | -c | a)
+        `
     help = `\
 
         positional arguments:
@@ -3927,6 +3934,7 @@ class TestMutuallyExclusiveOptionalsAndPositionalsMixed extends MEMixin_TestCase
           -y          y help
           -b          b help
           -c          c help
+          -z          z help
         `
 }
 
@@ -5190,9 +5198,9 @@ VV VV VV
         g.add_argument('positional', { nargs: '?' })
 
         const usage = textwrap.dedent(`\
-        usage: PROG [-h] [-v | -q | -x [EXTRA_LONG_OPTION_NAME] |
-                    -y [YET_ANOTHER_LONG_OPTION] |
-                    positional]
+        usage: PROG [-h]
+                    [-v | -q | -x [EXTRA_LONG_OPTION_NAME] |
+                    -y [YET_ANOTHER_LONG_OPTION] | positional]
         `)
         this.assertEqual(parser.format_usage(), usage)
     }
