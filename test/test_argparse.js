@@ -1125,6 +1125,44 @@ class ParserTestCase extends TestCase {
 }).run()
 
 
+class Color extends String {}
+Color.RED = new Color('red')
+Color.GREEN = new Color('green')
+Color.BLUE = new Color('blue')
+
+const colors = [Color.RED, Color.GREEN, Color.BLUE]
+
+;(new class TestStrEnumChoices extends TestCase {
+
+    test_parse_enum_value () {
+        const parser = argparse.ArgumentParser()
+        parser.add_argument('--color', {
+            choices: colors,
+            type: value => colors.find(color => String(color) === value) || value
+        })
+        const args = parser.parse_args(['--color', 'red'])
+        this.assertEqual(Color.RED, args.color)
+    }
+
+    test_help_message_contains_enum_choices () {
+        const parser = argparse.ArgumentParser()
+        parser.add_argument('--color', { choices: colors, help: 'Choose a color' })
+        this.assertRegex(parser.format_usage(), /\[--color \{red,green,blue\}\]/)
+        this.assertRegex(parser.format_help(), /  --color \{red,green,blue\}/)
+    }
+
+    test_invalid_enum_value_raises_error () {
+        const parser = argparse.ArgumentParser({ exit_on_error: false })
+        parser.add_argument('--color', { choices: colors })
+        const cm = this.assertRaises(argparse.ArgumentError, () =>
+            parser.parse_args(['--color', 'yellow']))
+        this.assertRegex(
+            String(cm.exception),
+            /invalid choice: 'yellow' \(choose from red, green, blue\)/)
+    }
+}).run()
+
+
 // ================
 // Positional tests
 // ================
@@ -2665,7 +2703,7 @@ class WFile {
             parser.parse_args(['baz']))
         this.assertRegex(
             cm.exception.stderr,
-            /error: argument \{foo,bar\}: invalid choice: 'baz' \(choose from 'foo', 'bar'\)\n$/)
+            /error: argument \{foo,bar\}: invalid choice: 'baz' \(choose from foo, bar\)\n$/)
     }
 
     test_optional_subparsers () {
