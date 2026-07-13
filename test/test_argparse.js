@@ -5481,6 +5481,50 @@ VV VV VV
 }).run()
 
 
+;(new class TestHelpUsageLongSubparserCommand extends TestCase {
+    /* Test that subparser commands are formatted correctly in help */
+
+    test_parent_help () {
+        function custom_formatter (options) {
+            return argparse.RawTextHelpFormatter({
+                ...options,
+                max_help_position: 50
+            })
+        }
+
+        const parent_parser = argparse.ArgumentParser({
+            prog: 'PROG',
+            formatter_class: custom_formatter
+        })
+
+        const cmd_subparsers = parent_parser.add_subparsers({
+            title: 'commands',
+            metavar: 'CMD',
+            help: 'command to use'
+        })
+        cmd_subparsers.add_parser('add', { help: 'add something' })
+        cmd_subparsers.add_parser('remove', { help: 'remove something' })
+        cmd_subparsers.add_parser('a-very-long-command', {
+            help: 'command that does something'
+        })
+
+        const parser_help = parent_parser.format_help()
+        this.assertEqual(parser_help, textwrap.dedent(`\
+            usage: PROG [-h] CMD ...
+
+            options:
+              -h, --help             show this help message and exit
+
+            commands:
+              CMD                    command to use
+                add                  add something
+                remove               remove something
+                a-very-long-command  command that does something
+        `))
+    }
+}).run()
+
+
 // =====================================
 // Optional/Positional constructor tests
 // =====================================
