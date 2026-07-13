@@ -5694,14 +5694,36 @@ VV VV VV
     /* Test a bunch of invalid Argument constructors */
 
     assertTypeError (...args) {
+        let errmsg
+        const kwargs = args[args.length - 1]
+        if (kwargs && typeof kwargs === 'object' && 'errmsg' in kwargs) {
+            const options = { ...kwargs }
+            errmsg = options.errmsg
+            delete options.errmsg
+            args[args.length - 1] = options
+        }
         const parser = argparse.ArgumentParser()
-        this.assertRaises(TypeError, () => parser.add_argument(...args))
+        const cm = this.assertRaises(TypeError, () => parser.add_argument(...args))
+        if (errmsg !== undefined) {
+            this.assertRegex(String(cm.exception), new RegExp(errmsg))
+        }
     }
 
     assertValueError (...args) {
+        let errmsg
+        const kwargs = args[args.length - 1]
+        if (kwargs && typeof kwargs === 'object' && 'errmsg' in kwargs) {
+            const options = { ...kwargs }
+            errmsg = options.errmsg
+            delete options.errmsg
+            args[args.length - 1] = options
+        }
         const parser = argparse.ArgumentParser()
         // same as TypeError in js
-        this.assertRaises(TypeError, () => parser.add_argument(...args))
+        const cm = this.assertRaises(TypeError, () => parser.add_argument(...args))
+        if (errmsg !== undefined) {
+            this.assertRegex(String(cm.exception), new RegExp(errmsg))
+        }
     }
 
     test_invalid_keyword_arguments () {
@@ -5713,7 +5735,7 @@ VV VV VV
 
     test_missing_destination () {
         this.assertTypeError()
-        for (const action of ['append', 'store']) {
+        for (const action of ['store', 'append', 'extend']) {
             this.assertTypeError({ action })
         }
     }
@@ -5736,17 +5758,43 @@ VV VV VV
         this.assertTypeError('command', { action: 'version' })
     }
 
-/*
-    test_invalid_action() {
-        this.assertValueError('-x', action='foo')
-        this.assertValueError('foo', action='baz')
-        this.assertValueError('--foo', action=('store', 'append'))
-        parser = argparse.ArgumentParser()
-        with this.assertRaises(ValueError) as cm:
-            parser.add_argument("--foo", action="store-true")
-        this.assertIn('unknown action', str(cm.exception))
+    test_invalid_action () {
+        this.assertValueError('-x', { action: 'foo' })
+        this.assertValueError('foo', { action: 'baz' })
+        this.assertValueError('--foo', { action: ['store', 'append'] })
+        this.assertValueError('--foo', { action: 'store-true', errmsg: 'unknown action' })
     }
 
+    test_no_argument_actions () {
+        for (const action of ['store_const', 'store_true', 'store_false',
+                              'append_const', 'count']) {
+            for (const attrs of [{ type: 'int' }, { nargs: '+' },
+                                 { choices: ['a', 'b'] }]) {
+                this.assertTypeError('-x', { action, ...attrs })
+                this.assertTypeError('x', { action, ...attrs })
+            }
+            this.assertTypeError('-x', { action, nargs: 0 })
+            this.assertTypeError('x', { action, nargs: 0 })
+        }
+    }
+
+    test_more_than_one_argument_actions () {
+        for (const action of ['store', 'append', 'extend']) {
+            // nargs=0 is disallowed
+            const action_name = action === 'extend' ? 'append' : action
+            const errmsg = `nargs for ${action_name} actions must be != 0`
+            this.assertValueError('-x', { nargs: 0, action, errmsg })
+            this.assertValueError('spam', { nargs: 0, action, errmsg })
+
+            // const is disallowed with non-optional arguments
+            for (const nargs of [1, '*', '+']) {
+                this.assertValueError('-x', { const: 'foo', nargs, action })
+                this.assertValueError('spam', { const: 'foo', nargs, action })
+            }
+        }
+    }
+
+/*
     test_multiple_dest() {
         parser = argparse.ArgumentParser()
         parser.add_argument(dest='foo')
@@ -5754,14 +5802,6 @@ VV VV VV
             parser.add_argument('bar', dest='baz')
         this.assertIn('dest supplied twice for positional argument',
                       str(cm.exception))
-    }
-
-    test_no_argument_actions() {
-        for action in ['store_const', 'store_true', 'store_false',
-                       'append_const', 'count']:
-            for attrs in [dict(type=int), dict(nargs='+'),
-                          dict(choices=['a', 'b'])]:
-                this.assertTypeError('-x', action=action, **attrs)
     }
 
     test_no_argument_no_const_actions() {
@@ -5773,21 +5813,6 @@ VV VV VV
 
             # nargs is always disallowed
             this.assertTypeError('-x', nargs='*', action=action)
-    }
-
-    test_more_than_one_argument_actions() {
-        for action in ['store', 'append']:
-
-            # nargs=0 is disallowed
-            this.assertValueError('-x', nargs=0, action=action)
-            this.assertValueError('spam', nargs=0, action=action)
-
-            # const is disallowed with non-optional arguments
-            for nargs in [1, '*', '+']:
-                this.assertValueError('-x', const='foo',
-                                      nargs=nargs, action=action)
-                this.assertValueError('spam', const='foo',
-                                      nargs=nargs, action=action)
     }
 
     test_required_const_actions() {
