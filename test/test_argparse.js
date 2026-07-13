@@ -5595,6 +5595,23 @@ VV VV VV
         const args = parser.parse_args([])
         this.assertEqual(NS({ x: [] }), args)
     }
+
+    test_double_dash () {
+        const parser = argparse.ArgumentParser()
+        parser.add_argument('-f', '--foo', { nargs: '*' })
+        parser.add_argument('bar', { nargs: '*' })
+
+        let args = parser.parse_args(['--foo=--'])
+        this.assertEqual(NS({ foo: ['--'], bar: [] }), args)
+        args = parser.parse_args(['--foo', '--'])
+        this.assertEqual(NS({ foo: [], bar: [] }), args)
+        args = parser.parse_args(['-f--'])
+        this.assertEqual(NS({ foo: ['--'], bar: [] }), args)
+        args = parser.parse_args(['-f', '--'])
+        this.assertEqual(NS({ foo: [], bar: [] }), args)
+        args = parser.parse_args(['--foo', 'a', 'b', '--', 'c', 'd'])
+        this.assertEqual(NS({ foo: ['a', 'b'], bar: ['c', 'd'] }), args)
+    }
 }).run()
 
 // ===========================
