@@ -2376,6 +2376,90 @@ class WFile {
     ]
 }).run()
 
+
+;(new class TestArgumentAndSubparserSuggestions extends TestCase {
+    /* Test error handling and suggestion when a user makes a typo */
+
+    test_wrong_argument_error_with_suggestions () {
+        const parser = new ErrorRaisingArgumentParser({ suggest_on_error: true })
+        parser.add_argument('foo', { choices: ['bar', 'baz'] })
+        const cm = this.assertRaises(ArgumentParserError, () =>
+            parser.parse_args(['bazz']))
+        assert(cm.exception.stderr.includes(
+            "error: argument foo: invalid choice: 'bazz', maybe you meant 'baz'? " +
+            '(choose from bar, baz)'))
+    }
+
+    test_wrong_argument_error_no_suggestions () {
+        const parser = new ErrorRaisingArgumentParser({ suggest_on_error: false })
+        parser.add_argument('foo', { choices: ['bar', 'baz'] })
+        const cm = this.assertRaises(ArgumentParserError, () =>
+            parser.parse_args(['bazz']))
+        assert(cm.exception.stderr.includes(
+            "error: argument foo: invalid choice: 'bazz' (choose from bar, baz)"))
+    }
+
+    test_wrong_argument_subparsers_with_suggestions () {
+        const parser = new ErrorRaisingArgumentParser({ suggest_on_error: true })
+        const subparsers = parser.add_subparsers({ required: true })
+        subparsers.add_parser('foo')
+        subparsers.add_parser('bar')
+        const cm = this.assertRaises(ArgumentParserError, () =>
+            parser.parse_args(['baz']))
+        assert(cm.exception.stderr.includes(
+            "error: argument {foo,bar}: invalid choice: 'baz', maybe you meant " +
+            "'bar'? (choose from foo, bar)"))
+    }
+
+    test_wrong_argument_subparsers_no_suggestions () {
+        const parser = new ErrorRaisingArgumentParser({ suggest_on_error: false })
+        const subparsers = parser.add_subparsers({ required: true })
+        subparsers.add_parser('foo')
+        subparsers.add_parser('bar')
+        const cm = this.assertRaises(ArgumentParserError, () =>
+            parser.parse_args(['baz']))
+        assert(cm.exception.stderr.includes(
+            "error: argument {foo,bar}: invalid choice: 'baz' (choose from foo, bar)"))
+    }
+
+    test_wrong_argument_no_suggestion_implicit () {
+        const parser = new ErrorRaisingArgumentParser()
+        parser.add_argument('foo', { choices: ['bar', 'baz'] })
+        const cm = this.assertRaises(ArgumentParserError, () =>
+            parser.parse_args(['bazz']))
+        assert(cm.exception.stderr.includes(
+            "error: argument foo: invalid choice: 'bazz' (choose from bar, baz)"))
+    }
+
+    test_suggestions_choices_empty () {
+        const parser = new ErrorRaisingArgumentParser({ suggest_on_error: true })
+        parser.add_argument('foo', { choices: [] })
+        const cm = this.assertRaises(ArgumentParserError, () =>
+            parser.parse_args(['bazz']))
+        assert(cm.exception.stderr.includes(
+            "error: argument foo: invalid choice: 'bazz' (choose from )"))
+    }
+
+    test_suggestions_choices_int () {
+        const parser = new ErrorRaisingArgumentParser({ suggest_on_error: true })
+        parser.add_argument('foo', { choices: [1, 2] })
+        const cm = this.assertRaises(ArgumentParserError, () =>
+            parser.parse_args(['3']))
+        assert(cm.exception.stderr.includes(
+            "error: argument foo: invalid choice: '3' (choose from 1, 2)"))
+    }
+
+    test_suggestions_choices_mixed_types () {
+        const parser = new ErrorRaisingArgumentParser({ suggest_on_error: true })
+        parser.add_argument('foo', { choices: [1, '2'] })
+        const cm = this.assertRaises(ArgumentParserError, () =>
+            parser.parse_args(['3']))
+        assert(cm.exception.stderr.includes(
+            "error: argument foo: invalid choice: '3' (choose from 1, 2)"))
+    }
+}).run()
+
+
 // ================
 // Subparsers tests
 // ================
@@ -2692,18 +2776,6 @@ class WFile {
         this.assertRegex(
             cm.exception.stderr,
             /error: the following arguments are required: \{foo,bar\}\n$/)
-    }
-
-    test_wrong_argument_subparsers_no_destination_error () {
-        const parser = new ErrorRaisingArgumentParser()
-        const subparsers = parser.add_subparsers({ required: true })
-        subparsers.add_parser('foo')
-        subparsers.add_parser('bar')
-        const cm = this.assertRaises(ArgumentParserError, () =>
-            parser.parse_args(['baz']))
-        this.assertRegex(
-            cm.exception.stderr,
-            /error: argument \{foo,bar\}: invalid choice: 'baz' \(choose from foo, bar\)\n$/)
     }
 
     test_optional_subparsers () {
@@ -3078,7 +3150,7 @@ class WFile {
         this._test_mutex_ab(args => parser.parse_args(args))
     }
 
-    test_single_granparent_mutex () {
+    test_single_grandparent_mutex () {
         const parents = [this.ab_mutex_parent]
         let parser = new ErrorRaisingArgumentParser({ add_help: false, parents })
         parser = new ErrorRaisingArgumentParser({ parents: [parser] })
