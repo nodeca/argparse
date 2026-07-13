@@ -906,6 +906,15 @@ class ParserTestCase extends TestCase {
         this.assertRegex(String(cm.exception), /got an unexpected keyword argument 'const'/)
     }
 
+    test_invalid_name () {
+        const parser = argparse.ArgumentParser()
+        const cm = this.assertRaises(TypeError, () =>
+            parser.add_argument('--no-foo', { action: argparse.BooleanOptionalAction }))
+        this.assertEqual(
+            "invalid option name '--no-foo' for BooleanOptionalAction",
+            cm.exception.message)
+    }
+
 }).run()
 
 ;(new class TestBooleanOptionalActionRequired extends ParserTestCase {
