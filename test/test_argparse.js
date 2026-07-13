@@ -3960,6 +3960,29 @@ VV VV VV
 }).run()
 
 
+;(new class TestHelpUsageWithParentheses extends HelpTestCase {
+    parser_signature = Sig({ prog: 'PROG' })
+    argument_signatures = [
+        Sig('positional', { metavar: '(example) positional' }),
+        Sig('-p', '--optional', { metavar: '{1 (option A), 2 (option B)}' }),
+    ]
+
+    usage = `\
+        usage: PROG [-h] [-p {1 (option A), 2 (option B)}] (example) positional
+        `
+    help = this.usage + `\
+
+        positional arguments:
+          (example) positional
+
+        options:
+          -h, --help            show this help message and exit
+          -p {1 (option A), 2 (option B)}, --optional {1 (option A), 2 (option B)}
+        `
+    version = ''
+}).run()
+
+
 ;(new class TestHelpOnlyUserGroups extends HelpTestCase {
     /* Test basic usage messages */
 
