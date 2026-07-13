@@ -5286,7 +5286,7 @@ VV VV VV
 }).run()
 
 
-;(new class TestHelpTupleMetavar extends HelpTestCase {
+;(new class TestHelpTupleMetavarOptional extends HelpTestCase {
     /* Test specifying metavar as a tuple */
 
     parser_signature = Sig({ prog: 'PROG' })
@@ -5309,6 +5309,35 @@ VV VV VV
           -x [X1 [X2 ...]]  x
           -y Y1 Y2 Y3       y
           -z [Z1]           z
+        `
+    version = ''
+}).run()
+
+
+;(new class TestHelpTupleMetavarPositional extends HelpTestCase {
+    /* Test specifying metavar on a Positional as a tuple */
+
+    parser_signature = Sig({ prog: 'PROG' })
+    argument_signatures = [
+        Sig('w', { help: 'w help', nargs: '+', metavar: ['W1', 'W2'] }),
+        Sig('x', { help: 'x help', nargs: '*', metavar: ['X1', 'X2'] }),
+        Sig('y', { help: 'y help', nargs: 3, metavar: ['Y1', 'Y2', 'Y3'] }),
+        Sig('z', { help: 'z help', nargs: '?', metavar: ['Z1'] }),
+    ]
+    argument_group_signatures = []
+    usage = `\
+        usage: PROG [-h] W1 [W2 ...] [X1 [X2 ...]] Y1 Y2 Y3 [Z1]
+        `
+    help = this.usage + `\
+
+        positional arguments:
+          W1 W2       w help
+          X1 X2       x help
+          Y1 Y2 Y3    y help
+          Z1          z help
+
+        options:
+          -h, --help  show this help message and exit
         `
     version = ''
 }).run()
@@ -6989,6 +7018,36 @@ VV VV VV
                          /the following arguments are required: bar, baz$/)
     }
 
+    test_required_args_with_metavar () {
+        this.parser.add_argument('bar')
+        this.parser.add_argument('baz', { metavar: 'BaZ' })
+        const cm = this.assertRaises(argparse.ArgumentError, () => {
+            this.parser.parse_args([])
+        })
+        this.assertRegex(cm.exception.message,
+                         /the following arguments are required: bar, BaZ$/)
+    }
+
+    test_required_args_n () {
+        this.parser.add_argument('bar')
+        this.parser.add_argument('baz', { nargs: 3 })
+        const cm = this.assertRaises(argparse.ArgumentError, () => {
+            this.parser.parse_args([])
+        })
+        this.assertRegex(cm.exception.message,
+                         /the following arguments are required: bar, baz$/)
+    }
+
+    test_required_args_n_with_metavar () {
+        this.parser.add_argument('bar')
+        this.parser.add_argument('baz', { nargs: 3, metavar: ['B', 'A', 'Z'] })
+        const cm = this.assertRaises(argparse.ArgumentError, () => {
+            this.parser.parse_args([])
+        })
+        this.assertRegex(cm.exception.message,
+                         /the following arguments are required: bar, B, A, Z$/)
+    }
+
     test_required_args_optional () {
         this.parser.add_argument('bar')
         this.parser.add_argument('baz', { nargs: '?' })
@@ -7007,6 +7066,26 @@ VV VV VV
         })
         this.assertRegex(cm.exception.message,
                          /the following arguments are required: bar$/)
+    }
+
+    test_required_args_one_or_more () {
+        this.parser.add_argument('bar')
+        this.parser.add_argument('baz', { nargs: '+' })
+        const cm = this.assertRaises(argparse.ArgumentError, () => {
+            this.parser.parse_args([])
+        })
+        this.assertRegex(cm.exception.message,
+                         /the following arguments are required: bar, baz$/)
+    }
+
+    test_required_args_one_or_more_with_metavar () {
+        this.parser.add_argument('bar')
+        this.parser.add_argument('baz', { nargs: '+', metavar: ['BaZ1', 'BaZ2'] })
+        const cm = this.assertRaises(argparse.ArgumentError, () => {
+            this.parser.parse_args([])
+        })
+        this.assertRegex(cm.exception.message,
+                         /the following arguments are required: bar, BaZ1\[, BaZ2]$/)
     }
 
     test_required_args_remainder () {
@@ -7028,6 +7107,54 @@ VV VV VV
         })
         this.assertRegex(cm.exception.message,
                          /one of the arguments --bar --baz is required/)
+    }
+
+    test_conflicting_mutually_exclusive_args_optional_with_metavar () {
+        const group = this.parser.add_mutually_exclusive_group()
+        group.add_argument('--bar')
+        group.add_argument('baz', { nargs: '?', metavar: 'BaZ' })
+        let cm = this.assertRaises(argparse.ArgumentError, () => {
+            this.parser.parse_args(['--bar', 'a', 'b'])
+        })
+        this.assertRegex(cm.exception.message,
+                         /argument BaZ: not allowed with argument --bar$/)
+        cm = this.assertRaises(argparse.ArgumentError, () => {
+            this.parser.parse_args(['a', '--bar', 'b'])
+        })
+        this.assertRegex(cm.exception.message,
+                         /argument --bar: not allowed with argument BaZ$/)
+    }
+
+    test_conflicting_mutually_exclusive_args_zero_or_more_with_metavar1 () {
+        const group = this.parser.add_mutually_exclusive_group()
+        group.add_argument('--bar')
+        group.add_argument('baz', { nargs: '*', metavar: ['BAZ1'] })
+        let cm = this.assertRaises(argparse.ArgumentError, () => {
+            this.parser.parse_args(['--bar', 'a', 'b'])
+        })
+        this.assertRegex(cm.exception.message,
+                         /argument BAZ1: not allowed with argument --bar$/)
+        cm = this.assertRaises(argparse.ArgumentError, () => {
+            this.parser.parse_args(['a', '--bar', 'b'])
+        })
+        this.assertRegex(cm.exception.message,
+                         /argument --bar: not allowed with argument BAZ1$/)
+    }
+
+    test_conflicting_mutually_exclusive_args_zero_or_more_with_metavar2 () {
+        const group = this.parser.add_mutually_exclusive_group()
+        group.add_argument('--bar')
+        group.add_argument('baz', { nargs: '*', metavar: ['BAZ1', 'BAZ2'] })
+        let cm = this.assertRaises(argparse.ArgumentError, () => {
+            this.parser.parse_args(['--bar', 'a', 'b'])
+        })
+        this.assertRegex(cm.exception.message,
+                         /argument BAZ1\[, BAZ2]: not allowed with argument --bar$/)
+        cm = this.assertRaises(argparse.ArgumentError, () => {
+            this.parser.parse_args(['a', '--bar', 'b'])
+        })
+        this.assertRegex(cm.exception.message,
+                         /argument --bar: not allowed with argument BAZ1\[, BAZ2]$/)
     }
 
     test_ambiguous_option () {
