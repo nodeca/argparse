@@ -2257,6 +2257,30 @@ class WFile {
         this.assertIsNone(ret.command)
     }
 
+    test_required_subparsers_no_destination_error () {
+        const parser = new ErrorRaisingArgumentParser()
+        const subparsers = parser.add_subparsers({ required: true })
+        subparsers.add_parser('foo')
+        subparsers.add_parser('bar')
+        const cm = this.assertRaises(ArgumentParserError, () =>
+            parser.parse_args([]))
+        this.assertRegex(
+            cm.exception.stderr,
+            /error: the following arguments are required: \{foo,bar\}\n$/)
+    }
+
+    test_wrong_argument_subparsers_no_destination_error () {
+        const parser = new ErrorRaisingArgumentParser()
+        const subparsers = parser.add_subparsers({ required: true })
+        subparsers.add_parser('foo')
+        subparsers.add_parser('bar')
+        const cm = this.assertRaises(ArgumentParserError, () =>
+            parser.parse_args(['baz']))
+        this.assertRegex(
+            cm.exception.stderr,
+            /error: argument \{foo,bar\}: invalid choice: 'baz' \(choose from 'foo', 'bar'\)\n$/)
+    }
+
     test_optional_subparsers () {
         const parser = new ErrorRaisingArgumentParser()
         const subparsers = parser.add_subparsers({ dest: 'command', required: false })
