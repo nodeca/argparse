@@ -6335,4 +6335,10 @@ VV VV VV
             this.parser.parse_args('--integers a'.split(' '))
         })
     }
+
+    test_exit_on_error_with_unrecognized_args () {
+        this.assertRaises(argparse.ArgumentError, () => {
+            this.parser.parse_args('--foo bar'.split(' '))
+        })
+    }
 }).run()
