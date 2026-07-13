@@ -1,5 +1,5 @@
-// Port of python's argparse module, version 3.9.0:
-// https://github.com/python/cpython/blob/v3.9.0rc1/Lib/test/test_argparse.py
+// Port of python's argparse module, version 3.14.6:
+// https://github.com/python/cpython/blob/v3.14.6/Lib/test/test_argparse.py
 
 // Copyright (C) 2010-2020 Python Software Foundation.
 // Copyright (C) 2020 argparse.js authors
