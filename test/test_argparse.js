@@ -5493,6 +5493,13 @@ VV VV VV
         this.assertEqual(NS({ v: 3, spam: true, badger: "B" }), args)
         this.assertEqual(["C", "--foo", "4"], extras)
     }
+
+    test_zero_or_more_optional () {
+        const parser = argparse.ArgumentParser()
+        parser.add_argument('x', { nargs: '*', choices: ['x', 'y'] })
+        const args = parser.parse_args([])
+        this.assertEqual(NS({ x: [] }), args)
+    }
 }).run()
 
 // ===========================
