@@ -1966,26 +1966,55 @@ const TempDirMixin_ParserTestCase = TempDirMixin(ParserTestCase)
 // Type conversion tests
 // =====================
 
+function FileType (...args) {
+    const emitWarning = process.emitWarning
+    process.emitWarning = () => {}
+    try {
+        return argparse.FileType(...args)
+    } finally {
+        process.emitWarning = emitWarning
+    }
+}
+
+
+;(new class TestFileTypeDeprecation extends TestCase {
+
+    test () {
+        const warnings = []
+        const emitWarning = process.emitWarning
+        process.emitWarning = (warning, type) => warnings.push([warning, type])
+        try {
+            argparse.FileType()
+        } finally {
+            process.emitWarning = emitWarning
+        }
+        this.assertEqual(1, warnings.length)
+        this.assertRegex(warnings[0][0], /FileType is deprecated/)
+        this.assertEqual('PendingDeprecationWarning', warnings[0][1])
+    }
+}).run()
+
+
 ;(new class TestFileTypeRepr extends TestCase {
 
     test_r () {
-        const type = argparse.FileType('r')
+        const type = FileType('r')
         this.assertEqual("FileType('r')", sub('%r', type))
     }
 
     test_r_utf8 () {
-        const type = argparse.FileType('r', { encoding: 'utf8' })
+        const type = FileType('r', { encoding: 'utf8' })
         this.assertEqual("FileType('r', encoding='utf8')", sub('%r', type))
     }
 
     test_w_utf8_0o400 () {
-        const type = argparse.FileType('w', { encoding: 'utf8', mode: 0o400 })
+        const type = FileType('w', { encoding: 'utf8', mode: 0o400 })
         this.assertEqual("FileType('w', encoding='utf8', mode=0o400)",
                          sub('%r', type))
     }
 
     test_w_utf8_close () {
-        const type = argparse.FileType('w', { encoding: 'utf8', emitClose: true })
+        const type = FileType('w', { encoding: 'utf8', emitClose: true })
         this.assertEqual("FileType('w', encoding='utf8', emitClose=true)",
                          sub('%r', type))
     }
@@ -2047,8 +2076,8 @@ class RFile {
     }
 
     argument_signatures = [
-        Sig('-x', { type: argparse.FileType() }),
-        Sig('spam', { type: argparse.FileType('r') }),
+        Sig('-x', { type: FileType() }),
+        Sig('spam', { type: FileType('r') }),
     ]
     failures = ['-x', '', 'non-existent-file.txt']
     successes = [
@@ -2070,7 +2099,7 @@ class RFile {
     }
 
     argument_signatures = [
-        Sig('-c', { type: argparse.FileType('r'), default: 'no-file.txt' }),
+        Sig('-c', { type: FileType('r'), default: 'no-file.txt' }),
     ]
     // should provoke no such file error
     failures = ['']
@@ -2094,8 +2123,8 @@ class WFile {
     }
 
     argument_signatures = [
-        Sig('-x', { type: argparse.FileType('w') }),
-        Sig('spam', { type: argparse.FileType('w') }),
+        Sig('-x', { type: FileType('w') }),
+        Sig('spam', { type: FileType('w') }),
     ]
     failures = ['-x', '', 'readonly']
     successes = [
@@ -2108,7 +2137,7 @@ class WFile {
 
 ;(new class TestFileTypeInvalid extends TestCase {
     test_invalid_file_type () {
-        this.assertRaises(TypeError, () => argparse.FileType('b')('-test'))
+        this.assertRaises(TypeError, () => FileType('b')('-test'))
     }
 }).run()
 
