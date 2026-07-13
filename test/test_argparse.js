@@ -2183,7 +2183,9 @@ class WFile {
     failures = [
         '--float -_.45',
         '--float -1__000.0',
+        '--float -1.0.0',
         '--int -1__000',
+        '--int -1.0',
     ]
     successes = [
         ['--int -1000 --float -1000.0', NS({ int: -1000, float: -1000.0 })],
@@ -2193,6 +2195,8 @@ class WFile {
         ['--float -1_000_000.0_0', NS({ int: undefined, float: -1000000.0 })],
         ['--float -.5', NS({ int: undefined, float: -0.5 })],
         ['--float -.5_000', NS({ int: undefined, float: -0.5 })],
+        ['--float -1e3', NS({ int: undefined, float: -1000 })],
+        ['--float -1e-3', NS({ int: undefined, float: -0.001 })],
     ]
 }).run()
 
