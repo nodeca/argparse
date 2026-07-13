@@ -3098,6 +3098,37 @@ class WFile {
     }
 }).run()
 
+
+;(new class TestGroupConstructor extends TestCase {
+
+    assertGroupPrefixCharsWarning (prefix_chars) {
+        const parser = new ErrorRaisingArgumentParser()
+        const msg =
+            "The use of the undocumented 'prefix_chars' parameter in " +
+            'ArgumentParser.add_argument_group() is deprecated.'
+        const warnings = []
+        const emitWarning = process.emitWarning
+        process.emitWarning = (warning, type) => warnings.push([warning, type])
+        try {
+            parser.add_argument_group({ prefix_chars })
+        } finally {
+            process.emitWarning = emitWarning
+        }
+        this.assertEqual([[msg, 'DeprecationWarning']], warnings)
+    }
+
+    test_group_prefix_chars () {
+        this.assertGroupPrefixCharsWarning('-+')
+    }
+
+    test_group_prefix_chars_default () {
+        // "default" isn't quite the right word here, but it's the same as
+        // the parser's default prefix so it's a good test
+        this.assertGroupPrefixCharsWarning('-')
+    }
+}).run()
+
+
 // ===================
 // Parent parser tests
 // ===================
