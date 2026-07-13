@@ -3731,6 +3731,13 @@ function MEPBase (cls) {
         this.assertEqual(NS({ foo: 2 }), parser.parse_args(['X']))
     }
 
+    test_set_defaults_on_subparser_with_namespace () {
+        const parser = argparse.ArgumentParser()
+        const xparser = parser.add_subparsers().add_parser('X')
+        xparser.set_defaults({ foo: 1 })
+        this.assertEqual(NS({ foo: 2 }), parser.parse_args(['X'], NS({ foo: 2 })))
+    }
+
     test_set_defaults_same_as_add_argument () {
         const parser = new ErrorRaisingArgumentParser()
         parser.set_defaults({ w: 'W', x: 'X', y: 'Y', z: 'Z' })
