@@ -3946,7 +3946,7 @@ VV VV VV
           -w W [W ...]          w
           -x [X ...]            x
           --foo, --no-foo       Whether to foo
-          --bar, --no-bar       Whether to bar (default: true)
+          --bar, --no-bar       Whether to bar
           -f, --foobar, --no-foobar, --barfoo, --no-barfoo
           --bazz, --no-bazz     Bazz!
 
@@ -4650,6 +4650,8 @@ VV VV VV
         Sig('--bar', { action: 'store_true', help: 'bar help' }),
         Sig('--taz', { action: argparse.BooleanOptionalAction,
             help: 'Whether to taz it', default: true }),
+        Sig('--corge', { action: argparse.BooleanOptionalAction,
+            help: 'Whether to corge it', default: argparse.SUPPRESS }),
         Sig('--quux', { help: 'Set the quux', default: 42 }),
         Sig('spam', { help: 'spam help' }),
         Sig('badger', { nargs: '?', default: 'wooden', help: 'badger help' }),
@@ -4659,8 +4661,8 @@ VV VV VV
          [Sig('--baz', { type: 'int', default: 42, help: 'baz help' })]],
     ]
     usage = `\
-        usage: PROG [-h] [--foo FOO] [--bar] [--taz | --no-taz] [--quux QUUX]
-                    [--baz BAZ]
+        usage: PROG [-h] [--foo FOO] [--bar] [--taz | --no-taz] [--corge | --no-corge]
+                    [--quux QUUX] [--baz BAZ]
                     spam [badger]
         `
     help = this.usage + `\
@@ -4668,20 +4670,21 @@ VV VV VV
         description
 
         positional arguments:
-          spam             spam help
-          badger           badger help (default: wooden)
+          spam                 spam help
+          badger               badger help (default: wooden)
 
         options:
-          -h, --help       show this help message and exit
-          --foo FOO        foo help - oh and by the way, undefined
-          --bar            bar help (default: false)
-          --taz, --no-taz  Whether to taz it (default: true)
-          --quux QUUX      Set the quux (default: 42)
+          -h, --help           show this help message and exit
+          --foo FOO            foo help - oh and by the way, undefined
+          --bar                bar help (default: false)
+          --taz, --no-taz      Whether to taz it (default: true)
+          --corge, --no-corge  Whether to corge it
+          --quux QUUX          Set the quux (default: 42)
 
         title:
           description
 
-          --baz BAZ        baz help (default: 42)
+          --baz BAZ            baz help (default: 42)
         `
     version = ''
 }).run()
