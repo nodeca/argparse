@@ -2145,6 +2145,23 @@ class WFile {
     ]
 }).run()
 
+
+;(new class TestFileTypeDashModes extends TestCase {
+
+    test_read_modes () {
+        for (const flags of ['r', 'rb']) {
+            assert.strictEqual(FileType(flags)('-'), process.stdin)
+        }
+    }
+
+    test_write_modes () {
+        for (const flags of ['w', 'wb', 'a', 'ab', 'x', 'xb']) {
+            assert.strictEqual(FileType(flags)('-'), process.stdout)
+        }
+    }
+}).run()
+
+
 ;(new class TestFileTypeInvalid extends TestCase {
     test_invalid_file_type () {
         this.assertRaises(TypeError, () => FileType('b')('-test'))
