@@ -6079,11 +6079,23 @@ VV VV VV
         this.assertEqual(NS({ bar: 'y', cmd: 'cmd', foo: 'x', rest: [1] }), args)
         this.assertEqual(["2", "3"], extras)
 
+        ;[args, extras] = parser.parse_known_intermixed_args(argv)
+        this.assertEqual(NS({ bar: 'y', cmd: 'cmd', foo: 'x', rest: [1, 2, 3] }), args)
+        this.assertEqual([], extras)
+
+        // unknown optionals go into extras
+        argv = 'cmd --foo x --error 1 2 --bar y 3'.split(' ')
+        ;[args, extras] = parser.parse_known_intermixed_args(argv)
+        this.assertEqual(NS({ bar: 'y', cmd: 'cmd', foo: 'x', rest: [1, 2, 3] }), args)
+        this.assertEqual(['--error'], extras)
         argv = 'cmd --foo x 1 --error 2 --bar y 3'.split(' ')
         ;[args, extras] = parser.parse_known_intermixed_args(argv)
-        // unknown optionals go into extras
-        this.assertEqual(NS({ bar: 'y', cmd: 'cmd', foo: 'x', rest: [1] }), args)
-        this.assertEqual(['--error', '2', '3'], extras)
+        this.assertEqual(NS({ bar: 'y', cmd: 'cmd', foo: 'x', rest: [1, 2, 3] }), args)
+        this.assertEqual(['--error'], extras)
+        argv = 'cmd --foo x 1 2 --error --bar y 3'.split(' ')
+        ;[args, extras] = parser.parse_known_intermixed_args(argv)
+        this.assertEqual(NS({ bar: 'y', cmd: 'cmd', foo: 'x', rest: [1, 2, 3] }), args)
+        this.assertEqual(['--error'], extras)
 
         // restores attributes that were temporarily changed
         this.assertIsNone(parser.usage)
@@ -6103,27 +6115,47 @@ VV VV VV
         this.assertRegex(String(cm.exception), /\.\.\./)
     }
 
-    test_exclusive () {
-        // mutually exclusive group; intermixed works fine
-        const parser = new ErrorRaisingArgumentParser({ prog: 'PROG' })
+    test_required_exclusive () {
+        // required mutually exclusive group; intermixed works fine
+        const parser = argparse.ArgumentParser({ prog: 'PROG', exit_on_error: false })
         const group = parser.add_mutually_exclusive_group({ required: true })
         group.add_argument('--foo', { action: 'store_true', help: 'FOO' })
         group.add_argument('--spam', { help: 'SPAM' })
         parser.add_argument('badger', { nargs: '*', default: 'X', help: 'BADGER' })
-        const args = parser.parse_intermixed_args('1 --foo 2'.split(' '))
+        let args = parser.parse_intermixed_args('--foo 1 2'.split(' '))
         this.assertEqual(NS({ badger: ['1', '2'], foo: true, spam: undefined }), args)
-        this.assertRaises(ArgumentParserError, () => parser.parse_intermixed_args('1 2'.split(' ')))
+        args = parser.parse_intermixed_args('1 --foo 2'.split(' '))
+        this.assertEqual(NS({ badger: ['1', '2'], foo: true, spam: undefined }), args)
+        const cm = this.assertRaises(argparse.ArgumentError, () =>
+            parser.parse_intermixed_args('1 2'.split(' ')))
+        this.assertRegex(cm.exception.message,
+                         /one of the arguments --foo --spam is required/)
         this.assertEqual(group.required, true)
     }
 
-    test_exclusive_incompatible () {
-        // mutually exclusive group including positional - fail
-        const parser = new ErrorRaisingArgumentParser({ prog: 'PROG' })
+    test_required_exclusive_with_positional () {
+        // required mutually exclusive group with positional argument
+        const parser = argparse.ArgumentParser({ prog: 'PROG', exit_on_error: false })
         const group = parser.add_mutually_exclusive_group({ required: true })
         group.add_argument('--foo', { action: 'store_true', help: 'FOO' })
         group.add_argument('--spam', { help: 'SPAM' })
         group.add_argument('badger', { nargs: '*', default: 'X', help: 'BADGER' })
-        this.assertRaises(TypeError, () => parser.parse_intermixed_args([]))
+        let args = parser.parse_intermixed_args(['--foo'])
+        this.assertEqual(NS({ foo: true, spam: undefined, badger: 'X' }), args)
+        args = parser.parse_intermixed_args(['a', 'b'])
+        this.assertEqual(NS({ foo: false, spam: undefined, badger: ['a', 'b'] }), args)
+        let cm = this.assertRaises(argparse.ArgumentError, () =>
+            parser.parse_intermixed_args([]))
+        this.assertRegex(cm.exception.message,
+                         /one of the arguments --foo --spam badger is required/)
+        cm = this.assertRaises(argparse.ArgumentError, () =>
+            parser.parse_intermixed_args(['--foo', 'a', 'b']))
+        this.assertRegex(cm.exception.message,
+                         /argument badger: not allowed with argument --foo/)
+        cm = this.assertRaises(argparse.ArgumentError, () =>
+            parser.parse_intermixed_args(['a', '--foo', 'b']))
+        this.assertRegex(cm.exception.message,
+                         /argument badger: not allowed with argument --foo/)
         this.assertEqual(group.required, true)
     }
 }).run()
@@ -6143,7 +6175,7 @@ VV VV VV
 
         cm = this.assertRaises(ArgumentParserError, () => parser.parse_intermixed_args([]))
         msg = String(cm.exception)
-        this.assertNotRegex(msg, /req_pos/)
+        this.assertRegex(msg, /req_pos/)
         this.assertRegex(msg, /req_opt/)
     }
 }).run()
