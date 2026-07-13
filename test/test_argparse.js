@@ -3718,6 +3718,11 @@ class TestMutuallyExclusivePositionalWithDefault extends MEMixin_TestCase {
 
 ;(new class TestMutuallyExclusiveNested extends MEMixin_TestCase {
 
+    // Nesting mutually exclusive groups is an undocumented feature
+    // that came about by accident through inheritance and has been
+    // the source of many bugs. It is deprecated and this test should
+    // eventually be removed along with it.
+
     get_parser ({ required = undefined } = {}) {
         const parser = new ErrorRaisingArgumentParser({ prog: 'PROG' })
         const group = parser.add_mutually_exclusive_group({ required })
