@@ -92,6 +92,18 @@ class StdIOBuffer extends stream.Writable {
 }
 
 
+function captured_stderr (fn) {
+    const old_stderr = Object.getOwnPropertyDescriptor(process, 'stderr')
+    Object.defineProperty(process, 'stderr', { value: new StdIOBuffer() })
+    try {
+        fn()
+        return process.stderr.getvalue()
+    } finally {
+        Object.defineProperty(process, 'stderr', old_stderr)
+    }
+}
+
+
 class TestCase extends JSTestCase {
 
     setUp () {
@@ -6045,7 +6057,8 @@ VV VV VV
         const string = (
             "Action(option_strings=[ '--foo', '-a', '-b' ], dest='b', " +
             "nargs='+', const=undefined, default=42, type='int', " +
-            "choices=[ 1, 2, 3 ], required=false, help='HELP', metavar='METAVAR')")
+            "choices=[ 1, 2, 3 ], required=false, help='HELP', " +
+            "metavar='METAVAR', deprecated=false)")
         this.assertStringEqual(option, string)
     }
 
@@ -6063,7 +6076,8 @@ VV VV VV
         const string = sub(
             "Action(option_strings=[], dest='x', nargs='?', " +
             "const=undefined, default=2.5, type=%r, choices=[ 0.5, 1.5, 2.5 ], " +
-            "required=true, help='H HH H', metavar='MV MV MV')", Number)
+            "required=true, help='H HH H', metavar='MV MV MV', " +
+            "deprecated=false)", Number)
         this.assertStringEqual(argument, string)
     }
 
@@ -6244,6 +6258,116 @@ VV VV VV
         this.assertEqual(NS({ foo: 'foo_converted' }), args)
     }
 }).run()
+
+
+// ==============================================
+// Check that deprecated arguments output warning
+// ==============================================
+
+;(new class TestDeprecatedArguments extends TestCase {
+
+    test_deprecated_option () {
+        const parser = argparse.ArgumentParser()
+        parser.add_argument('-f', '--foo', { deprecated: true })
+
+        let stderr = captured_stderr(() => parser.parse_args(['--foo', 'spam']))
+        this.assertRegex(stderr, /warning: option '--foo' is deprecated/)
+        this.assertEqual(1, stderr.split('is deprecated').length - 1)
+
+        stderr = captured_stderr(() => parser.parse_args(['-f', 'spam']))
+        this.assertRegex(stderr, /warning: option '-f' is deprecated/)
+        this.assertEqual(1, stderr.split('is deprecated').length - 1)
+
+        stderr = captured_stderr(() =>
+            parser.parse_args(['--foo', 'spam', '-f', 'ham']))
+        this.assertRegex(stderr, /warning: option '--foo' is deprecated/)
+        this.assertRegex(stderr, /warning: option '-f' is deprecated/)
+        this.assertEqual(2, stderr.split('is deprecated').length - 1)
+
+        stderr = captured_stderr(() =>
+            parser.parse_args(['--foo', 'spam', '--foo', 'ham']))
+        this.assertRegex(stderr, /warning: option '--foo' is deprecated/)
+        this.assertEqual(1, stderr.split('is deprecated').length - 1)
+    }
+
+    test_deprecated_boolean_option () {
+        const parser = argparse.ArgumentParser()
+        parser.add_argument('-f', '--foo', {
+            action: argparse.BooleanOptionalAction,
+            deprecated: true
+        })
+
+        let stderr = captured_stderr(() => parser.parse_args(['--foo']))
+        this.assertRegex(stderr, /warning: option '--foo' is deprecated/)
+        this.assertEqual(1, stderr.split('is deprecated').length - 1)
+
+        stderr = captured_stderr(() => parser.parse_args(['-f']))
+        this.assertRegex(stderr, /warning: option '-f' is deprecated/)
+        this.assertEqual(1, stderr.split('is deprecated').length - 1)
+
+        stderr = captured_stderr(() => parser.parse_args(['--no-foo']))
+        this.assertRegex(stderr, /warning: option '--no-foo' is deprecated/)
+        this.assertEqual(1, stderr.split('is deprecated').length - 1)
+
+        stderr = captured_stderr(() => parser.parse_args(['--foo', '--no-foo']))
+        this.assertRegex(stderr, /warning: option '--foo' is deprecated/)
+        this.assertRegex(stderr, /warning: option '--no-foo' is deprecated/)
+        this.assertEqual(2, stderr.split('is deprecated').length - 1)
+    }
+
+    test_deprecated_arguments () {
+        const parser = argparse.ArgumentParser()
+        parser.add_argument('foo', { nargs: '?', deprecated: true })
+        parser.add_argument('bar', { nargs: '?', deprecated: true })
+
+        let stderr = captured_stderr(() => parser.parse_args([]))
+        this.assertEqual(0, stderr.split('is deprecated').length - 1)
+
+        stderr = captured_stderr(() => parser.parse_args(['spam']))
+        this.assertRegex(stderr, /warning: argument 'foo' is deprecated/)
+        this.assertEqual(1, stderr.split('is deprecated').length - 1)
+
+        stderr = captured_stderr(() => parser.parse_args(['spam', 'ham']))
+        this.assertRegex(stderr, /warning: argument 'foo' is deprecated/)
+        this.assertRegex(stderr, /warning: argument 'bar' is deprecated/)
+        this.assertEqual(2, stderr.split('is deprecated').length - 1)
+    }
+
+    test_deprecated_varargument () {
+        const parser = argparse.ArgumentParser()
+        parser.add_argument('foo', { nargs: '*', deprecated: true })
+
+        let stderr = captured_stderr(() => parser.parse_args([]))
+        this.assertEqual(0, stderr.split('is deprecated').length - 1)
+
+        stderr = captured_stderr(() => parser.parse_args(['spam']))
+        this.assertRegex(stderr, /warning: argument 'foo' is deprecated/)
+        this.assertEqual(1, stderr.split('is deprecated').length - 1)
+
+        stderr = captured_stderr(() => parser.parse_args(['spam', 'ham']))
+        this.assertRegex(stderr, /warning: argument 'foo' is deprecated/)
+        this.assertEqual(1, stderr.split('is deprecated').length - 1)
+    }
+
+    test_deprecated_subparser () {
+        const parser = argparse.ArgumentParser()
+        const subparsers = parser.add_subparsers()
+        subparsers.add_parser('foo', { aliases: ['baz'], deprecated: true })
+        subparsers.add_parser('bar')
+
+        let stderr = captured_stderr(() => parser.parse_args(['bar']))
+        this.assertEqual(0, stderr.split('is deprecated').length - 1)
+
+        stderr = captured_stderr(() => parser.parse_args(['foo']))
+        this.assertRegex(stderr, /warning: command 'foo' is deprecated/)
+        this.assertEqual(1, stderr.split('is deprecated').length - 1)
+
+        stderr = captured_stderr(() => parser.parse_args(['baz']))
+        this.assertRegex(stderr, /warning: command 'baz' is deprecated/)
+        this.assertEqual(1, stderr.split('is deprecated').length - 1)
+    }
+}).run()
+
 
 // ==================================================================
 // Check semantics regarding the default argument and type conversion
