@@ -10,7 +10,7 @@
 'use strict'
 
 const assert = require('assert')
-const { describe, it, before, after } = require('node:test')
+const { describe, it, beforeEach, afterEach } = require('node:test')
 const fs = require('fs')
 const os = require('os')
 const path = require('path')
@@ -27,9 +27,9 @@ class JSTestCase {
         describe(this.constructor.name, () => {
             for (const method of this) {
                 if (method === 'setUp') {
-                    before(() => this[method]())
+                    beforeEach(() => this[method]())
                 } else if (method === 'tearDown') {
-                    after(() => this[method]())
+                    afterEach(() => this[method]())
                 } else if (typeof method === 'string' && method.startsWith('skip_test') &&
                     this[method] !== undefined) {
                     it.skip(method, () => this[method]())
@@ -2293,7 +2293,8 @@ class WFile {
             subparsers_kwargs.help = 'command help'
         }
         const subparsers = parser.add_subparsers(subparsers_kwargs)
-        this.assertArgumentParserError(() => parser.add_subparsers())
+        const cm = this.assertRaises(argparse.ArgumentError, () => parser.add_subparsers())
+        this.assertRegex(cm.exception.message, /cannot have multiple subparser arguments/)
 
         // add first sub-parser
         const parser1_kwargs = { description: '1 description' }
@@ -6321,7 +6322,8 @@ VV VV VV
 ;(new class TestExitOnError extends TestCase {
 
     setUp () {
-        this.parser = argparse.ArgumentParser({ exit_on_error: false })
+        this.parser = argparse.ArgumentParser({
+            exit_on_error: false, fromfile_prefix_chars: '@' })
         this.parser.add_argument('--integers', { metavar: 'N', type: 'int' })
     }
 
@@ -6336,9 +6338,57 @@ VV VV VV
         })
     }
 
-    test_exit_on_error_with_unrecognized_args () {
-        this.assertRaises(argparse.ArgumentError, () => {
+    test_unrecognized_args () {
+        const cm = this.assertRaises(argparse.ArgumentError, () => {
             this.parser.parse_args('--foo bar'.split(' '))
         })
+        this.assertRegex(cm.exception.message, /unrecognized arguments: --foo bar/)
+    }
+
+    test_unrecognized_intermixed_args () {
+        const cm = this.assertRaises(argparse.ArgumentError, () => {
+            this.parser.parse_intermixed_args('--foo bar'.split(' '))
+        })
+        this.assertRegex(cm.exception.message, /unrecognized arguments: --foo bar/)
+    }
+
+    test_required_args () {
+        this.parser.add_argument('bar')
+        this.parser.add_argument('baz')
+        const cm = this.assertRaises(argparse.ArgumentError, () => {
+            this.parser.parse_args([])
+        })
+        this.assertRegex(cm.exception.message,
+                         /the following arguments are required: bar, baz/)
+    }
+
+    test_required_mutually_exclusive_args () {
+        const group = this.parser.add_mutually_exclusive_group({ required: true })
+        group.add_argument('--bar')
+        group.add_argument('--baz')
+        const cm = this.assertRaises(argparse.ArgumentError, () => {
+            this.parser.parse_args([])
+        })
+        this.assertRegex(cm.exception.message,
+                         /one of the arguments --bar --baz is required/)
+    }
+
+    test_ambiguous_option () {
+        this.parser.add_argument('--foobaz')
+        this.parser.add_argument('--fooble', { action: 'store_true' })
+        const cm = this.assertRaises(argparse.ArgumentError, () => {
+            this.parser.parse_args(['--foob'])
+        })
+        this.assertRegex(cm.exception.message,
+                         /ambiguous option: --foob could match --foobaz, --fooble/)
+    }
+
+    test_os_error () {
+        this.parser.add_argument('file')
+        const cm = this.assertRaises(argparse.ArgumentError, () => {
+            this.parser.parse_args(['@no-such-file'])
+        })
+        this.assertRegex(cm.exception.message,
+                         /no such file or directory.*no-such-file/i)
     }
 }).run()
