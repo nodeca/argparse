@@ -376,7 +376,7 @@ class ParserTestCase extends TestCase {
         Sig('-z'),
     ]
     failures = ['a', '--foo', '-xa', '-x --foo', '-x -z', '-z -x',
-                '-yx', '-yz a', '-yyyx', '-yyyza', '-xyza']
+                '-yx', '-yz a', '-yyyx', '-yyyza', '-xyza', '-x=']
     successes = [
         ['', NS({ x: false, yyy: undefined, z: undefined })],
         ['-x', NS({ x: true, yyy: undefined, z: undefined })],
