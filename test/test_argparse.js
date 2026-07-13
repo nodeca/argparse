@@ -2266,18 +2266,19 @@ class WFile {
         this.assertRaises(ArgumentParserError, ...args)
     }
 
-    _get_parser ({ subparser_help = false, prefix_chars = undefined, aliases = false } = {}) {
+    _get_parser ({ subparser_help = false, prefix_chars = undefined,
+                   aliases = false, usage = undefined } = {}) {
         // create a parser with a subparsers argument
         let parser
 
         if (prefix_chars) {
             parser = new ErrorRaisingArgumentParser({
-                prog: 'PROG', description: 'main description', prefix_chars })
+                prog: 'PROG', description: 'main description', usage, prefix_chars })
             parser.add_argument(
                 prefix_chars[0].repeat(2) + 'foo', { action: 'store_true', help: 'foo help' })
         } else {
             parser = new ErrorRaisingArgumentParser({
-                prog: 'PROG', description: 'main description' })
+                prog: 'PROG', description: 'main description', usage })
             parser.add_argument(
                 '--foo', { action: 'store_true', help: 'foo help' })
         }
@@ -2318,7 +2319,10 @@ class WFile {
         parser2.add_argument('z', { type: 'str', nargs: '*', help: 'z help' })
 
         // add third sub-parser
-        const parser3_kwargs = { description: '3 description' }
+        const parser3_kwargs = {
+            description: '3 description',
+            usage: 'PROG --foo bar 3 t ...'
+        }
         if (subparser_help) {
             parser3_kwargs.help = '3 help'
         }
@@ -2342,6 +2346,63 @@ class WFile {
                               '0.5 1 -y', '0.5 2 -w']) {
             const args = args_str.split(/\s+/).filter(Boolean)
             this.assertArgumentParserError(() => this.parser.parse_args(args))
+        }
+    }
+
+    test_parse_args_failures_details () {
+        for (const [args_str, usage_str, error_str] of [
+            [
+                '',
+                'usage: PROG [-h] [--foo] bar {1,2,3} ...',
+                'PROG: error: the following arguments are required: bar'
+            ],
+            [
+                '0.5 1 -y',
+                'usage: PROG bar 1 [-h] [-w W] {a,b,c}',
+                'PROG bar 1: error: the following arguments are required: x'
+            ],
+            [
+                '0.5 3',
+                'usage: PROG --foo bar 3 t ...',
+                'PROG bar 3: error: the following arguments are required: t'
+            ]
+        ]) {
+            const args = args_str.split(/\s+/).filter(Boolean)
+            const cm = this.assertRaises(ArgumentParserError, () =>
+                this.parser.parse_args(args))
+            this.assertEqual(cm.exception.m, 'SystemExit')
+            this.assertEqual(cm.exception.stderr, `${usage_str}\n${error_str}\n`)
+        }
+    }
+
+    test_parse_args_failures_details_custom_usage () {
+        const parser = this._get_parser({
+            usage: 'PROG [--foo] bar 1 [-w W] {a,b,c}\n' +
+                   '       PROG --foo bar 3 t ...'
+        })
+        for (const [args_str, usage_str, error_str] of [
+            [
+                '',
+                'usage: PROG [--foo] bar 1 [-w W] {a,b,c}\n' +
+                '       PROG --foo bar 3 t ...',
+                'PROG: error: the following arguments are required: bar'
+            ],
+            [
+                '0.5 1 -y',
+                'usage: PROG bar 1 [-h] [-w W] {a,b,c}',
+                'PROG bar 1: error: the following arguments are required: x'
+            ],
+            [
+                '0.5 3',
+                'usage: PROG --foo bar 3 t ...',
+                'PROG bar 3: error: the following arguments are required: t'
+            ]
+        ]) {
+            const args = args_str.split(/\s+/).filter(Boolean)
+            const cm = this.assertRaises(ArgumentParserError, () =>
+                parser.parse_args(args))
+            this.assertEqual(cm.exception.m, 'SystemExit')
+            this.assertEqual(cm.exception.stderr, `${usage_str}\n${error_str}\n`)
         }
     }
 
