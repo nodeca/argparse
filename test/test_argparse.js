@@ -4574,7 +4574,7 @@ VV VV VV
 
         options:
           -h, --help            show this help message and exit
-          -p {1 (option A), 2 (option B)}, --optional {1 (option A), 2 (option B)}
+          -p, --optional {1 (option A), 2 (option B)}
         `
     version = ''
 }).run()
@@ -5253,8 +5253,8 @@ VV VV VV
     help = this.usage + `\
 
         options:
-          ^^foo              foo help
-          ;b BAR, ;;bar BAR  bar help
+          ^^foo          foo help
+          ;b, ;;bar BAR  bar help
         `
     version = ''
 }).run()
