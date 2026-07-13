@@ -3916,6 +3916,8 @@ VV VV VV
         Sig('--bar', { help: 'Whether to bar', default: true,
                        action: argparse.BooleanOptionalAction }),
         Sig('-f', '--foobar', '--barfoo', { action: argparse.BooleanOptionalAction }),
+        Sig('--bazz', { action: argparse.BooleanOptionalAction,
+                        default: argparse.SUPPRESS, help: 'Bazz!' }),
     ]
     argument_group_signatures = [
         [Sig('group'), [
@@ -3928,8 +3930,8 @@ VV VV VV
     usage = `\
         usage: PROG [-h] [-w W [W ...]] [-x [X ...]] [--foo | --no-foo]
                     [--bar | --no-bar]
-                    [-f | --foobar | --no-foobar | --barfoo | --no-barfoo] [-y [Y]]
-                    [-z Z Z Z]
+                    [-f | --foobar | --no-foobar | --barfoo | --no-barfoo]
+                    [--bazz | --no-bazz] [-y [Y]] [-z Z Z Z]
                     a b b [c] [d ...] e [e ...]
         `
     help = this.usage + `\
@@ -3946,6 +3948,7 @@ VV VV VV
           --foo, --no-foo       Whether to foo
           --bar, --no-bar       Whether to bar (default: true)
           -f, --foobar, --no-foobar, --barfoo, --no-barfoo
+          --bazz, --no-bazz     Bazz!
 
         group:
           -y [Y]                y
