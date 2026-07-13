@@ -5804,6 +5804,15 @@ VV VV VV
         })
     }
 
+    test_multiple_dest () {
+        const parser = argparse.ArgumentParser()
+        parser.add_argument({ dest: 'foo' })
+        const cm = this.assertRaises(TypeError, () =>
+            parser.add_argument('bar', { dest: 'baz' }))
+        this.assertRegex(String(cm.exception),
+            /dest supplied twice for positional argument, did you mean metavar\?/)
+    }
+
     test_no_argument_actions () {
         for (const action of ['store_const', 'store_true', 'store_false',
                               'append_const', 'count']) {
@@ -5834,15 +5843,6 @@ VV VV VV
     }
 
 /*
-    test_multiple_dest() {
-        parser = argparse.ArgumentParser()
-        parser.add_argument(dest='foo')
-        with this.assertRaises(ValueError) as cm:
-            parser.add_argument('bar', dest='baz')
-        this.assertIn('dest supplied twice for positional argument',
-                      str(cm.exception))
-    }
-
     test_no_argument_no_const_actions() {
         # options with zero arguments
         for action in ['store_true', 'store_false', 'count']:
