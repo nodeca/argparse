@@ -2277,6 +2277,35 @@ class WFile {
         )
     }
 
+    test_parse_known_args_with_single_dash_option () {
+        const parser = new ErrorRaisingArgumentParser()
+        parser.add_argument('-k', '--known', { action: 'count', default: 0 })
+        parser.add_argument('-n', '--new', { action: 'count', default: 0 })
+        this.assertEqual(parser.parse_known_args(['-k', '-u']),
+                         [NS({ known: 1, new: 0 }), ['-u']])
+        this.assertEqual(parser.parse_known_args(['-u', '-k']),
+                         [NS({ known: 1, new: 0 }), ['-u']])
+        this.assertEqual(parser.parse_known_args(['-ku']),
+                         [NS({ known: 1, new: 0 }), ['-u']])
+        this.assertArgumentParserError(() => parser.parse_known_args(['-k=u']))
+        this.assertEqual(parser.parse_known_args(['-uk']),
+                         [NS({ known: 0, new: 0 }), ['-uk']])
+        this.assertEqual(parser.parse_known_args(['-u=k']),
+                         [NS({ known: 0, new: 0 }), ['-u=k']])
+        this.assertEqual(parser.parse_known_args(['-kunknown']),
+                         [NS({ known: 1, new: 0 }), ['-unknown']])
+        this.assertArgumentParserError(() => parser.parse_known_args(['-k=unknown']))
+        this.assertEqual(parser.parse_known_args(['-ku=nknown']),
+                         [NS({ known: 1, new: 0 }), ['-u=nknown']])
+        this.assertEqual(parser.parse_known_args(['-knew']),
+                         [NS({ known: 1, new: 1 }), ['-ew']])
+        this.assertArgumentParserError(() => parser.parse_known_args(['-kn=ew']))
+        this.assertArgumentParserError(() => parser.parse_known_args(['-k-new']))
+        this.assertArgumentParserError(() => parser.parse_known_args(['-kn-ew']))
+        this.assertEqual(parser.parse_known_args(['-kne-w']),
+                         [NS({ known: 1, new: 1 }), ['-e-w']])
+    }
+
     test_dest () {
         const parser = new ErrorRaisingArgumentParser()
         parser.add_argument('--foo', { action: 'store_true' })
