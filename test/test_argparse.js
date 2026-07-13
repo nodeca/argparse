@@ -2367,6 +2367,39 @@ class WFile {
         `))
     }
 
+    test_help_blank () {
+        // Issue 24444
+        let parser = new ErrorRaisingArgumentParser({
+            prog: 'PROG', description: 'main description' })
+        parser.add_argument('foo', { help: '    ' })
+        this.assertEqual(parser.format_help(), textwrap.dedent(`\
+            usage: PROG [-h] foo
+
+            main description
+
+            positional arguments:
+              foo         
+
+            options:
+              -h, --help  show this help message and exit
+        `))
+
+        parser = new ErrorRaisingArgumentParser({
+            prog: 'PROG', description: 'main description' })
+        parser.add_argument('foo', { choices: [], help: '%(choices)s' })
+        this.assertEqual(parser.format_help(), textwrap.dedent(`\
+            usage: PROG [-h] {}
+
+            main description
+
+            positional arguments:
+              {}          
+
+            options:
+              -h, --help  show this help message and exit
+        `))
+    }
+
     test_help_alternate_prefix_chars () {
         const parser = this._get_parser({ prefix_chars: '+:/' })
         this.assertEqual(parser.format_usage(),
