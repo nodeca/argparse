@@ -5921,12 +5921,13 @@ VV VV VV
             nargs: '+',
             default: 42,
             choices: [1, 2, 3],
+            required: false,
             help: 'HELP',
             metavar: 'METAVAR' })
         const string = (
             "Action(option_strings=[ '--foo', '-a', '-b' ], dest='b', " +
             "nargs='+', const=undefined, default=42, type='int', " +
-            "choices=[ 1, 2, 3 ], help='HELP', metavar='METAVAR')")
+            "choices=[ 1, 2, 3 ], required=false, help='HELP', metavar='METAVAR')")
         this.assertStringEqual(option, string)
     }
 
@@ -5938,12 +5939,13 @@ VV VV VV
             nargs: '?',
             default: 2.5,
             choices: [0.5, 1.5, 2.5],
+            required: true,
             help: 'H HH H',
             metavar: 'MV MV MV' })
         const string = sub(
             "Action(option_strings=[], dest='x', nargs='?', " +
             "const=undefined, default=2.5, type=%r, choices=[ 0.5, 1.5, 2.5 ], " +
-            "help='H HH H', metavar='MV MV MV')", Number)
+            "required=true, help='H HH H', metavar='MV MV MV')", Number)
         this.assertStringEqual(argument, string)
     }
 
