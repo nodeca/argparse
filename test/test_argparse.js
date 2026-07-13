@@ -1784,18 +1784,24 @@ class ParserTestCase extends TestCase {
     /* Test actions with suppressed defaults */
 
     argument_signatures = [
-        Sig('foo', { nargs: '?', default: argparse.SUPPRESS }),
-        Sig('bar', { nargs: '*', default: argparse.SUPPRESS }),
+        Sig('foo', { nargs: '?', type: 'int', default: argparse.SUPPRESS }),
+        Sig('bar', { nargs: '*', type: 'int', default: argparse.SUPPRESS }),
         Sig('--baz', { action: 'store_true', default: argparse.SUPPRESS }),
+        Sig('--qux', { nargs: '?', type: 'int', default: argparse.SUPPRESS }),
+        Sig('--quux', { nargs: '*', type: 'int', default: argparse.SUPPRESS }),
     ]
-    failures = ['-x']
+    failures = ['-x', 'a', '1 a']
     successes = [
         ['', NS({})],
-        ['a', NS({ foo: 'a' })],
-        ['a b', NS({ foo: 'a', bar: ['b'] })],
+        ['1', NS({ foo: 1 })],
+        ['1 2', NS({ foo: 1, bar: [2] })],
         ['--baz', NS({ baz: true })],
-        ['a --baz', NS({ foo: 'a', baz: true })],
-        ['--baz a b', NS({ foo: 'a', bar: ['b'], baz: true })],
+        ['1 --baz', NS({ foo: 1, baz: true })],
+        ['--baz 1 2', NS({ foo: 1, bar: [2], baz: true })],
+        ['--qux', NS({ qux: undefined })],
+        ['--qux 1', NS({ qux: 1 })],
+        ['--quux', NS({ quux: [] })],
+        ['--quux 1 2', NS({ quux: [1, 2] })],
     ]
 }).run()
 
