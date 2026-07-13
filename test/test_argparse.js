@@ -1167,7 +1167,7 @@ const colors = [Color.RED, Color.GREEN, Color.BLUE]
             parser.parse_args(['--color', 'yellow']))
         this.assertRegex(
             String(cm.exception),
-            /invalid choice: 'yellow' \(choose from red, green, blue\)/)
+            /invalid choice: 'yellow' \(choose from 'red', 'green', 'blue'\)/)
     }
 }).run()
 
@@ -2443,7 +2443,7 @@ class WFile {
             parser.parse_args(['bazz']))
         assert(cm.exception.stderr.includes(
             "error: argument foo: invalid choice: 'bazz', maybe you meant 'baz'? " +
-            '(choose from bar, baz)'))
+            "(choose from 'bar', 'baz')"))
     }
 
     test_wrong_argument_error_no_suggestions () {
@@ -2452,7 +2452,7 @@ class WFile {
         const cm = this.assertRaises(ArgumentParserError, () =>
             parser.parse_args(['bazz']))
         assert(cm.exception.stderr.includes(
-            "error: argument foo: invalid choice: 'bazz' (choose from bar, baz)"))
+            "error: argument foo: invalid choice: 'bazz' (choose from 'bar', 'baz')"))
     }
 
     test_wrong_argument_subparsers_with_suggestions () {
@@ -2464,7 +2464,7 @@ class WFile {
             parser.parse_args(['baz']))
         assert(cm.exception.stderr.includes(
             "error: argument {foo,bar}: invalid choice: 'baz', maybe you meant " +
-            "'bar'? (choose from foo, bar)"))
+            "'bar'? (choose from 'foo', 'bar')"))
     }
 
     test_wrong_argument_subparsers_no_suggestions () {
@@ -2475,7 +2475,7 @@ class WFile {
         const cm = this.assertRaises(ArgumentParserError, () =>
             parser.parse_args(['baz']))
         assert(cm.exception.stderr.includes(
-            "error: argument {foo,bar}: invalid choice: 'baz' (choose from foo, bar)"))
+            "error: argument {foo,bar}: invalid choice: 'baz' (choose from 'foo', 'bar')"))
     }
 
     test_wrong_argument_no_suggestion_implicit () {
@@ -2484,7 +2484,7 @@ class WFile {
         const cm = this.assertRaises(ArgumentParserError, () =>
             parser.parse_args(['bazz']))
         assert(cm.exception.stderr.includes(
-            "error: argument foo: invalid choice: 'bazz' (choose from bar, baz)"))
+            "error: argument foo: invalid choice: 'bazz' (choose from 'bar', 'baz')"))
     }
 
     test_suggestions_choices_empty () {
@@ -2502,7 +2502,7 @@ class WFile {
         const cm = this.assertRaises(ArgumentParserError, () =>
             parser.parse_args(['3']))
         assert(cm.exception.stderr.includes(
-            "error: argument foo: invalid choice: '3' (choose from 1, 2)"))
+            "error: argument foo: invalid choice: '3' (choose from '1', '2')"))
     }
 
     test_suggestions_choices_mixed_types () {
@@ -2511,7 +2511,7 @@ class WFile {
         const cm = this.assertRaises(ArgumentParserError, () =>
             parser.parse_args(['3']))
         assert(cm.exception.stderr.includes(
-            "error: argument foo: invalid choice: '3' (choose from 1, 2)"))
+            "error: argument foo: invalid choice: '3' (choose from '1', '2')"))
     }
 }).run()
 
