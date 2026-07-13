@@ -3449,6 +3449,120 @@ class TestMutuallyExclusiveOptionalsAndPositionalsMixed extends MEMixin_TestCase
         `
 }
 
+
+class TestMutuallyExclusiveOptionalOptional extends MEMixin_TestCase {
+
+    get_parser ({ required = undefined } = {}) {
+        const parser = new ErrorRaisingArgumentParser({ prog: 'PROG' })
+        const group = parser.add_mutually_exclusive_group({ required })
+        group.add_argument('--foo')
+        group.add_argument('--bar', { nargs: '?' })
+        return parser
+    }
+
+    failures = [
+        '--foo X --bar Y',
+        '--foo X --bar',
+    ]
+    successes = [
+        ['--foo X', NS({ foo: 'X', bar: undefined })],
+        ['--bar X', NS({ foo: undefined, bar: 'X' })],
+        ['--bar', NS({ foo: undefined, bar: undefined })],
+    ]
+    successes_when_not_required = [
+        ['', NS({ foo: undefined, bar: undefined })],
+    ]
+    usage_when_required = `\
+        usage: PROG [-h] (--foo FOO | --bar [BAR])
+        `
+    usage_when_not_required = `\
+        usage: PROG [-h] [--foo FOO | --bar [BAR]]
+        `
+    help = `\
+
+        options:
+          -h, --help   show this help message and exit
+          --foo FOO
+          --bar [BAR]
+        `
+}
+
+
+class TestMutuallyExclusiveOptionalWithDefault extends MEMixin_TestCase {
+
+    get_parser ({ required = undefined } = {}) {
+        const parser = new ErrorRaisingArgumentParser({ prog: 'PROG' })
+        const group = parser.add_mutually_exclusive_group({ required })
+        group.add_argument('--foo')
+        group.add_argument('--bar', { type: Boolean, default: true })
+        return parser
+    }
+
+    failures = [
+        '--foo X --bar Y',
+        '--foo X --bar=',
+    ]
+    successes = [
+        ['--foo X', NS({ foo: 'X', bar: true })],
+        ['--bar X', NS({ foo: undefined, bar: true })],
+        ['--bar=', NS({ foo: undefined, bar: false })],
+    ]
+    successes_when_not_required = [
+        ['', NS({ foo: undefined, bar: true })],
+    ]
+    usage_when_required = `\
+        usage: PROG [-h] (--foo FOO | --bar BAR)
+        `
+    usage_when_not_required = `\
+        usage: PROG [-h] [--foo FOO | --bar BAR]
+        `
+    help = `\
+
+        options:
+          -h, --help  show this help message and exit
+          --foo FOO
+          --bar BAR
+        `
+}
+
+
+class TestMutuallyExclusivePositionalWithDefault extends MEMixin_TestCase {
+
+    get_parser ({ required = undefined } = {}) {
+        const parser = new ErrorRaisingArgumentParser({ prog: 'PROG' })
+        const group = parser.add_mutually_exclusive_group({ required })
+        group.add_argument('--foo')
+        group.add_argument('bar', { nargs: '?', type: Boolean, default: true })
+        return parser
+    }
+
+    failures = [
+        '--foo X Y',
+    ]
+    successes = [
+        ['--foo X', NS({ foo: 'X', bar: true })],
+        ['X', NS({ foo: undefined, bar: true })],
+    ]
+    successes_when_not_required = [
+        ['', NS({ foo: undefined, bar: true })],
+    ]
+    usage_when_required = `\
+        usage: PROG [-h] (--foo FOO | bar)
+        `
+    usage_when_not_required = `\
+        usage: PROG [-h] [--foo FOO | bar]
+        `
+    help = `\
+
+        positional arguments:
+          bar
+
+        options:
+          -h, --help  show this help message and exit
+          --foo FOO
+        `
+}
+
 ;(new class TestMutuallyExclusiveNested extends MEMixin_TestCase {
 
     get_parser ({ required = undefined } = {}) {
@@ -3546,6 +3660,11 @@ function MEPBase (cls) {
 ;(new TestMutuallyExclusiveOptionalsAndPositionalsMixed()).run()
 ;(new class TestMutuallyExclusiveOptionalsAndPositionalsMixedParent extends
     MEPBase(TestMutuallyExclusiveOptionalsAndPositionalsMixed) {}).run()
+
+
+;(new TestMutuallyExclusiveOptionalOptional()).run()
+;(new TestMutuallyExclusiveOptionalWithDefault()).run()
+;(new TestMutuallyExclusivePositionalWithDefault()).run()
 
 
 // =================
