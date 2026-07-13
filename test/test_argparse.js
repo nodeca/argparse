@@ -2328,6 +2328,34 @@ class WFile {
         )
     }
 
+    test_abbreviation () {
+        const parser = new ErrorRaisingArgumentParser()
+        parser.add_argument('--foodle')
+        parser.add_argument('--foonly')
+        const subparsers = parser.add_subparsers()
+        const parser1 = subparsers.add_parser('bar')
+        parser1.add_argument('--fo')
+        parser1.add_argument('--foonew')
+
+        this.assertEqual(parser.parse_args(['--food', 'baz', 'bar']),
+                         NS({ foodle: 'baz', foonly: undefined,
+                             fo: undefined, foonew: undefined }))
+        this.assertEqual(parser.parse_args(['--foon', 'baz', 'bar']),
+                         NS({ foodle: undefined, foonly: 'baz',
+                             fo: undefined, foonew: undefined }))
+        this.assertArgumentParserError(() => parser.parse_args(['--fo', 'baz', 'bar']))
+        this.assertEqual(parser.parse_args(['bar', '--fo', 'baz']),
+                         NS({ foodle: undefined, foonly: undefined,
+                             fo: 'baz', foonew: undefined }))
+        this.assertEqual(parser.parse_args(['bar', '--foo', 'baz']),
+                         NS({ foodle: undefined, foonly: undefined,
+                             fo: undefined, foonew: 'baz' }))
+        this.assertEqual(parser.parse_args(['bar', '--foon', 'baz']),
+                         NS({ foodle: undefined, foonly: undefined,
+                             fo: undefined, foonew: 'baz' }))
+        this.assertArgumentParserError(() => parser.parse_args(['bar', '--food', 'baz']))
+    }
+
     test_parse_known_args_with_single_dash_option () {
         const parser = new ErrorRaisingArgumentParser()
         parser.add_argument('-k', '--known', { action: 'count', default: 0 })
