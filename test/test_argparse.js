@@ -103,6 +103,49 @@ class TestCase extends JSTestCase {
 }
 
 
+;(new class StdStreamTest extends TestCase {
+
+    test_skip_invalid_stderr () {
+        const parser = new argparse.ArgumentParser()
+        const old_stderr = Object.getOwnPropertyDescriptor(process, 'stderr')
+        const old_exit = Object.getOwnPropertyDescriptor(process, 'exit')
+        Object.defineProperty(process, 'stderr', { value: undefined })
+        Object.defineProperty(process, 'exit', { value: () => {} })
+        try {
+            parser.exit(0, 'foo')
+        } finally {
+            Object.defineProperty(process, 'stderr', old_stderr)
+            Object.defineProperty(process, 'exit', old_exit)
+        }
+    }
+
+    test_skip_invalid_stdout () {
+        const parser = new argparse.ArgumentParser()
+        for (const func of [
+            parser.print_usage.bind(parser),
+            parser.print_help.bind(parser),
+            parser.parse_args.bind(parser, ['-h']),
+        ]) {
+            const mocked_stderr = new StdIOBuffer()
+            const old_stdout = Object.getOwnPropertyDescriptor(process, 'stdout')
+            const old_stderr = Object.getOwnPropertyDescriptor(process, 'stderr')
+            const old_exit = Object.getOwnPropertyDescriptor(process, 'exit')
+            Object.defineProperty(process, 'stdout', { value: undefined })
+            Object.defineProperty(process, 'stderr', { value: mocked_stderr })
+            Object.defineProperty(process, 'exit', { value: () => {} })
+            try {
+                func()
+                this.assertRegex(mocked_stderr.getvalue(), /usage:/)
+            } finally {
+                Object.defineProperty(process, 'stdout', old_stdout)
+                Object.defineProperty(process, 'stderr', old_stderr)
+                Object.defineProperty(process, 'exit', old_exit)
+            }
+        }
+    }
+}).run()
+
+
 function TempDirMixin (cls) {
     return class TempDirMixin extends cls {
 
