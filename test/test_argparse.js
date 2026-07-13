@@ -10,7 +10,9 @@
 'use strict'
 
 const assert = require('assert')
+const child_process = require('child_process')
 const { describe, it, beforeEach, afterEach } = require('node:test')
+const { once } = require('events')
 const fs = require('fs')
 const os = require('os')
 const path = require('path')
@@ -586,7 +588,7 @@ class ParserTestCase extends TestCase {
         Sig('--badger', { action: 'store_true' }),
         Sig('--bat'),
     ]
-    failures = ['--bar', '--b', '--ba', '--b: 2', '--ba: 4', '--badge 5']
+    failures = ['--bar', '--b', '--ba', '--b=2', '--ba=4', '--badge 5']
     successes = [
         ['', NS({ badger: false, bat: undefined })],
         ['--bat X', NS({ badger: false, bat: 'X' })],
@@ -605,7 +607,7 @@ class ParserTestCase extends TestCase {
         Sig('--badger', { action: 'store_true' }),
         Sig('--ba'),
     ]
-    failures = ['--bar', '--b', '--ba', '--b: 2', '--badge 5']
+    failures = ['--bar', '--b', '--ba', '--b=2', '--badge 5']
     successes = [
         ['', NS({ badger: false, ba: undefined })],
         ['--ba X', NS({ badger: false, ba: 'X' })],
@@ -2099,12 +2101,18 @@ class FileTypeTestCase extends ParserTestCase {
                 ns[key] = eq_stdin
             } else if (ns[key] instanceof stream.Readable && ns[key].fd) {
                 const fd = ns[key].fd
-                ns[key] = new RFile(fs.readFileSync(fd, 'utf8'))
+                const file_name = path.basename(ns[key].path)
+                const contents = fs.readFileSync(fd, 'utf8')
                 fs.closeSync(fd)
+                ns[key] = new RFile(file_name, contents)
             } else if (ns[key] instanceof stream.Writable && ns[key].fd) {
                 const fd = ns[key].fd
-                ns[key] = new WFile()
+                const file_name = path.basename(ns[key].path)
+                const contents = 'Check that file is writable.'
+                fs.writeSync(fd, contents)
                 fs.closeSync(fd)
+                ns[key] = new WFile(file_name,
+                                    fs.readFileSync(ns[key].path, 'utf8'))
             }
         }
         return ns
@@ -2114,8 +2122,9 @@ class FileTypeTestCase extends ParserTestCase {
 const TempDirMixin_FileTypeTestCase = TempDirMixin(FileTypeTestCase)
 
 class RFile {
-    constructor (name) {
+    constructor (name, contents = name) {
         this.name = name
+        this.contents = contents
     }
 }
 
@@ -2165,7 +2174,9 @@ class RFile {
 
 
 class WFile {
-    constructor () {
+    constructor (name, contents = 'Check that file is writable.') {
+        this.name = name
+        this.contents = contents
     }
 }
 
@@ -2189,6 +2200,32 @@ class WFile {
         ['bar -x foo', NS({ x: new WFile('foo'), spam: new WFile('bar') })],
         ['-x - -', NS({ x: eq_stdout, spam: eq_stdout })],
     ]
+}).run()
+
+
+;(new class TestFileTypeStreams extends TempDirMixin(TestCase) {
+
+    async test_read_stream () {
+        fs.writeFileSync('readable', 'contents')
+        const file = FileType('r')('readable')
+        const chunks = []
+        const closed = once(file, 'close')
+        file.on('data', chunk => chunks.push(chunk))
+        await closed
+        this.assertEqual('readable', file.path)
+        this.assertEqual('contents', Buffer.concat(chunks).toString())
+        this.assertEqual(true, file.closed)
+    }
+
+    async test_write_stream () {
+        const file = FileType('w')('writable')
+        const closed = once(file, 'close')
+        file.end('contents')
+        await closed
+        this.assertEqual('writable', file.path)
+        this.assertEqual('contents', fs.readFileSync('writable', 'utf8'))
+        this.assertEqual(true, file.closed)
+    }
 }).run()
 
 
@@ -3398,11 +3435,10 @@ class WFile {
 
     test_parent_help () {
         const parents = [this.abcd_parent, this.wxyz_parent]
-        const parser = new ErrorRaisingArgumentParser({ parents })
+        const parser = new ErrorRaisingArgumentParser({ prog: 'PROG', parents })
         const parser_help = parser.format_help()
-        const progname = this.main_program
         this.assertEqual(parser_help, textwrap.dedent(sub(`\
-            usage: %s%s[-h] [-b B] [--d D] [--w W] [-y Y] a z
+            usage: PROG [-h] [-b B] [--d D] [--w W] [-y Y] a z
 
             positional arguments:
               a
@@ -3418,7 +3454,7 @@ class WFile {
 
             x:
               -y Y
-        `, progname, progname ? ' ' : '')))
+        `)))
     }
 
     test_groups_parents () {
@@ -3429,15 +3465,14 @@ class WFile {
         const m = parent.add_mutually_exclusive_group()
         m.add_argument('-y')
         m.add_argument('-z')
-        const parser = new ErrorRaisingArgumentParser({ parents: [parent] })
+        const parser = new ErrorRaisingArgumentParser({ prog: 'PROG', parents: [parent] })
 
         this.assertRaises(ArgumentParserError, () =>
             parser.parse_args(['-y', 'Y', '-z', 'Z']))
 
         const parser_help = parser.format_help()
-        const progname = this.main_program
         this.assertEqual(parser_help, textwrap.dedent(sub(`\
-            usage: %s%s[-h] [-w W] [-x X] [-y Y | -z Z]
+            usage: PROG [-h] [-w W] [-x X] [-y Y | -z Z]
 
             options:
               -h, --help  show this help message and exit
@@ -3449,7 +3484,7 @@ class WFile {
 
               -w W
               -x X
-        `, progname, progname ? ' ' : '')))
+        `)))
     }
 
     test_wrong_type_parents () {
@@ -6149,64 +6184,61 @@ VV VV VV
     test_version_missing_params () {
         this.assertTypeError('command', { action: 'version' })
     }
-/*
-    test_no_argument_no_const_actions() {
-        # options with zero arguments
-        for action in ['store_true', 'store_false', 'count']:
 
-            # const is always disallowed
-            this.assertTypeError('-x', const='foo', action=action)
-
-            # nargs is always disallowed
-            this.assertTypeError('-x', nargs='*', action=action)
-    }
-
-    test_required_const_actions() {
-        for action in ['store_const', 'append_const']:
+    test_no_argument_no_const_actions () {
+        // options with zero arguments
+        for (const action of ['store_true', 'store_false', 'count']) {
+            // const is always disallowed
+            this.assertTypeError('-x', { const: 'foo', action })
 
             // nargs is always disallowed
-            this.assertTypeError('-x', nargs='+', action=action)
+            this.assertTypeError('-x', { nargs: '*', action })
+        }
     }
 
-    test_parsers_action_missing_params() {
-        this.assertTypeError('command', action='parsers')
-        this.assertTypeError('command', action='parsers', prog='PROG')
-        this.assertTypeError('command', action='parsers',
-                             parser_class=argparse.ArgumentParser)
+    test_required_const_actions () {
+        for (const action of ['store_const', 'append_const']) {
+            // nargs is always disallowed
+            this.assertTypeError('-x', { nargs: '+', action })
+        }
     }
 
-    test_required_positional() {
-        this.assertTypeError('foo', required=True)
+    test_parsers_action_missing_params () {
+        this.assertTypeError('command', { action: 'parsers' })
+        this.assertTypeError('command', { action: 'parsers', prog: 'PROG' })
+        this.assertTypeError('command', {
+            action: 'parsers', parser_class: argparse.ArgumentParser
+        })
     }
 
-    test_user_defined_action() {
-
-        class Success(Exception):
-            pass
-
-        class Action(object):
-
-            def __init__(self,
-                         option_strings,
-                         dest,
-                         const,
-                         default,
-                         required=False):
-                if dest == 'spam':
-                    if const is Success:
-                        if default is Success:
-                            raise Success()
-
-            def __call__(self, *args, **kwargs):
-                pass
-
-        parser = argparse.ArgumentParser()
-        this.assertRaises(Success, parser.add_argument, '--spam',
-                          action=Action, default=Success, const=Success)
-        this.assertRaises(Success, parser.add_argument, 'spam',
-                          action=Action, default=Success, const=Success)
+    test_required_positional () {
+        this.assertTypeError('foo', { required: true })
     }
-*/
+
+    test_user_defined_action () {
+        class Success extends Error {}
+
+        class Action extends argparse.Action {
+            constructor (...args) {
+                super(...args)
+                if (this.dest === 'spam' &&
+                    this.const === Success &&
+                    this.default === Success) {
+                    throw new Success()
+                }
+            }
+
+            call () {}
+        }
+
+        const parser = argparse.ArgumentParser()
+        this.assertRaises(Success, () => parser.add_argument('--spam', {
+            action: Action, default: Success, const: Success
+        }))
+        this.assertRaises(Success, () => parser.add_argument('spam', {
+            action: Action, default: Success, const: Success
+        }))
+    }
 }).run()
 
 // ================================
@@ -6801,21 +6833,10 @@ VV VV VV
 
 ;(new class TestParseKnownArgs extends TestCase {
 
-    /* test_arguments_tuple() {
-        let parser = argparse.ArgumentParser()
-        parser.parse_args([])
-    } */
-
     test_arguments_list () {
         const parser = argparse.ArgumentParser()
         parser.parse_args([])
     }
-
-    /* test_arguments_tuple_positional() {
-        let parser = argparse.ArgumentParser()
-        parser.add_argument('x')
-        parser.parse_args(['x'])
-    } */
 
     test_arguments_list_positional () {
         const parser = argparse.ArgumentParser()
@@ -7371,8 +7392,43 @@ VV VV VV
 }).run()
 
 // ============================
-// from argparse import * tests
+// CommonJS public exports tests
 // ============================
+
+;(new class TestImportStar extends TestCase {
+
+    expected_exports = [
+        'Action',
+        'ArgumentDefaultsHelpFormatter',
+        'ArgumentError',
+        'ArgumentParser',
+        'ArgumentTypeError',
+        'BooleanOptionalAction',
+        'FileType',
+        'HelpFormatter',
+        'MetavarTypeHelpFormatter',
+        'Namespace',
+        'ONE_OR_MORE',
+        'OPTIONAL',
+        'PARSER',
+        'REMAINDER',
+        'RawDescriptionHelpFormatter',
+        'RawTextHelpFormatter',
+        'SUPPRESS',
+        'ZERO_OR_MORE',
+    ]
+
+    test () {
+        for (const name of this.expected_exports) {
+            assert(Object.hasOwn(argparse, name))
+        }
+    }
+
+    test_all_exports_everything () {
+        this.assertEqual(this.expected_exports, Object.keys(argparse).sort())
+    }
+}).run()
+
 
 ;(new class TestWrappingMetavar extends TestCase {
     force_not_colorized = new Set(['test_help_with_metavar'])
@@ -7617,6 +7673,44 @@ VV VV VV
         })
         this.assertRegex(cm.exception.message,
                          /no such file or directory.*no-such-file/i)
+    }
+}).run()
+
+
+// =========================
+// Default program name tests
+// =========================
+
+;(new class TestProgName extends TempDirMixin(TestCase) {
+
+    source = `\
+        const argparse = require(${JSON.stringify(require.resolve('../'))})
+        argparse.ArgumentParser().parse_args()
+    `
+
+    check_usage (expected, ...args) {
+        const result = child_process.spawnSync(process.execPath,
+                                                [...args, '-h'],
+                                                { encoding: 'utf8' })
+        this.assertEqual(0, result.status)
+        this.assertEqual('', result.stderr)
+        this.assertEqual(`usage: ${expected} [-h]`,
+                         result.stdout.split(/\r?\n/, 1)[0])
+    }
+
+    test_script () {
+        const script_name = path.join(this.temp_dir, 'example.js')
+        fs.writeFileSync(script_name, this.source)
+        this.check_usage(path.basename(script_name), script_name)
+    }
+
+    test_package () {
+        const package_name = path.join(this.temp_dir, 'package_entry')
+        fs.mkdirSync(package_name)
+        fs.writeFileSync(path.join(package_name, 'index.js'), this.source)
+        fs.writeFileSync(path.join(package_name, 'package.json'),
+                         JSON.stringify({ main: 'index.js' }))
+        this.check_usage(path.basename(package_name), package_name)
     }
 }).run()
 
