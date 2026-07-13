@@ -2388,6 +2388,18 @@ class WFile {
         )
     }
 
+    test_parse_known_args_to_class_namespace () {
+        class C {}
+        this.assertEqual(
+            this.parser.parse_known_args('0.5 1 b -w 7 -p'.split(' '), C),
+            [C, ['-p']]
+        )
+        this.assertEqual(C.foo, false)
+        this.assertEqual(C.bar, 0.5)
+        this.assertEqual(C.w, 7)
+        this.assertEqual(C.x, 'b')
+    }
+
     test_abbreviation () {
         const parser = new ErrorRaisingArgumentParser()
         parser.add_argument('--foodle')
