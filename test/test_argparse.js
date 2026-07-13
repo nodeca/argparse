@@ -2808,6 +2808,33 @@ class WFile {
             `))
     }
 
+    assert_bad_help (context_type, func, ...args) {
+        const cm = this.assertRaises(TypeError, () => func(...args))
+        this.assertRegex(cm.exception.message, /badly formed help string/)
+        assert(cm.exception.cause instanceof context_type)
+    }
+
+    test_invalid_subparsers_help () {
+        let parser = new ErrorRaisingArgumentParser({ prog: 'PROG' })
+        this.assert_bad_help(TypeError, parser.add_subparsers.bind(parser),
+            { help: '%Y-%m-%d' })
+        parser = new ErrorRaisingArgumentParser({ prog: 'PROG' })
+        this.assert_bad_help(TypeError, parser.add_subparsers.bind(parser),
+            { help: '%(spam)s' })
+        parser = new ErrorRaisingArgumentParser({ prog: 'PROG' })
+        this.assert_bad_help(TypeError, parser.add_subparsers.bind(parser),
+            { help: '%(prog)d' })
+    }
+
+    test_invalid_subparser_help () {
+        const parser = new ErrorRaisingArgumentParser({ prog: 'PROG' })
+        const subparsers = parser.add_subparsers()
+        const add_parser = subparsers.add_parser.bind(subparsers)
+        this.assert_bad_help(TypeError, add_parser, '1', { help: '%Y-%m-%d' })
+        this.assert_bad_help(TypeError, add_parser, '1', { help: '%(spam)s' })
+        this.assert_bad_help(TypeError, add_parser, '1', { help: '%(prog)d' })
+    }
+
     test_subparser_title_help () {
         const parser = new ErrorRaisingArgumentParser({ prog: 'PROG',
                                                       description: 'main description' })
@@ -5763,6 +5790,18 @@ VV VV VV
         this.assertValueError('foo', { action: 'baz' })
         this.assertValueError('--foo', { action: ['store', 'append'] })
         this.assertValueError('--foo', { action: 'store-true', errmsg: 'unknown action' })
+    }
+
+    test_invalid_help () {
+        this.assertValueError('--foo', {
+            help: '%Y-%m-%d', errmsg: 'badly formed help string'
+        })
+        this.assertValueError('--foo', {
+            help: '%(spam)s', errmsg: 'badly formed help string'
+        })
+        this.assertValueError('--foo', {
+            help: '%(prog)d', errmsg: 'badly formed help string'
+        })
     }
 
     test_no_argument_actions () {
