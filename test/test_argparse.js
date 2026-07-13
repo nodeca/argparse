@@ -473,15 +473,22 @@ class ParserTestCase extends TestCase {
     /* Test Optionals that partially match but are not subsets */
 
     argument_signatures = [Sig('-foobar'), Sig('-foorab')]
-    failures = ['-f', '-f a', '-fa', '-foa', '-foo', '-fo', '-foo b']
+    failures = ['-f', '-f a', '-fa', '-foa', '-foo', '-fo', '-foo b',
+                '-f=a', '-foo=b']
     successes = [
         ['', NS({ foobar: undefined, foorab: undefined })],
         ['-foob a', NS({ foobar: 'a', foorab: undefined })],
+        ['-foob=a', NS({ foobar: 'a', foorab: undefined })],
         ['-foor a', NS({ foobar: undefined, foorab: 'a' })],
+        ['-foor=a', NS({ foobar: undefined, foorab: 'a' })],
         ['-fooba a', NS({ foobar: 'a', foorab: undefined })],
+        ['-fooba=a', NS({ foobar: 'a', foorab: undefined })],
         ['-foora a', NS({ foobar: undefined, foorab: 'a' })],
+        ['-foora=a', NS({ foobar: undefined, foorab: 'a' })],
         ['-foobar a', NS({ foobar: 'a', foorab: undefined })],
+        ['-foobar=a', NS({ foobar: 'a', foorab: undefined })],
         ['-foorab a', NS({ foobar: undefined, foorab: 'a' })],
+        ['-foorab=a', NS({ foobar: undefined, foorab: 'a' })],
     ]
 }).run()
 
@@ -1003,7 +1010,9 @@ class ParserTestCase extends TestCase {
     successes = [
         ['', NS({ foo: undefined, foobaz: undefined, fooble: false })],
         ['--foo 7', NS({ foo: '7', foobaz: undefined, fooble: false })],
+        ['--foo=7', NS({ foo: '7', foobaz: undefined, fooble: false })],
         ['--fooba a', NS({ foo: undefined, foobaz: 'a', fooble: false })],
+        ['--fooba=a', NS({ foo: undefined, foobaz: 'a', fooble: false })],
         ['--foobl --foo g', NS({ foo: 'g', foobaz: undefined, fooble: true })],
     ]
 }).run()
