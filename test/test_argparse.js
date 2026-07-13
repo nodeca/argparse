@@ -5680,11 +5680,34 @@ VV VV VV
     }
 
     test_double_dash () {
-        const parser = argparse.ArgumentParser()
-        parser.add_argument('-f', '--foo', { nargs: '*' })
+        let parser = argparse.ArgumentParser({ exit_on_error: false })
+        parser.add_argument('-f', '--foo')
         parser.add_argument('bar', { nargs: '*' })
 
         let args = parser.parse_args(['--foo=--'])
+        this.assertEqual(NS({ foo: '--', bar: [] }), args)
+        let cm = this.assertRaises(argparse.ArgumentError,
+            () => parser.parse_args(['--foo', '--']))
+        this.assertRegex(cm.exception.message, /argument -f\/--foo: expected one argument/)
+        args = parser.parse_args(['-f--'])
+        this.assertEqual(NS({ foo: '--', bar: [] }), args)
+        cm = this.assertRaises(argparse.ArgumentError,
+            () => parser.parse_args(['-f', '--']))
+        this.assertRegex(cm.exception.message, /argument -f\/--foo: expected one argument/)
+        args = parser.parse_args(['--foo', 'a', '--', 'b', 'c'])
+        this.assertEqual(NS({ foo: 'a', bar: ['b', 'c'] }), args)
+        args = parser.parse_args(['a', 'b', '--foo', 'c'])
+        this.assertEqual(NS({ foo: 'c', bar: ['a', 'b'] }), args)
+        args = parser.parse_args(['a', '--', 'b', '--foo', 'c'])
+        this.assertEqual(NS({ foo: undefined, bar: ['a', 'b', '--foo', 'c'] }), args)
+        args = parser.parse_args(['a', '--', 'b', '--', 'c', '--foo', 'd'])
+        this.assertEqual(NS({ foo: undefined, bar: ['a', 'b', '--', 'c', '--foo', 'd'] }), args)
+
+        parser = argparse.ArgumentParser({ exit_on_error: false })
+        parser.add_argument('-f', '--foo', { nargs: '*' })
+        parser.add_argument('bar', { nargs: '*' })
+
+        args = parser.parse_args(['--foo=--'])
         this.assertEqual(NS({ foo: ['--'], bar: [] }), args)
         args = parser.parse_args(['--foo', '--'])
         this.assertEqual(NS({ foo: [], bar: [] }), args)
@@ -5694,6 +5717,42 @@ VV VV VV
         this.assertEqual(NS({ foo: [], bar: [] }), args)
         args = parser.parse_args(['--foo', 'a', 'b', '--', 'c', 'd'])
         this.assertEqual(NS({ foo: ['a', 'b'], bar: ['c', 'd'] }), args)
+        args = parser.parse_args(['a', 'b', '--foo', 'c', 'd'])
+        this.assertEqual(NS({ foo: ['c', 'd'], bar: ['a', 'b'] }), args)
+        args = parser.parse_args(['a', '--', 'b', '--foo', 'c', 'd'])
+        this.assertEqual(NS({ foo: undefined, bar: ['a', 'b', '--foo', 'c', 'd'] }), args)
+        let argv
+        ;[args, argv] = parser.parse_known_args(['a', 'b', '--foo', 'c', '--', 'd'])
+        this.assertEqual(NS({ foo: ['c'], bar: ['a', 'b'] }), args)
+        this.assertEqual(['--', 'd'], argv)
+
+        parser = argparse.ArgumentParser({ exit_on_error: false })
+        parser.add_argument('foo')
+        parser.add_argument('bar', { nargs: '*' })
+
+        args = parser.parse_args(['--', 'a', 'b', 'c'])
+        this.assertEqual(NS({ foo: 'a', bar: ['b', 'c'] }), args)
+        args = parser.parse_args(['a', '--', 'b', 'c'])
+        this.assertEqual(NS({ foo: 'a', bar: ['b', 'c'] }), args)
+        args = parser.parse_args(['a', 'b', '--', 'c'])
+        this.assertEqual(NS({ foo: 'a', bar: ['b', 'c'] }), args)
+        args = parser.parse_args(['a', '--', 'b', '--', 'c'])
+        this.assertEqual(NS({ foo: 'a', bar: ['b', '--', 'c'] }), args)
+        args = parser.parse_args(['--', '--', 'a', '--', 'b', 'c'])
+        this.assertEqual(NS({ foo: '--', bar: ['a', '--', 'b', 'c'] }), args)
+
+        parser = argparse.ArgumentParser({ exit_on_error: false })
+        parser.add_argument('foo')
+        parser.add_argument('bar', { nargs: argparse.REMAINDER })
+
+        args = parser.parse_args(['--', 'a', 'b', 'c'])
+        this.assertEqual(NS({ foo: 'a', bar: ['b', 'c'] }), args)
+        args = parser.parse_args(['a', '--', 'b', 'c'])
+        this.assertEqual(NS({ foo: 'a', bar: ['b', 'c'] }), args)
+        args = parser.parse_args(['a', 'b', '--', 'c'])
+        this.assertEqual(NS({ foo: 'a', bar: ['b', '--', 'c'] }), args)
+        args = parser.parse_args(['a', '--', 'b', '--', 'c'])
+        this.assertEqual(NS({ foo: 'a', bar: ['b', '--', 'c'] }), args)
     }
 }).run()
 
