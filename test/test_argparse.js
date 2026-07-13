@@ -3279,7 +3279,7 @@ class TestMutuallyExclusiveOptionalAndPositional extends MEMixin_TestCase {
         const group = parser.add_mutually_exclusive_group({ required })
         group.add_argument('--foo', { action: 'store_true', help: 'FOO' })
         group.add_argument('--spam', { help: 'SPAM' })
-        group.add_argument('badger', { nargs: '*', default: 'X', help: 'BADGER' })
+        group.add_argument('badger', { nargs: '*', help: 'BADGER' })
         return parser
     }
 
@@ -3291,13 +3291,13 @@ class TestMutuallyExclusiveOptionalAndPositional extends MEMixin_TestCase {
         '--foo X Y',
     ]
     successes = [
-        ['--foo', NS({ foo: true, spam: undefined, badger: 'X' })],
-        ['--spam S', NS({ foo: false, spam: 'S', badger: 'X' })],
+        ['--foo', NS({ foo: true, spam: undefined, badger: [] })],
+        ['--spam S', NS({ foo: false, spam: 'S', badger: [] })],
         ['X', NS({ foo: false, spam: undefined, badger: ['X'] })],
         ['X Y Z', NS({ foo: false, spam: undefined, badger: ['X', 'Y', 'Z'] })],
     ]
     successes_when_not_required = [
-        ['', NS({ foo: false, spam: undefined, badger: 'X' })],
+        ['', NS({ foo: false, spam: undefined, badger: [] })],
     ]
 
     usage_when_not_required = `\
@@ -6359,7 +6359,37 @@ VV VV VV
             this.parser.parse_args([])
         })
         this.assertRegex(cm.exception.message,
-                         /the following arguments are required: bar, baz/)
+                         /the following arguments are required: bar, baz$/)
+    }
+
+    test_required_args_optional () {
+        this.parser.add_argument('bar')
+        this.parser.add_argument('baz', { nargs: '?' })
+        const cm = this.assertRaises(argparse.ArgumentError, () => {
+            this.parser.parse_args([])
+        })
+        this.assertRegex(cm.exception.message,
+                         /the following arguments are required: bar$/)
+    }
+
+    test_required_args_zero_or_more () {
+        this.parser.add_argument('bar')
+        this.parser.add_argument('baz', { nargs: '*' })
+        const cm = this.assertRaises(argparse.ArgumentError, () => {
+            this.parser.parse_args([])
+        })
+        this.assertRegex(cm.exception.message,
+                         /the following arguments are required: bar$/)
+    }
+
+    test_required_args_remainder () {
+        this.parser.add_argument('bar')
+        this.parser.add_argument('baz', { nargs: '...' })
+        const cm = this.assertRaises(argparse.ArgumentError, () => {
+            this.parser.parse_args([])
+        })
+        this.assertRegex(cm.exception.message,
+                         /the following arguments are required: bar$/)
     }
 
     test_required_mutually_exclusive_args () {
