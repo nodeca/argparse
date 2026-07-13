@@ -51,7 +51,7 @@ Process some integers.
 positional arguments:
   N           an integer for the accumulator
 
-optional arguments:
+options:
   -h, --help  show this help message and exit
   --sum       sum the integers (default: find the max)
 ```
