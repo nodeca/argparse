@@ -5821,8 +5821,11 @@ VV VV VV
                 this.assertTypeError('-x', { action, ...attrs })
                 this.assertTypeError('x', { action, ...attrs })
             }
+            this.assertValueError('x', { action,
+                errmsg: `action '${action}' is not valid for positional arguments` })
             this.assertTypeError('-x', { action, nargs: 0 })
-            this.assertTypeError('x', { action, nargs: 0 })
+            this.assertValueError('x', { action, nargs: 0,
+                errmsg: 'nargs for positionals must be != 0' })
         }
     }
 
@@ -5832,7 +5835,8 @@ VV VV VV
             const action_name = action === 'extend' ? 'append' : action
             const errmsg = `nargs for ${action_name} actions must be != 0`
             this.assertValueError('-x', { nargs: 0, action, errmsg })
-            this.assertValueError('spam', { nargs: 0, action, errmsg })
+            this.assertValueError('spam', { nargs: 0, action,
+                errmsg: 'nargs for positionals must be != 0' })
 
             // const is disallowed with non-optional arguments
             for (const nargs of [1, '*', '+']) {
