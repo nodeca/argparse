@@ -53,3 +53,8 @@ Override `Action.call` instead of `Action.__call__` in inherited classes
 ## 7. No `gettext` support
 
 All error messages are hardcoded.
+
+## 8. No `pickle` support
+
+Python's `ArgumentParser` can be serialized with `pickle`. JavaScript has no
+equivalent serialization mechanism, so this behavior is not supported.
