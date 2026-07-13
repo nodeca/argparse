@@ -5818,10 +5818,66 @@ VV VV VV
 }).run()
 
 
-;(new class TestHelpUsageLongSubparserCommand extends TestCase {
-    /* Test that subparser commands are formatted correctly in help */
+;(new class TestHelpCustomHelpFormatter extends TestCase {
+    test_custom_formatter_function () {
+        function custom_formatter (options) {
+            return argparse.RawTextHelpFormatter({
+                ...options,
+                indent_increment: 5
+            })
+        }
 
-    test_parent_help () {
+        const parser = argparse.ArgumentParser({
+            prog: 'PROG',
+            prefix_chars: '-+',
+            formatter_class: custom_formatter
+        })
+        parser.add_argument('+f', '++foo', { help: 'foo help' })
+        parser.add_argument('spam', { help: 'spam help' })
+
+        const parser_help = parser.format_help()
+        this.assertEqual(parser_help, textwrap.dedent(`\
+            usage: PROG [-h] [+f FOO] spam
+
+            positional arguments:
+                 spam           spam help
+
+            options:
+                 -h, --help     show this help message and exit
+                 +f, ++foo FOO  foo help
+        `))
+    }
+
+    test_custom_formatter_class () {
+        class CustomFormatter extends argparse.RawTextHelpFormatter {
+            constructor (options) {
+                super({ ...options, indent_increment: 5 })
+            }
+        }
+
+        const parser = argparse.ArgumentParser({
+            prog: 'PROG',
+            prefix_chars: '-+',
+            formatter_class: CustomFormatter
+        })
+        parser.add_argument('+f', '++foo', { help: 'foo help' })
+        parser.add_argument('spam', { help: 'spam help' })
+
+        const parser_help = parser.format_help()
+        this.assertEqual(parser_help, textwrap.dedent(`\
+            usage: PROG [-h] [+f FOO] spam
+
+            positional arguments:
+                 spam           spam help
+
+            options:
+                 -h, --help     show this help message and exit
+                 +f, ++foo FOO  foo help
+        `))
+    }
+
+    test_usage_long_subparser_command () {
+        /* Test that subparser commands are formatted correctly in help */
         function custom_formatter (options) {
             return argparse.RawTextHelpFormatter({
                 ...options,
