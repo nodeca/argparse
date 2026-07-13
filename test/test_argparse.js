@@ -3182,6 +3182,13 @@ class WFile {
         // the parser's default prefix so it's a good test
         this.assertGroupPrefixCharsWarning('-')
     }
+
+    test_nested_argument_group () {
+        const parser = argparse.ArgumentParser()
+        const group = parser.add_argument_group()
+        const cm = this.assertRaises(TypeError, () => group.add_argument_group())
+        this.assertRegex(String(cm.exception), /argument groups cannot be nested/)
+    }
 }).run()
 
 
@@ -3510,6 +3517,16 @@ class TestMutuallyExclusiveGroupErrors extends TestCase {
         const parser = argparse.ArgumentParser()
         parser.add_mutually_exclusive_group()
         this.assertRaises(TypeError, () => parser.parse_args(['-h']))
+    }
+
+    test_nested_mutex_groups () {
+        const parser = argparse.ArgumentParser({ prog: 'PROG' })
+        const group = parser.add_mutually_exclusive_group()
+        group.add_argument('--spam')
+        const cm = this.assertRaises(TypeError, () =>
+            group.add_mutually_exclusive_group())
+        this.assertRegex(String(cm.exception),
+            /mutually exclusive groups cannot be nested/)
     }
 }
 
@@ -4026,53 +4043,6 @@ class TestMutuallyExclusivePositionalWithDefault extends MEMixin_TestCase {
           --foo FOO
         `
 }
-
-;(new class TestMutuallyExclusiveNested extends MEMixin_TestCase {
-
-    // Nesting mutually exclusive groups is an undocumented feature
-    // that came about by accident through inheritance and has been
-    // the source of many bugs. It is deprecated and this test should
-    // eventually be removed along with it.
-
-    get_parser ({ required = undefined } = {}) {
-        const parser = new ErrorRaisingArgumentParser({ prog: 'PROG' })
-        const group = parser.add_mutually_exclusive_group({ required })
-        group.add_argument('-a')
-        group.add_argument('-b')
-        const group2 = group.add_mutually_exclusive_group({ required })
-        group2.add_argument('-c')
-        group2.add_argument('-d')
-        const group3 = group2.add_mutually_exclusive_group({ required })
-        group3.add_argument('-e')
-        group3.add_argument('-f')
-        return parser
-    }
-
-    usage_when_not_required = `\
-        usage: PROG [-h] [-a A | -b B | [-c C | -d D | [-e E | -f F]]]
-        `
-    usage_when_required = `\
-        usage: PROG [-h] (-a A | -b B | (-c C | -d D | (-e E | -f F)))
-        `
-
-    help = `\
-
-        options:
-          -h, --help  show this help message and exit
-          -a A
-          -b B
-          -c C
-          -d D
-          -e E
-          -f F
-        `
-
-    // We are only interested in testing the behavior of format_usage().
-    test_failures_when_not_required = undefined
-    test_failures_when_required = undefined
-    test_successes_when_not_required = undefined
-    test_successes_when_required = undefined
-}).run()
 
 // =================================================
 // Mutually exclusive group in parent parser tests
@@ -5185,24 +5155,6 @@ VV VV VV
             nargs: '?', const: 'default', metavar: 'NAME', help: argparse.SUPPRESS
         })
         const usage = 'usage: PROG [-h]\n'
-        this.assertEqual(parser.format_usage(), usage)
-    }
-
-    test_nested_mutex_groups () {
-        const parser = argparse.ArgumentParser({ prog: 'PROG' })
-        const g = parser.add_mutually_exclusive_group()
-        g.add_argument('--spam')
-        const gg = g.add_mutually_exclusive_group()
-        gg.add_argument('--hax')
-        gg.add_argument('--hox', { help: argparse.SUPPRESS })
-        gg.add_argument('--hex')
-        g.add_argument('--eggs')
-        parser.add_argument('--num')
-
-        const usage = textwrap.dedent(`\
-        usage: PROG [-h] [--spam SPAM | [--hax HAX | --hex HEX] | --eggs EGGS]
-                    [--num NUM]
-        `)
         this.assertEqual(parser.format_usage(), usage)
     }
 
