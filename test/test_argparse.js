@@ -3145,6 +3145,30 @@ class TestMutuallyExclusiveGroupErrors extends TestCase {
         this.assertEqual(parser.format_help(), textwrap.dedent(expected))
     }
 
+    test_optional_order () {
+        let parser = new ErrorRaisingArgumentParser({ prog: 'PROG' })
+        let group = parser.add_mutually_exclusive_group({ required: true })
+        group.add_argument('--foo')
+        group.add_argument('bar', { nargs: '?' })
+        const expected = `\
+            usage: PROG [-h] (--foo FOO | bar)
+
+            positional arguments:
+              bar
+
+            options:
+              -h, --help  show this help message and exit
+              --foo FOO
+              `
+        this.assertEqual(parser.format_help(), textwrap.dedent(expected))
+
+        parser = new ErrorRaisingArgumentParser({ prog: 'PROG' })
+        group = parser.add_mutually_exclusive_group({ required: true })
+        group.add_argument('bar', { nargs: '?' })
+        group.add_argument('--foo')
+        this.assertEqual(parser.format_help(), textwrap.dedent(expected))
+    }
+
     test_empty_group () {
         // See issue 26952
         const parser = argparse.ArgumentParser()
