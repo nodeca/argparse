@@ -1045,6 +1045,24 @@ class ParserTestCase extends TestCase {
 }).run()
 
 
+;(new class TestOptionalsDisallowSingleDashLongAbbreviation extends ParserTestCase {
+    /* Do not allow abbreviations of long options at all */
+
+    parser_signature = Sig({ allow_abbrev: false })
+    argument_signatures = [
+        Sig('-foo'),
+        Sig('-foodle', { action: 'store_true' }),
+        Sig('-foonly'),
+    ]
+    failures = ['-foon 3', '-food', '-food -foo 2']
+    successes = [
+        ['', NS({ foo: undefined, foodle: false, foonly: undefined })],
+        ['-foo 3', NS({ foo: '3', foodle: false, foonly: undefined })],
+        ['-foonly 7 -foodle -foo 2', NS({ foo: '2', foodle: true, foonly: '7' })],
+    ]
+}).run()
+
+
 ;(new class TestDisallowLongAbbreviationAllowsShortGrouping extends ParserTestCase {
     /* Do not allow abbreviations of long options at all */
 
