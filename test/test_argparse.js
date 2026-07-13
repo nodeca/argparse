@@ -5056,6 +5056,20 @@ VV VV VV
               --spam NEW_SPAM
             `))
     }
+
+    test_subparser_conflict () {
+        const parser = argparse.ArgumentParser()
+        const sp = parser.add_subparsers()
+        sp.add_parser('fullname', { aliases: ['alias'] })
+        this.assertRaises(argparse.ArgumentError,
+                          () => sp.add_parser('fullname'))
+        this.assertRaises(argparse.ArgumentError,
+                          () => sp.add_parser('alias'))
+        this.assertRaises(argparse.ArgumentError,
+                          () => sp.add_parser('other', { aliases: ['fullname'] }))
+        this.assertRaises(argparse.ArgumentError,
+                          () => sp.add_parser('other', { aliases: ['alias'] }))
+    }
 }).run()
 
 
