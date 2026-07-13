@@ -3169,6 +3169,31 @@ class TestMutuallyExclusiveGroupErrors extends TestCase {
         this.assertEqual(parser.format_help(), textwrap.dedent(expected))
     }
 
+    test_help_subparser_all_mutually_exclusive_group_members_suppressed () {
+        const parser = new ErrorRaisingArgumentParser({ prog: 'PROG' })
+        const commands = parser.add_subparsers({ title: 'commands', dest: 'command' })
+        const cmd_foo = commands.add_parser('foo')
+        const group = cmd_foo.add_mutually_exclusive_group()
+        group.add_argument('--verbose', {
+            action: 'store_true', help: argparse.SUPPRESS
+        })
+        group.add_argument('--quiet', {
+            action: 'store_true', help: argparse.SUPPRESS
+        })
+        const longopt = '--' + 'long'.repeat(32)
+        const longmeta = 'LONG'.repeat(32)
+        cmd_foo.add_argument(longopt)
+        const expected = `\
+            usage: PROG foo [-h]
+                            [${longopt} ${longmeta}]
+
+            options:
+              -h, --help            show this help message and exit
+              ${longopt} ${longmeta}
+              `
+        this.assertEqual(cmd_foo.format_help(), textwrap.dedent(expected))
+    }
+
     test_empty_group () {
         // See issue 26952
         const parser = argparse.ArgumentParser()
