@@ -10,6 +10,7 @@
     "args"
   ],
   "main": "lib/argparse.js",
+  "types": "lib/argparse.d.ts",
   "files": [
     "lib/"
   ],
