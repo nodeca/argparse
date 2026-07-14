@@ -6,6 +6,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [3.0.0] - 2026-07-14
+### Added
+- Colored help output, enabled automatically on supported terminals and
+  configurable with the `color` option.
+- Suggestions for mistyped choices and subcommands via `suggest_on_error`.
+- Deprecation warnings for arguments and subcommands marked with `deprecated`.
+- Built-in TypeScript declarations.
+
+### Changed
+- Updated the Python `argparse` port from 3.9.0 to 3.14.6.
+
+### Removed
+- Removed the deprecated v1 compatibility API and undocumented `type: 'auto'`.
+  See the [migration guide](./doc/migrate_v2_to_v3.md) for replacements.
+
+
 ## [2.0.1] - 2020-08-29
 ### Fixed
 - Fix issue with `process.argv` when used with interpreters (`coffee`, `ts-node`, etc.), #150.
@@ -184,6 +200,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - First release.
 
 
+[3.0.0]: https://github.com/nodeca/argparse/compare/2.0.1...3.0.0
 [2.0.1]: https://github.com/nodeca/argparse/compare/2.0.0...2.0.1
 [2.0.0]: https://github.com/nodeca/argparse/compare/1.0.10...2.0.0
 [1.0.10]: https://github.com/nodeca/argparse/compare/1.0.9...1.0.10
