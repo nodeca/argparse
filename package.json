@@ -14,7 +14,7 @@
   "files": [
     "lib/"
   ],
-  "license": "Python-2.0",
+  "license": "PSF-2.0",
   "repository": "nodeca/argparse",
   "funding": [
     {
