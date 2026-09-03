@@ -2468,6 +2468,19 @@ class WFile {
     ]
 }).run()
 
+;(new class TestActionExtendDefaultNargs extends ParserTestCase {
+    /* Without nargs, a single value is a string, and extend() spreads it
+     * character by character, same as Python's list.extend() on a str */
+
+    argument_signatures = [
+        Sig('--foo', { action: 'extend' }),
+    ]
+    failures = []
+    successes = [
+        ['--foo abc', NS({ foo: ['a', 'b', 'c'] })],
+    ]
+}).run()
+
 ;(new class TestNegativeNumber extends ParserTestCase {
     /* Test parsing negative numbers */
 
