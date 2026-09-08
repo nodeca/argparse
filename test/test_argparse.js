@@ -7961,3 +7961,16 @@ VV VV VV
         assert(!demo_parser.format_help().includes('\x1b['))
     }
 }).run()
+
+describe('blank float arguments', () => {
+    it('rejects empty and whitespace-only values', () => {
+        const parser = new argparse.ArgumentParser({ exit_on_error: false })
+        parser.add_argument('--float', { type: 'float' })
+        for (const value of ['', '   ', '\t\n']) {
+            assert.throws(() => parser.parse_args(['--float', value]), argparse.ArgumentError)
+        }
+        for (const value of ['0', ' 0 ', '\t1.5\n']) {
+            assert.strictEqual(parser.parse_args(['--float', value]).float, Number(value))
+        }
+    })
+})
