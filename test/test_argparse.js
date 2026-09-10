@@ -7685,7 +7685,7 @@ VV VV VV
 
     source = `\
         const argparse = require(${JSON.stringify(require.resolve('../'))})
-        argparse.ArgumentParser().parse_args()
+        argparse.ArgumentParser({ color: false }).parse_args()
     `
 
     check_usage (expected, ...args) {
