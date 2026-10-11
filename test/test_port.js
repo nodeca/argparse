@@ -81,3 +81,49 @@ for (const type of ['int', 'float']) {
         }
     })
 }
+
+// A Python destination named __proto__ is an ordinary namespace attribute.
+// The inherited JavaScript setter must not consume it or change the prototype.
+describe('prototype-named destinations', () => {
+    it('stores explicit values and defaults as own attributes', () => {
+        const parser = new argparse.ArgumentParser({ add_help: false })
+        const defaultValue = { value: 'default' }
+        parser.add_argument('--value', { dest: '__proto__', default: defaultValue })
+        const defaults = parser.parse_args([])
+        const explicit = parser.parse_args(['--value', 'parsed'])
+        assert.strictEqual(Object.getOwnPropertyDescriptor(defaults, '__proto__').value, defaultValue)
+        assert.strictEqual(Object.getOwnPropertyDescriptor(explicit, '__proto__').value, 'parsed')
+        assert.ok(Object.prototype.hasOwnProperty.call(explicit, '__proto__'))
+        assert.strictEqual(Object.getPrototypeOf(defaults), argparse.Namespace.prototype)
+        assert.strictEqual(Object.getPrototypeOf(explicit), argparse.Namespace.prototype)
+    })
+
+    it('supports append and count actions without changing a supplied namespace', () => {
+        for (const [action, expected] of [['append', ['first', 'second']], ['count', 2]]) {
+            const parser = new argparse.ArgumentParser({ add_help: false })
+            parser.add_argument('--value', { dest: '__proto__', action })
+            const namespace = {}
+            const args = action === 'append'
+                ? ['--value', 'first', '--value', 'second']
+                : ['--value', '--value']
+            assert.strictEqual(parser.parse_args(args, namespace), namespace)
+            assert.deepStrictEqual(Object.getOwnPropertyDescriptor(namespace, '__proto__').value, expected)
+            assert.strictEqual(Object.getPrototypeOf(namespace), Object.prototype)
+        }
+    })
+
+    it('keeps null and boxed primitive namespace source behavior', () => {
+        assert.deepStrictEqual(Object.keys(new argparse.Namespace(null)), [])
+        assert.strictEqual(new argparse.Namespace('x')[0], 'x')
+    })
+
+    it('copies namespace values including enumerable symbols safely', () => {
+        const symbol = Symbol('value')
+        const options = { ['__proto__']: 'initial', [symbol]: 42 }
+        const namespace = new argparse.Namespace(options)
+        assert.strictEqual(Object.getOwnPropertyDescriptor(namespace, '__proto__').value, 'initial')
+        assert.strictEqual(namespace[symbol], 42)
+        assert.strictEqual(Object.getPrototypeOf(namespace), argparse.Namespace.prototype)
+        assert.deepStrictEqual(Object.keys(namespace), ['__proto__'])
+    })
+})
