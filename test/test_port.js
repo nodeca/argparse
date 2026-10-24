@@ -6,6 +6,7 @@
 const assert = require('assert')
 const { describe, it } = require('node:test')
 const argparse = require('../')
+const textwrap = require('../lib/textwrap')
 
 
 // Number conversion: CPython calls the int() / float() builtins, the port
@@ -81,3 +82,37 @@ for (const type of ['int', 'float']) {
         }
     })
 }
+
+
+describe('UTF-16 line wrapping', () => {
+    for (const [text, width, expected] of [
+        ['😀😀😀', 3, ['😀', '😀', '😀']],
+        ['a😀😀b', 2, ['a', '😀', '😀', 'b']],
+        ['😀😀', 1, ['😀', '😀']],
+        ['😀😀', 1.5, ['😀', '😀']],
+        ['ab 😀😀😀', 4, ['ab', '😀😀', '😀']],
+        ['a😀b', 3, ['a😀', 'b']],
+        ['abcd', 2, ['ab', 'cd']]
+    ]) {
+        it(`keeps characters intact at width ${width}: ${text}`, () => {
+            assert.deepStrictEqual(textwrap.wrap(text, { width }), expected)
+        })
+    }
+
+    it('keeps a help description well formed', () => {
+        class NarrowFormatter extends argparse.HelpFormatter {
+            constructor (options) {
+                super({ ...options, width: 23 })
+            }
+        }
+        const parser = new argparse.ArgumentParser({
+            prog: 'demo',
+            add_help: false,
+            color: false,
+            formatter_class: NarrowFormatter,
+            description: '😀'.repeat(20)
+        })
+        assert.strictEqual(parser.format_help(),
+            'usage: demo\n\n' + '😀'.repeat(11) + '\n' + '😀'.repeat(9) + '\n')
+    })
+})
